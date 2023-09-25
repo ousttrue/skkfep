@@ -317,7 +317,7 @@ chld_changed()
 		Exit(0);
 
 #else /* not AIX */
-	union wait statusp;
+	int statusp;
 
 	reset_tty_without_close();
 #ifndef NO_SUSPEND

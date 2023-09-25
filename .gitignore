@@ -1,0 +1,6 @@
+*.o
+/prefix/
+
+/genMakefile
+/jc
+/skkfep
