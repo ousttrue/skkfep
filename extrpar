@@ -1,0 +1,4 @@
+BEGIN	{p=0}
+/#if makefile_parameter/ {p=1; next}
+/#endif/	{p=0; next}
+p==1	{print}

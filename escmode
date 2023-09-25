@@ -1,0 +1,23 @@
+#!/bin/sh
+if [ ${SKKFEP_PID:-no} = no ]; then
+	echo SKKFEP is not active.
+	exit 1
+fi
+if [ $# = 0 ]; then
+	MODE=-INT
+else
+	case $1 in
+	[vV]*)
+		MODE=-USR1
+		;;
+	[Ee]*)
+		MODE=-USR2
+		;;
+	*)
+		echo 'usage: escmode [vi|emacs]'
+		exit 1
+		;;
+	esac
+fi
+kill $MODE $SKKFEP_PID
+

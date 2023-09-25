@@ -1,0 +1,83 @@
+#!/bin/sh
+CSH=1
+case $* in
+-u)
+	CSH=
+	;;
+esac
+if [ -z "${SKKFEP_PID}" ]; then
+	if [ -n "$CSH" ] ; then
+		resize -c
+	else
+		resize -u
+	fi
+	exit 0
+fi
+SIG=WINCH
+if [ -z "`kill -list | grep WINCH`" ]; then
+	SIG=USR1
+fi
+
+if [ -n "$CSH" ]; then
+	resize -c | \
+	awk '/LINES/ { \
+		for (i = 3; i <= NF; i++) t = t $i; \
+		for (i=1;substr(t,i,1)!~/[0-9]/;i++); \
+		for (j=i;substr(t,i,1)~/[0-9]/;i++); \
+		print $1,$2,substr(t,1,j-1) substr(t,j,i-j)-1 substr(t,i); \
+		next } \
+	     /TERMCAP/ { \
+		for (i = 3; i <= NF; i++) t = t $i; \
+		i=1;\
+		while (substr(t,i,1) != ":") i++; \
+		i++; \
+		while (i<length(t)) { \
+			if (substr(t,i,2)=="li") { \
+				p=substr(t,1,i+2); \
+				j = i; \
+				while (substr(t,j,1)!=":") j++; \
+				q=substr(t,i+3,j-i-3)-1; \
+				r=substr(t,j); \
+				print $1,$2,p q r; \
+				next \
+			} \
+			else { \
+				while (substr(t,i,1)!=":")i++; \
+				i++ \
+			}\
+		} \
+	     } \
+	     { print }'
+else
+	resize -u | \
+	awk '/^LINES=/ { \
+		for (i=7;substr($1,i,1)!~/[0-9]/;i++); \
+		for (j=i;substr($1,i,1)~/[0-9]/;i++); \
+		print "LINES=" substr($1,7,j-7) substr($1,j,i-j)-1 substr($1,i); \
+		next } \
+	     /^TERMCAP=/ { \
+		i=9;\
+		while (substr($0,i,1) != ":") i++; \
+		i++; \
+		while (i<length($0)) { \
+			if (substr($0,i,2)=="li") { \
+				p=substr($0,1,i+2); \
+				j = i; \
+				while (substr($0,j,1)!=":") j++; \
+				q=substr($0,i+3,j-i-3)-1; \
+				r=substr($0,j); \
+				print p q r; \
+				next; \
+			} \
+			else { \
+				while (substr($0,i,1)!=":")i++; \
+				i++; \
+			}\
+		}; \
+	     } \
+	     { print }'
+fi
+
+kill -$SIG $SKKFEP_PID  > /dev/null
+
+exit 0

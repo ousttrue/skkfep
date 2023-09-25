@@ -1,0 +1,96 @@
+.TH skkfep 1N aito-product 
+.SH NAME 
+\fBskkfep\fR \- SKK-like Kana-to-Kanji FrontEnd Processor 
+.SH USAGE 
+.nf 
+\fBskkfep \fR[options]
+.fi 
+.SH DESCRIPTION 
+skkfep is a tool to input Kana and Kanji from the
+terminal.  It invokes user's default shell unless \fB-e\fR option is
+specified.  
+.SH OPTIONS 
+.TP 
+.BI -o kanjicode 
+Specifies the output
+kanji code.  
+.I kanjicode 
+is one of the following: 
+.RS 
+.IP \fBeuc\fR
+EUC (or DEC code).  
+.IP \fBsj\fR 
+MS-Kanji (Shift-JIS) code.  
+.IP \fBjis\fIIO\fR 
+JIS code. \fII\fR and \fIO\fR are characters which
+represent shift-in/out escape sequence respectively.  For shift-in,
+\fBA,@\fR(ESC $ @) or \fBB\fR(ESC $ B) can be specified; for
+shift-out, \fBH\fR(ESC ( H), \fBJ\fR(ESC ( J) or \fBB\fR(ESC ( B) can
+be specified.  
+.RE
+.TP 
+.BI -f kanjicode 
+Specifies the file IO kanji code.  
+.TP 
+.BI -udic \0dictionary 
+Specifies the user dictionary file.
+Default is $(HOME)/.skk-jisyo.  
+.TP 
+.B -bs 
+Toggle BS behavior when the
+file IO kanji code is JIS; the meaning of this option changes
+according to the configuration when this program was compiled. If you
+feel troublesome with the behavior of BS code, try this option.  
+.TP
+.BI -lm \0mode
+Choose the mode of learning words got from skk server. 
+\fImode\fR is one of following:
+.RS
+.IP \fBnone\fR or \fBoff\fR or \fB0\fR
+Do not learn the words at all.
+.IP \fBtemporal\fR or \fB1\fR
+Learn the words while the skkfep process is alive, but do not record
+the learned information.
+.IP \fBpermanent\fR or \fB2\fR
+Learn the words and record them on the user dictionary.
+.RE
+.TP
+.B -P
+Preserve the input kana string for kana-kanji conversion when
+the conversion fails.
+.TP
+.BI -k char 
+Specify the kanji toggle key. A control character is
+expressed as ^ followed by an alphabet (for example, ^t).  Default is
+^T.  
+.TP
+.B -esc
+With this option, ESC key becomes `RETUEN-TO-SKK-MODE' key.
+This option is useful for vi-users.
+.TP
+.B -rs
+Reverse status line.
+.TP 
+.BI -e \0command 
+Specify the program which is invoked by
+skkfep.  If this option is omitted, skkfep invokes the default shell.
+.SH ENVIRONMENT VARIABLE
+.TP
+.B SKKSERVER
+Specifies the host at which skkserv is running.
+.SH BUGS
+Word registration is not supported yet.
+.SH RELATED INFORMATION 
+.BR script (1) 
+.SH AUTHOR 
+Akinori Ito
+(aito@ecip.tohoku.ac.jp), Yutaka Kaneko (kaneko@rcais.tohoku.ac.jp)
+and Masatoshi Watanabe (watanabe@material.tohoku.ac.jp) 
+.SH COPYRIGHT NOTICE 
+(C) Copyright 1992,1993 by Akinori ITO, Yutaka KANEKO and
+Masatoshi WATANABE 
+.br 
+You may freely use, copy, modify and distribute
+this software.  This software is provided "as is" without warranty of
+any kind.  The entire risk as to the quality and performance of the
+program is with you. 

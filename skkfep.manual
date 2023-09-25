@@ -1,0 +1,132 @@
+
+
+
+skkfep(1N)        MISC. REFERENCE MANUAL PAGES         skkfep(1N)
+
+
+
+NAME
+     skkfep - SKK-like Kana-to-Kanji FrontEnd Processor
+
+USAGE
+     skkfep [options]
+
+DESCRIPTION
+     skkfep is a tool to input Kana and Kanji from the  terminal.
+     It  invokes  user's default shell unless -e option is speci-
+     fied.
+
+OPTIONS
+     -okanjicode
+          Specifies the output kanji code. kanjicode  is  one  of
+          the following:
+
+          euc  EUC (or DEC code).
+
+          sj   MS-Kanji (Shift-JIS) code.
+
+          jisIO
+               JIS code. I and O are characters  which  represent
+               shift-in/out  escape  sequence  respectively.  For
+               shift-in, A,@(ESC $ @) or B(ESC $ B) can be speci-
+               fied;  for  shift-out,  H(ESC  ( H), J(ESC ( J) or
+               B(ESC ( B) can be specified.
+
+     -fkanjicode
+          Specifies the file IO kanji code.
+
+     -udic dictionary
+          Specifies  the  user  dictionary  file.    Default   is
+          $(HOME)/.skk-jisyo.
+
+     -bs  Toggle BS behavior when the file IO kanji code is  JIS;
+          the  meaning  of  this  option changes according to the
+          configuration when this program was  compiled.  If  you
+          feel troublesome with the behavior of BS code, try this
+          option.
+
+     -lm mode
+          Choose the mode of learning words got from skk  server.
+          mode is one of following:
+
+          none Do not learn the words at all.
+
+          temporal
+               Learn the words while the skkfep process is alive,
+               but do not record the learned information.
+
+          permanent
+               Learn the  words  and  record  them  on  the  user
+
+
+
+Sun Release 4.1     Last change: aito-product                   1
+
+
+
+
+
+
+skkfep(1N)        MISC. REFERENCE MANUAL PAGES         skkfep(1N)
+
+
+
+               dictionary.
+
+     -P   Preserve the input kana string for  kana-kanji  conver-
+          sion when the conversion fails.
+
+     -kchar
+          Specify the kanji toggle key. A  control  character  is
+          expressed  as  ^  followed by an alphabet (for example,
+          ^t).  Default is ^T.
+
+     -esc With this option, ESC key becomes  `RETUEN-TO-SKK-MODE'
+          key.  This option is useful for vi-users.
+
+     -rs  Reverse status line.
+
+     -e command
+          Specify the program which is  invoked  by  skkfep.   If
+          this  option  is  omitted,  skkfep  invokes the default
+          shell.
+
+ENVIRONMENT VARIABLE
+     SKKSERVER
+          Specifies the host at which skkserv is running.
+
+BUGS
+     Word registration is not supported yet.
+
+RELATED INFORMATION
+     script(1)
+
+AUTHOR
+     Akinori   Ito   (aito@ecip.tohoku.ac.jp),   Yutaka    Kaneko
+     (kaneko@rcais.tohoku.ac.jp)     and    Masatoshi    Watanabe
+     (watanabe@material.tohoku.ac.jp)
+
+COPYRIGHT NOTICE
+     (C) Copyright 1992,1993 by Akinori ITO,  Yutaka  KANEKO  and
+     Masatoshi WATANABE
+     You  may  freely  use,  copy,  modify  and  distribute  this
+     software.   This  software  is provided "as is" without war-
+     ranty of any kind.  The entire risk as to  the  quality  and
+     performance of the program is with you.
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sun Release 4.1     Last change: aito-product                   2
+
+
+

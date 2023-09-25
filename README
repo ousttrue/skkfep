@@ -1,0 +1,74 @@
+(1) skkfep とは？
+
+skkfep は，NEmacs/Mule の漢字入力システムである SKK と似た，UNIX用
+の漢字入力フロントエンドです．skkfep を使えば，NEmacs/Mule を使って
+いない時にも SKK 風の日本語入力が実現できます．
+
+(2) 特徴と問題点
+
+	(a) SKK 風のかな・漢字入力
+	(b) SKK と個人辞書および辞書サーバを共有
+	(c) ただし単語登録モードはサポートされていない．
+
+(3) インストールと，注意すべき点
+
+インストール手順については，INSTALL の内容を参照してください．
+
+(4) おまけつき
+
+おまけとして，simpledic というプログラムが付属しています．これ
+は，ユーザ辞書の中から skkserv にある単語を削除するものです．
+ユーザ辞書が巨大になりすぎた時などにお使いください．
+
+また，画面の最下行をステータスラインとして使う人のために，resetsize
+というスクリプトを用意しました．これを resize の代りに使って
+
+	eval `resetsize [-c]`	(csh 使用時)
+	eval `resetsize -u`	(sh 使用時)
+
+を実行すると，skkfep 使用時には最下行をステータスラインとして
+resize します．また，skkfep を使用していない時には，単なる resize
+と同じ動作をします．
+
+version 0.83 から，"Emacs escape モード" "vi escapeモード" が
+つきました．これを切りかえるコマンドが escmode です．使用法は
+
+	escmode		通常モードへの切りかえ
+	escmode vi	vi エスケープモードへの切りかえ
+	escmode emacs	emacs エスケープモードへの切りかえ
+
+(5) 著作権と利用・配布条件について
+
+ (C) 1992-1997 by Akinori ITO, Yutaka KANEKO and Masatoshi WATANABE
+
+このソフトウェアは，作者の許可なく利用・改変・配布できます．な
+お，このソフトウェアの利用によって利用者が何らかの被害を受けた
+場合，作者はその責任を一切負いません．
+
+(6) 謝辞
+
+SKK の作者である，京都大学の佐藤雅彦教授(masahiko@kuis.kyoto-u.ac.jp)
+に感謝いたします．当然のことですが，SKK がなければ skkfep は誕生
+しなかったでしょう．
+また，バグ情報や改善の提案をお寄せくださった，以下の方々に感謝い
+たします：
+	黒木  玄さん＠東北大学(kuroki@math.tohoku.ac.jp)
+	三浦雅弘さん＠東芝(mmiura@pdcd.ilab.toshiba.co.jp)
+	笹部哲郎さん＠東京大学(tss@a.u-tokyo.ac.jp)
+	鈴木雅人さん＠東北大学(suz@sato.riec.tohoku.ac.jp)
+	広川一夫さん＠計算機科学研究所(hirokawa@rics.co.jp)
+	増井俊之さん＠シャープ(masui@shpcsl.sharp.co.jp)
+	堀内保秀さん＠松下(yhori@trl.mei.co.jp)
+	酒井清隆さん＠東京大学(ksakai@mtl.t.u-tokyo.ac.jp)
+	伊藤康史さん＠京都大学(yito@yajima.kuis.kyoto-u.ac.jp)
+	    同      ＠奈良先端科学技術大学院大学(yasufu-i@is.aist-nara.ac.jp)
+	滝本英二さん＠東北大学(t2@maruoka.ecei.tohoku.ac.jp)
+	小林修平さん＠東北大学(tba4kac@aix370.ecip.tohoku.ac.jp)
+	鯉江英隆さん (sgphk1@ipcs.shizuoka.ac.jp)
+	西塚博文さん＠ＮＥＣ中研(nishi@rpts.cl.nec.co.jp)
+	黒沢崇宏さん＠東京大学(kurosawa@sail.t.u-tokyo.ac.jp)
+
+(7) 苦情受け付け
+
+skkfep に関する苦情・お問い合わせ・提案・はげましのお便りなどは，
+伊藤彰則 (aito@ei5sun.yz.yamagata-u.ac.jp) までお願いします．

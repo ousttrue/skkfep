@@ -1,0 +1,29 @@
+CFLAGS=$(SYSINCLUDE) $(SYSDEFINE) $(DEFINE) $(OPTIMIZE)
+LIBS  =$(SYSLIBS) $(EXTRALIBS) -ltermcap
+
+OBJS=fep.o connsh.o readwrite.o terms.o stty.o keybind.o romkan.o etc.o\
+	kkconv.o keymap.o version.o
+SKKOBJS=skklib.o connserv.o
+SDICOBJS=simpledic.o
+SKKFEP=skkfep
+
+all: jc $(SKKFEP)
+
+romkan.c: romkan-org.c jc
+	./jc -`./jc -c romkan-org.c`P romkan-org.c > romkan.c
+
+jc: jc.o
+	$(CC) $(CFLAGS) -o jc jc.o
+
+$(SKKFEP): $(OBJS) $(SKKOBJS)
+	$(CC) $(CFLAGS) -o $(SKKFEP) $(OBJS) $(SKKOBJS) $(LIBS)
+
+simpledic: $(SDICOBJS) $(SKKOBJS)
+	$(CC) $(CFLAGS) -o simpledic $(SDICOBJS) $(SKKOBJS) $(LIBS)
+
+clean:
+	-rm -rf $(OBJS) $(SKKOBJS) $(SDICOBJS) romkan.c
+	-rm -rf *~ *.bak
+	-rm -rf core
+	-rm -rf jc jc.o
+	-rm -rf skkfep simpledic 

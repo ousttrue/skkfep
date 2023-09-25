@@ -1,0 +1,96 @@
+SKKFEP version 0.80 by Akinori ITO, Yutaka KANEKO and Masatoshi WATANABE
+	18 May, 1994
+
+・インストールのしかた．
+
+1. config.hを編集します．
+
+  まず，自分のシステムにあわせて，configs/*.h を include します．
+
+#include "configs/sun.h"
+
+	386bsd.h		386BSD
+	aix3_1.h		IBM RS6000 AIX 3.x
+	aix370.h		AIX/370 (誰も使わないかも)
+	hpux.h			HP-UX8.0
+	linux.h			Linux
+	luna.h			Luna UNIOS-B
+	mips.h			MIPS (または Ustation/S)
+	necews.h		NEC EWS4800 RISC
+	sony.h			NEWS-OS 4.x
+	sony33.h		NEWS-OS 3.x
+	sun.h			SunOS 4.x
+
+  次に，define を変更します．
+
+#define DEFAULT_KANAKEY	「SKK モード」と 「かなモード」の toggle に使うキー
+			を定義します．このキーは，同時に漢字入力開始・終了
+			キーとしても使われます．
+
+#define KUTOUTEN	句読点に「、。」を使うとき define します．
+			define しないと「，．」になります．
+
+#define KANJIBS		SHELL側の漢字コードを JIS にしているとき，漢字モード
+			の途中で backspace (C-h) を送出した場合に，その前後に
+			Shift-IN/OUT のコードを送出するかどうかを選択できる
+			ようにします．
+
+#define KANJIBS_DEFAULT	0	KANJIBS を指定したときのデフォルトの動作の指定．
+				例えば「あ^H^Hい」という入力に対して，
+				0 の場合  ^[$B$"^[(B^H^H^[$B$$^[(B
+				1 の場合  ^[$B$"^H^H$$^[(B
+				を送出します．
+
+#define PRESERVE_ON_FAILURE 1	漢字変換が失敗した時の動作を指定します．これ
+				が 0 の場合は候補が消えて「かなモード」に戻り，
+				1 の場合はベルが鳴って単語入力モードになりま
+				す．この動作は，-P オプションでも切りかえられ
+				ます．
+
+#define NET_LEARN_MODE LearnParmanent
+				skkserv から引いてきた単語を学習するかどうか
+				の指定をします．ここには，LearnOff/
+				LearnTemporal/LearnParmanent のいずれかを指定
+				します．この動作は，-lm オプションでも切りか
+				えられます．
+
+#define NATIVECODE euc	漢字コードを指定します．
+			ここには，euc,sj,jisAH,jisAJ,jisAB,jisBH,jisBJ,jisBB 
+			のいずれかを指定します．
+
+#define USER_DIC_NAME	ユーザ辞書の名前を指定します．辞書の位置は，
+			HOME からの相対位置です．
+#define SYSTEM_DIC_NAME	システム辞書の名前を指定します．define しな
+			ければ，システム辞書を使いません．
+                        ただし，これを define するとプロセスがかなり
+                        巨大になるので覚悟してください．
+#define SKK_SERVER_HOST	skkserv が走っているホストの名前を指定します．
+
+2. make します．
+3. skkfep というプログラムができるので，これを適当なディレクトリに
+   移動します．
+4. skkfep を動かす端末の termcap に，ss (show status), hs (hide
+   status), ts (to status), fs (from status) の4つのエントリがある
+   ことを確認してください．kterm の場合，
+
+	:ts=\E[?%i%dT:fs=\E[?F:ss=\E[?S:hs=\E[?H:
+
+   を termcap に追加すればOKです．terminfo の場合，
+
+	hs, tsl=\E[?%i%p1%dT, fsl=\E[?F, dsl=\E[?H,
+
+   を terminfo に追加してコンパイルします．これらのエントリがない場
+   合には，画面の最下行がステータス行になります．
+
+
+・使うための準備
+
+個人用辞書として，SKK 用の辞書を自分のホームディレクトリに .skk-jisyo
+という名前で作成しておきます．このとき，辞書の漢字コードは必ず EUC に
+しておいてください．
+また，どこかのホストで skkserv を動かしておきます．
+
+なお，skkserv と SKK辞書は，skkfep の配布パッケージに含まれていません．
+したがって，これらをお持ちでない方は，別途手に入れておく必要があります．
+ftp が利用できる場合は，ftp.kuis.kyoto-u.ac.jp から anonymous FTP に
+よって手にいれることができます．
