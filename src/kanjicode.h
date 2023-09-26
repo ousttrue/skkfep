@@ -1,4 +1,4 @@
-
+#pragma once
 #define	SIC_A	"\033$@"
 #define	SIC_B	"\033$B"
 #define	SOC_H	"\033(H"

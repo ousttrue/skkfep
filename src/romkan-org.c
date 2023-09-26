@@ -1,7 +1,6 @@
 #include "config.h"
 #include "fep.h"
 #include <ctype.h>
-#include "functions.h"
 
 #define VOW_A	0
 #define VOW_I	1

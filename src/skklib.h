@@ -6,58 +6,96 @@
 
 #ifndef SKKLIB_H
 #define SKKLIB_H
-
-#ifndef NO_MALLOC_H
 #include <malloc.h>
-#endif
+#include <time.h>
 
 /*
  * Structure for Dictionary
  */
-typedef struct DicList {
-	struct CandList *cand;
-	struct DicList *nextitem;
-	char kanaword[1];
-} *DicList;
+struct DicList
+{
+  struct CandList* cand;
+  struct DicList* nextitem;
+  char kanaword[1];
+};
 
 /*
  * Structure for Candidate
  */
-typedef struct CandList {
-	struct CandList *okuri;
-	struct CandList *nextcand;
-	struct CandList *prevcand;
-	struct DicList *dicitem;
-	char candword[1];
-} *CandList;
+struct CandList
+{
+  CandList* okuri;
+  CandList* nextcand;
+  CandList* prevcand;
+  DicList* dicitem;
+  char candword[1];
+};
 
-typedef struct Hash {
-	DicList h_index;
-	short length;
-	struct Hash *next;
-} *Hash;
+struct Hash
+{
+  DicList* h_index;
+  short length;
+  Hash* next;
+};
 
 #define HASHSIZE 256
 
-typedef struct Dictionary {
-	DicList dlist;
-	DicList okuriAriFirst;
-	DicList okuriNasiFirst;
-	Hash *dhash;
-	time_t mtime;
-} *Dictionary;
+struct Dictionary
+{
+  DicList* dlist;
+  DicList* okuriAriFirst;
+  DicList* okuriNasiFirst;
+  Hash** dhash;
+  time_t mtime;
+};
+extern Dictionary* UserDic;
 
-#define _NEW(type) ((type)malloc(sizeof(struct type)))
-#define _NEW2(type,add)	((type)malloc(sizeof(struct type)+(add)))
+Dictionary*
+openSKK(const char* dicname);
 
-Dictionary openSKK();
-CandList getCand(),getCandList();
-CandList deleteCand(),firstCand();
-CandList searchOkuri();
-DicList addNewItem();
+int
+isConjugate(char word[], int l);
+
+DicList*
+addNewItem(Dictionary dic, char* word, CandList clist);
+
+CandList*
+getCandList(FILE* f, DicList* ditem, int okuri);
+
+void
+closeSKK(Dictionary* dic, char* dicname);
+
+void
+mergeDictionary(Dictionary* dic, char* dicname);
 
 /* flags for printCand() */
 #define NOFREE_CAND 0
 #define FREE_CAND 1
+void
+printCand(CandList* cl, FILE* f, int fre);
+
+int
+hashVal(const char* s);
+
+void
+addHash(Hash** hash, DicList* ditem);
+
+CandList*
+getCand(Dictionary* dic, char* s);
+
+void
+selectCand(CandList** first, CandList* cand);
+
+void
+freeCand(CandList* cl);
+
+CandList*
+deleteCand(CandList* frlist, CandList* itlist);
+
+CandList*
+firstCand(CandList* l);
+
+CandList*
+searchOkuri(CandList* cl, char* okuri, CandList*** newfirst);
 
 #endif /* SKKLIB_H */

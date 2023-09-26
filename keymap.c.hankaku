@@ -1,6 +1,5 @@
 #include "config.h"
 #include "fep.h"
-#include "functions.h"
 #include "ctrlcode.h"
 
 SparseKeymapBody _NormalKeymap[] = {

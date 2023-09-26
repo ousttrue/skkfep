@@ -1,3 +1,3 @@
-project('skkfep', 'c', default_options: [])
+project('skkfep', 'cpp', 'c', default_options: [])
 subdir('src')
 
