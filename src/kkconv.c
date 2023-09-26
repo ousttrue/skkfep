@@ -354,15 +354,6 @@ char c;
 	else {
 		FirstCandEntry = NULL;
 	}
-#ifdef SYSTEM_DIC_NAME
-	if (CurrentCand == NULL) {
-	    CurrentCand = getCand(SystemDic,WordBuf);
-		if (CurrentCand && OkuriInput)
-			CurrentCand = searchOkuri(CurrentCand,
-						  OkuriBuf,
-						  &FirstCandEntry);
-	}
-#endif
 
 	l = WordBufLen;
 	if (OkuriInput)

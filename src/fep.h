@@ -186,10 +186,6 @@ EscapeBehavior CurrentEscapeBehavior, LastEscapeBehavior;
 
 extern
 Dictionary UserDic;
-#ifdef SYSTEM_DIC_NAME
-extern
-Dictionary SystemDic;
-#endif
 
 #define MAX_CONSO 5
 extern char LastConso[MAX_CONSO];  /* LastConso[0] is always '\0' */

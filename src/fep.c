@@ -24,9 +24,6 @@ kanjicode decideCode();
 KeymapPtr CurrentKeymap;
 char UserDicName[64];
 Dictionary UserDic;
-#ifdef SYSTEM_DIC_NAME
-Dictionary SystemDic;
-#endif
 
 short BlockTty;
 
@@ -204,14 +201,6 @@ options:\n\
 		strcat(UserDicName,USER_DIC_NAME);
 	}
 	UserDic = openSKK(UserDicName);
-#ifdef SYSTEM_DIC_NAME
-	SystemDic = openSKK(SYSTEM_DIC_NAME);
-	if (SystemDic->dlist == NULL) {
-		fprintf(stderr,"Can't open the system dictionary or no entry in the dictionary\n");
-		reset_tty();
-		Exit(1);
-	}
-#endif
 	toAsc();
 
 	establishShell();
