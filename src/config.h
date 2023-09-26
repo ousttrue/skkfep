@@ -28,4 +28,3 @@ EXTRALIBS=
 
 #define NATIVECODE	euc	/* EUC Kanji code */
 
-#define SKK_SERVER_HOST	"ei5nazha"	/* SKK server host */

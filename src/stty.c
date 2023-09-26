@@ -462,17 +462,10 @@ set_int()
 
 saveJisyo()
 {
-#ifdef USE_SERVER
-	if ((NetLearnMode != LearnTemporal) && (UserDic != NULL)) {
-		printf("Saving JISYO...\n");
-		closeSKK(UserDic,UserDicName);
-	}
-#else
 	if (UserDic != NULL) {
 		printf("Saving JISYO...\n");
 		closeSKK(UserDic,UserDicName);
 	}
-#endif
 }
 
 	

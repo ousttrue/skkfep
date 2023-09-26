@@ -11,7 +11,6 @@ executable('skkfep', [
   'terms.c',
   'stty.c',
   'skklib.c',
-  'connserv.c',
   'keymap.c',
   'etc.c',
   'romkan.c',

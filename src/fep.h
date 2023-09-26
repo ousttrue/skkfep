@@ -100,14 +100,6 @@ typedef struct SparseKeymap {
 	struct SparseKeymapBody *keymap;
 } SparseKeymap;
 
-#ifdef USE_SERVER
-typedef enum {
-	LearnOff = 0,
-	LearnTemporal,
-	LearnPermanent
-} LearnMode;
-#endif
-
 typedef enum {
 	NoStatusLine = 0,
 	HaveStatusLine,
@@ -197,13 +189,6 @@ Dictionary UserDic;
 #ifdef SYSTEM_DIC_NAME
 extern
 Dictionary SystemDic;
-#endif
-#ifdef USE_SERVER
-extern
-LearnMode NetLearnMode;
-
-extern
-int ServerOK;
 #endif
 
 #define MAX_CONSO 5

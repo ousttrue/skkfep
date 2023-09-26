@@ -11,10 +11,6 @@
 #include <malloc.h>
 #endif
 
-#ifdef SKK_SERVER_HOST
-#define USE_SERVER
-#endif
-
 /*
  * Structure for Dictionary
  */
@@ -56,9 +52,6 @@ typedef struct Dictionary {
 
 Dictionary openSKK();
 CandList getCand(),getCandList();
-#ifdef USE_SERVER
-CandList getCandFromServer();
-#endif
 CandList deleteCand(),firstCand();
 CandList searchOkuri();
 DicList addNewItem();
@@ -66,10 +59,5 @@ DicList addNewItem();
 /* flags for printCand() */
 #define NOFREE_CAND 0
 #define FREE_CAND 1
-
-#ifdef USE_SERVER
-extern
-char *SKKServerHost;
-#endif
 
 #endif /* SKKLIB_H */

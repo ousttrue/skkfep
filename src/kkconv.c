@@ -3,10 +3,6 @@
 #include "functions.h"
 #include <ctype.h>
 
-#ifdef USE_SERVER
-/* #define SHOW_SERVER_RESPONSE	/* Display the query to server */
-#endif
-
 #define WORD_BUF_LEN 128
 #define OKURI_LEN 8
 
@@ -19,12 +15,6 @@ static CandList *FirstCandEntry;
 static short OkuriInput;
 static char OkuriBuf[OKURI_LEN];
 static int OkuriBufLen;
-
-#ifdef USE_SERVER
-static CandList NetCand;
-static int CandFromServer;
-LearnMode NetLearnMode = NET_LEARN_MODE;
-#endif
 
 static void putOkuri();
 void showCand();
@@ -351,9 +341,6 @@ char c;
 	showmode(KSELECT_MODE); 
 		
 	WordBuf[WordBufLen] = '\0';
-#ifdef USE_SERVER
-	CandFromServer = 0;
-#endif
 	CurrentCand = getCand(UserDic,WordBuf);
 	if (CurrentCand) {
 		originalDicItem = CurrentCand->dicitem;
@@ -374,22 +361,6 @@ char c;
 			CurrentCand = searchOkuri(CurrentCand,
 						  OkuriBuf,
 						  &FirstCandEntry);
-	}
-#endif
-#ifdef USE_SERVER
-	if (CurrentCand == NULL && ServerOK) {
-#ifdef SHOW_SERVER_RESPONSE
-		showmessage("Querying first candidate to server...");
-#endif
-		CurrentCand = getCandFromServer(WordBuf);
-		if (CurrentCand && OkuriInput)
-			CurrentCand = searchOkuri(CurrentCand,
-						  OkuriBuf,
-						  &FirstCandEntry);
-		if (CurrentCand != NULL) {
-			CandFromServer = 1;
-			NetCand = CurrentCand;
-		}
 	}
 #endif
 
@@ -537,30 +508,6 @@ nxCand()
 	if (nextcand) {
 		showNextCand(nextcand);
 	}
-#ifdef USE_SERVER
-	else if (ServerOK && !CandFromServer) {
-#ifdef SHOW_SERVER_RESPONSE
-		showmessage("Querying next candidate to server...");
-#endif
-		NetCand = getCandFromServer(WordBuf);
-		if (NetCand) {
-			NetCand = deleteCand(NetCand,firstCand(CurrentCand));
-			if (NetCand) {
-				CandFromServer = 1;
-				nnextcand->nextcand = NetCand;
-				NetCand->prevcand = nnextcand;
-				if (OkuriInput) {
-					showNextCand(searchOkuri(NetCand,
-								 OkuriBuf,
-								 &FirstCandEntry));
-				}
-				else {
-					showNextCand(NetCand);
-				}
-			}
-		}
-	}
-#endif
 }
 
 void
@@ -594,15 +541,6 @@ pvCand()
 /* back to kanji input mode */
 backToKanjiInput()
 {
-#ifdef USE_SERVER
-	if (CandFromServer) {
-		if (NetCand->prevcand)
-			NetCand->prevcand->nextcand = NULL;
-		freeCand(NetCand);
-		CurrentCand = NULL;
-		CandFromServer = 0;
-	}
-#endif
 	restoreKeymap(&CurrentKeymap);
 	showmode(KINPUT_MODE);
 	kanjiInputEffect(1);
@@ -658,37 +596,6 @@ char c;
 			writeShells(OkuriBuf);
 		}
 		flushOut(l);
-#ifdef USE_SERVER
-		if (!CandFromServer) {
-			selectCand(FirstCandEntry,CurrentCand);
-		}
-		else if (NetLearnMode != LearnOff) {
-			if (CurrentCand->dicitem == NULL) {
-				/*
-				 * Candidate from server and no synonym entry
-				 * in the personal dictionary
-				 */
-				if (FirstCandEntry == NULL) {
-					dlist = addNewItem(UserDic,WordBuf,NetCand);
-					CurrentCand->dicitem = dlist;
-					FirstCandEntry = &(dlist->cand);
-				}
-				else
-					CurrentCand->dicitem = (*FirstCandEntry)->dicitem;
-			}
-			if (NetCand == CurrentCand) {
-				/*
-				 * NetCand becomes NetCand->nextcand
-				 * not to free the selected candidate.
-				 */
-				NetCand = CurrentCand->nextcand;
-				if (NetCand == NULL) {
-					CandFromServer = NIL;
-				}
-			}
-			selectCand(FirstCandEntry,CurrentCand);
-		}
-#endif
 	}
 	endKanjiInput();
 }
@@ -734,15 +641,6 @@ endKanjiInput()
 	OkuriInput = 0;
 	toKana();
 	BlockTty = 0;
-#ifdef USE_SERVER
-	if (CandFromServer) {
-		if (NetCand->prevcand)
-			NetCand->prevcand->nextcand = NULL;
-		freeCand(NetCand);
-		CurrentCand = NULL;
-		CandFromServer = 0;
-	}
-#endif
 }
 
 void

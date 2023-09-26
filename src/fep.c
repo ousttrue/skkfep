@@ -27,9 +27,6 @@ Dictionary UserDic;
 #ifdef SYSTEM_DIC_NAME
 Dictionary SystemDic;
 #endif
-#ifdef USE_SERVER
-int ServerOK = 0;
-#endif
 
 short BlockTty;
 
@@ -138,29 +135,6 @@ char	*argv[],*envp[];
 			ShellArg = argv+i;
 			break;
 		}
-#ifdef USE_SERVER
-		else if (!strcmp(argv[i],"-lm")) {
-			i++;
-			switch (*argv[i]) {
-			    case 'o': /* off */
-			    case 'n': /* none */
-			    case '0':
-				NetLearnMode = LearnOff;
-				break;
-			    case 't': /* temporal */
-			    case '1':
-				NetLearnMode = LearnTemporal;
-				break;
-			    case 'p':
-			    case '2':
-				NetLearnMode = LearnPermanent;
-				break;
-			    default:
-				fprintf(stderr,"Illegal learn mode \n");
-				fprintf(stderr,"specify one of 'none', 'temporal' and 'permanent'\n");
-			}
-		}
-#endif
 		else if (!strcmp(argv[i],"-P")) {
 			PreserveOnFailure ^= 1;
 		}
@@ -237,10 +211,6 @@ options:\n\
 		reset_tty();
 		Exit(1);
 	}
-#endif
-#ifdef USE_SERVER
-	if (openSKKserv() != -1)
-		ServerOK = 1;
 #endif
 	toAsc();
 

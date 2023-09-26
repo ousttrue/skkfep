@@ -8,23 +8,6 @@
 #include <sys/types.h>
 #include "skklib.h"
 
-#ifdef USE_SERVER
-
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-
-#define SKK_PORT_NUMBER	1178
-#define SKK_SERVICENAME	"skkserv"
-
-#ifdef BCOPY
-#define bincopy(a,b,n)	bcopy(a,b,n)
-#define fillzero(a,n)	bzero(a,n)
-#else
-#define bincopy(a,b,n)	memcpy(b,a,n)
-#define fillzero(a,n)	memset(a,0,n)
-#endif
-
 int skkservsock = -1;
 FILE *rserv,*wserv;
 char *SKKServerHost = NULL;

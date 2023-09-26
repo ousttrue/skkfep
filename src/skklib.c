@@ -247,10 +247,6 @@ char *dicname;
 	struct stat sbuf;
 	int old = 0;
 
-#ifdef USE_SERVER
-	closeSKKserv();
-#endif
-
 	buf = malloc(256);
 	/* backup skk-jisyo if jisyo is not empty. */
 	sprintf(buf,"%s.BAK",dicname);
