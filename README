@@ -1,74 +1,74 @@
-(1) skkfep $@$H$O!)(J
+(1) skkfep とは？
 
-skkfep $@$O!$(JNEmacs/Mule $@$N4A;zF~NO%7%9%F%`$G$"$k(J SKK $@$H;w$?!$(JUNIX$@MQ(J
-$@$N4A;zF~NO%U%m%s%H%(%s%I$G$9!%(Jskkfep $@$r;H$($P!$(JNEmacs/Mule $@$r;H$C$F(J
-$@$$$J$$;~$K$b(J SKK $@Iw$NF|K\8lF~NO$,<B8=$G$-$^$9!%(J
+skkfep は，NEmacs/Mule の漢字入力システムである SKK と似た，UNIX用
+の漢字入力フロントエンドです．skkfep を使えば，NEmacs/Mule を使って
+いない時にも SKK 風の日本語入力が実現できます．
 
-(2) $@FCD'$HLdBjE@(J
+(2) 特徴と問題点
 
-	(a) SKK $@Iw$N$+$J!&4A;zF~NO(J
-	(b) SKK $@$H8D?M<-=q$*$h$S<-=q%5!<%P$r6&M-(J
-	(c) $@$?$@$7C18lEPO?%b!<%I$O%5%]!<%H$5$l$F$$$J$$!%(J
+	(a) SKK 風のかな・漢字入力
+	(b) SKK と個人辞書および辞書サーバを共有
+	(c) ただし単語登録モードはサポートされていない．
 
-(3) $@%$%s%9%H!<%k$H!$Cm0U$9$Y$-E@(J
+(3) インストールと，注意すべき点
 
-$@%$%s%9%H!<%k<j=g$K$D$$$F$O!$(JINSTALL $@$NFbMF$r;2>H$7$F$/$@$5$$!%(J
+インストール手順については，INSTALL の内容を参照してください．
 
-(4) $@$*$^$1$D$-(J
+(4) おまけつき
 
-$@$*$^$1$H$7$F!$(Jsimpledic $@$H$$$&%W%m%0%i%`$,IUB0$7$F$$$^$9!%$3$l(J
-$@$O!$%f!<%6<-=q$NCf$+$i(J skkserv $@$K$"$kC18l$r:o=|$9$k$b$N$G$9!%(J
-$@%f!<%6<-=q$,5pBg$K$J$j$9$.$?;~$J$I$K$*;H$$$/$@$5$$!%(J
+おまけとして，simpledic というプログラムが付属しています．これ
+は，ユーザ辞書の中から skkserv にある単語を削除するものです．
+ユーザ辞書が巨大になりすぎた時などにお使いください．
 
-$@$^$?!$2hLL$N:G2<9T$r%9%F!<%?%9%i%$%s$H$7$F;H$&?M$N$?$a$K!$(Jresetsize
-$@$H$$$&%9%/%j%W%H$rMQ0U$7$^$7$?!%$3$l$r(J resize $@$NBe$j$K;H$C$F(J
+また，画面の最下行をステータスラインとして使う人のために，resetsize
+というスクリプトを用意しました．これを resize の代りに使って
 
-	eval `resetsize [-c]`	(csh $@;HMQ;~(J)
-	eval `resetsize -u`	(sh $@;HMQ;~(J)
+	eval `resetsize [-c]`	(csh 使用時)
+	eval `resetsize -u`	(sh 使用時)
 
-$@$r<B9T$9$k$H!$(Jskkfep $@;HMQ;~$K$O:G2<9T$r%9%F!<%?%9%i%$%s$H$7$F(J
-resize $@$7$^$9!%$^$?!$(Jskkfep $@$r;HMQ$7$F$$$J$$;~$K$O!$C1$J$k(J resize
-$@$HF1$8F0:n$r$7$^$9!%(J
+を実行すると，skkfep 使用時には最下行をステータスラインとして
+resize します．また，skkfep を使用していない時には，単なる resize
+と同じ動作をします．
 
-version 0.83 $@$+$i!$(J"Emacs escape $@%b!<%I(J" "vi escape$@%b!<%I(J" $@$,(J
-$@$D$-$^$7$?!%$3$l$r@Z$j$+$($k%3%^%s%I$,(J escmode $@$G$9!%;HMQK!$O(J
+version 0.83 から，"Emacs escape モード" "vi escapeモード" が
+つきました．これを切りかえるコマンドが escmode です．使用法は
 
-	escmode		$@DL>o%b!<%I$X$N@Z$j$+$((J
-	escmode vi	vi $@%(%9%1!<%W%b!<%I$X$N@Z$j$+$((J
-	escmode emacs	emacs $@%(%9%1!<%W%b!<%I$X$N@Z$j$+$((J
+	escmode		通常モードへの切りかえ
+	escmode vi	vi エスケープモードへの切りかえ
+	escmode emacs	emacs エスケープモードへの切りかえ
 
-(5) $@Cx:n8"$HMxMQ!&G[I[>r7o$K$D$$$F(J
+(5) 著作権と利用・配布条件について
 
  (C) 1992-1997 by Akinori ITO, Yutaka KANEKO and Masatoshi WATANABE
 
-$@$3$N%=%U%H%&%'%"$O!$:n<T$N5v2D$J$/MxMQ!&2~JQ!&G[I[$G$-$^$9!%$J(J
-$@$*!$$3$N%=%U%H%&%'%"$NMxMQ$K$h$C$FMxMQ<T$,2?$i$+$NHo32$r<u$1$?(J
-$@>l9g!$:n<T$O$=$N@UG$$r0l@ZIi$$$^$;$s!%(J
+このソフトウェアは，作者の許可なく利用・改変・配布できます．な
+お，このソフトウェアの利用によって利用者が何らかの被害を受けた
+場合，作者はその責任を一切負いません．
 
-(6) $@<U<-(J
+(6) 謝辞
 
-SKK $@$N:n<T$G$"$k!$5~ETBg3X$N:4F#2mI'65<x(J(masahiko@kuis.kyoto-u.ac.jp)
-$@$K46<U$$$?$7$^$9!%EvA3$N$3$H$G$9$,!$(JSKK $@$,$J$1$l$P(J skkfep $@$OCB@8(J
-$@$7$J$+$C$?$G$7$g$&!%(J
-$@$^$?!$%P%0>pJs$d2~A1$NDs0F$r$*4s$;$/$@$5$C$?!$0J2<$NJ}!9$K46<U$$(J
-$@$?$7$^$9!'(J
-	$@9uLZ(J  $@8<$5$s!wElKLBg3X(J(kuroki@math.tohoku.ac.jp)
-	$@;01:2m90$5$s!wEl<G(J(mmiura@pdcd.ilab.toshiba.co.jp)
-	$@:{ItE/O:$5$s!wEl5~Bg3X(J(tss@a.u-tokyo.ac.jp)
-	$@NkLZ2m?M$5$s!wElKLBg3X(J(suz@sato.riec.tohoku.ac.jp)
-	$@9-@n0lIW$5$s!w7W;;5!2J3X8&5f=j(J(hirokawa@rics.co.jp)
-	$@A}0f=SG7$5$s!w%7%c!<%W(J(masui@shpcsl.sharp.co.jp)
-	$@KYFbJ]=($5$s!w>>2<(J(yhori@trl.mei.co.jp)
-	$@<r0f@6N4$5$s!wEl5~Bg3X(J(ksakai@mtl.t.u-tokyo.ac.jp)
-	$@0KF#9/;K$5$s!w5~ETBg3X(J(yito@yajima.kuis.kyoto-u.ac.jp)
-	    $@F1(J      $@!wF`NI@hC<2J3X5;=QBg3X1!Bg3X(J(yasufu-i@is.aist-nara.ac.jp)
-	$@BlK\1QFs$5$s!wElKLBg3X(J(t2@maruoka.ecei.tohoku.ac.jp)
-	$@>.NS=$J?$5$s!wElKLBg3X(J(tba4kac@aix370.ecip.tohoku.ac.jp)
-	$@8q9>1QN4$5$s(J (sgphk1@ipcs.shizuoka.ac.jp)
-	$@@>DMGnJ8$5$s!w#N#E#CCf8&(J(nishi@rpts.cl.nec.co.jp)
-	$@9uBt?r9($5$s!wEl5~Bg3X(J(kurosawa@sail.t.u-tokyo.ac.jp)
+SKK の作者である，京都大学の佐藤雅彦教授(masahiko@kuis.kyoto-u.ac.jp)
+に感謝いたします．当然のことですが，SKK がなければ skkfep は誕生
+しなかったでしょう．
+また，バグ情報や改善の提案をお寄せくださった，以下の方々に感謝い
+たします：
+	黒木  玄さん＠東北大学(kuroki@math.tohoku.ac.jp)
+	三浦雅弘さん＠東芝(mmiura@pdcd.ilab.toshiba.co.jp)
+	笹部哲郎さん＠東京大学(tss@a.u-tokyo.ac.jp)
+	鈴木雅人さん＠東北大学(suz@sato.riec.tohoku.ac.jp)
+	広川一夫さん＠計算機科学研究所(hirokawa@rics.co.jp)
+	増井俊之さん＠シャープ(masui@shpcsl.sharp.co.jp)
+	堀内保秀さん＠松下(yhori@trl.mei.co.jp)
+	酒井清隆さん＠東京大学(ksakai@mtl.t.u-tokyo.ac.jp)
+	伊藤康史さん＠京都大学(yito@yajima.kuis.kyoto-u.ac.jp)
+	    同      ＠奈良先端科学技術大学院大学(yasufu-i@is.aist-nara.ac.jp)
+	滝本英二さん＠東北大学(t2@maruoka.ecei.tohoku.ac.jp)
+	小林修平さん＠東北大学(tba4kac@aix370.ecip.tohoku.ac.jp)
+	鯉江英隆さん (sgphk1@ipcs.shizuoka.ac.jp)
+	西塚博文さん＠ＮＥＣ中研(nishi@rpts.cl.nec.co.jp)
+	黒沢崇宏さん＠東京大学(kurosawa@sail.t.u-tokyo.ac.jp)
 
-(7) $@6l>p<u$1IU$1(J
+(7) 苦情受け付け
 
-skkfep $@$K4X$9$k6l>p!&$*Ld$$9g$o$;!&Ds0F!&$O$2$^$7$N$*JX$j$J$I$O!$(J
-$@0KF#>4B'(J (aito@ei5sun.yz.yamagata-u.ac.jp) $@$^$G$*4j$$$7$^$9!%(J
+skkfep に関する苦情・お問い合わせ・提案・はげましのお便りなどは，
+伊藤彰則 (aito@ei5sun.yz.yamagata-u.ac.jp) までお願いします．
