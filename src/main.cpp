@@ -17,55 +17,14 @@ char UserDicName[64];
 char ShellName[64] = "";
 char** ShellArg = NULL;
 
-static kanjicode
-decideCode(const char* s)
-{
-  if (!strcmp(s, "sj"))
-    return sj;
-  else if (!strcmp(s, "euc"))
-    return euc;
-  else if (!strncmp(s, "jis", 3)) {
-    switch (s[3]) {
-      case 'A':
-      case '@':
-        switch (s[4]) {
-          case 'H':
-            return jisAH;
-          case 'J':
-            return jisAJ;
-          case 'B':
-            return jisAB;
-        }
-        break;
-      case 'B':
-        switch (s[4]) {
-          case 'H':
-            return jisBH;
-          case 'J':
-            return jisBJ;
-          case 'B':
-            return jisBB;
-        }
-        break;
-    }
-  }
-  return jisAJ; /* default */
-}
-
 static void
 ParseArgs(int argc, char** argv)
 {
   for (int i = 1; i < argc; i++) {
-    if (!strncmp(argv[i], "-o", 2))
-      OutCode = decideCode(argv[i] + 2);
-    else if (!strncmp(argv[i], "-f", 2))
-      WriteCode = decideCode(argv[i] + 2);
-    else if (!strncmp(argv[i], "-k", 2))
+    if (!strncmp(argv[i], "-k", 2))
       KanaKey = argv[i] + 2;
     else if (!strcmp(argv[i], "-udic"))
       strcpy(UserDicName, argv[++i]);
-    else if (!strcmp(argv[i], "-bs"))
-      KanjiBS = ~KANJIBS_DEFAULT;
     else if (!strcmp(argv[i], "-e")) {
       strcpy(ShellName, argv[++i]);
       ShellArg = argv + i;
@@ -125,40 +84,12 @@ options:\n\
   }
 }
 
-static const char*
-kanjicode2string(int code)
-{
-  switch (code) {
-    case euc:
-      return "EUC";
-    case sj:
-      return "MS-KANJI(ShiftJIS)";
-    case jisAH:
-      return "JIS(@H)";
-    case jisAJ:
-      return "JIS(@J)";
-    case jisAB:
-      return "JIS(@B)";
-    case jisBH:
-      return "JIS(BH)";
-    case jisBJ:
-      return "JIS(BJ)";
-    case jisBB:
-      return "JIS(BB)";
-  }
-
-  return "error";
-}
-
 int
 main(int argc, char* argv[], char* envp[])
 {
   ParseArgs(argc, argv);
 
   printf("SKKFEP version %s\n", version);
-  printf("Display: %s, FileIO: %s.\n",
-         kanjicode2string(OutCode),
-         kanjicode2string(WriteCode));
 
   if (!App::Instance().Initialize(UserDicName, ShellName, ShellArg)) {
     return 1;

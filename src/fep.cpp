@@ -3,7 +3,6 @@
 #include "config.h"
 #include "connsh.h"
 #include "etc.h"
-#include "kanjicode.h"
 #include "keybind.h"
 #include "readwrite.h"
 #include "romkan.h"
@@ -24,56 +23,10 @@
 #define FLUSH_TIMEOUT 300000 /* timeout ( micro-sec ) */
 
 KeymapPtr CurrentKeymap;
-#ifdef SYSTEM_DIC_NAME
-Dictionary SystemDic;
-#endif
-
 
 extern char* version;
 extern char ShellName[];
 extern char** ShellArg;
-
-#ifdef DEBUG
-FILE* wrlog;
-#endif
-
-
-void
-guess_system_kanji_code()
-{
-  char* p = NULL;
-  static struct Locale
-  {
-    const char* str;
-    kanjicode code;
-  } local[] = { { "ja_JP.JIS", jisBB }, { "ja_JP.jis7", jisBB },
-                { "ja_JP.EUC", euc },   { "japanese.euc", euc },
-#ifdef HPUX /* for my hpux machine */
-                { "japanese", sj },
-#else
-                { "japanese", euc },
-#endif
-                { "ja_JP.ujis", euc },  { "ja_JP.SJIS", sj },
-                { "ja_JP.mscode", sj }, { 0, 0 } };
-
-#ifdef USE_LOCALE
-  p = setlocale(LC_CTYPE, "");
-  if (p == NULL)
-    p = getenv("LC_CTYPE");
-#endif
-  if (p == NULL)
-    p = getenv("LANG");
-  if (p != NULL) {
-    struct Locale* tab;
-    for (tab = local; tab->str; tab++) {
-      if (strcmp(tab->str, p) == 0) {
-        OutCode = tab->code;
-        WriteCode = tab->code;
-        break;
-      }
-    }
-  }
-}
 
 #ifndef NO_SUSPEND
 void

@@ -522,10 +522,7 @@ kanaBS(char c)
     for (i = 1; i < n; i++)
       iKanaC(con[i]);
   } else {
-    if (KanjiBS)
-      writeShell1(c);
-    else
-      thru(c);
+    thru(c);
   }
 }
 
