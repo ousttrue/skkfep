@@ -54,3 +54,6 @@ erase(int n);
 
 void
 rubout(int n);
+
+void
+bell();

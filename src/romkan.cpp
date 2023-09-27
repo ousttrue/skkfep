@@ -1,9 +1,10 @@
 #include "romkan.h"
 #include "config.h"
+#include "connsh.h"
 #include "etc.h"
 #include "fep.h"
 #include "keybind.h"
-#include "readwrite.h"
+#include "stty.h"
 #include "terms.h"
 #include <ctype.h>
 #include <string.h>

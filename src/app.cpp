@@ -3,7 +3,6 @@
 #include "fep.h"
 #include "keybind.h"
 #include "kkconv.h"
-#include "readwrite.h"
 #include "skklib.h"
 #include "stty.h"
 #include "terms.h"

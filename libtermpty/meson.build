@@ -4,7 +4,6 @@ termcap_dep = cc.find_library('termcap', required: true)
 termpty_lib = static_library('termpty', [
   'stty.cpp',
   'terms.cpp',
-  'readwrite.cpp',
   'connsh.cpp',
   ])
 

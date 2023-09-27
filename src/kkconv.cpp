@@ -1,12 +1,13 @@
 #include "kkconv.h"
 #include "app.h"
 #include "config.h"
+#include "connsh.h"
 #include "etc.h"
 #include "fep.h"
 #include "keybind.h"
-#include "readwrite.h"
 #include "romkan.h"
 #include "skklib.h"
+#include "stty.h"
 #include "terms.h"
 #include <ctype.h>
 #include <string.h>

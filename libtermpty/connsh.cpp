@@ -228,3 +228,30 @@ freeDevice()
   chmod(SlaveName, 0666);
   chown(SlaveName, 0, 0);
 }
+
+void
+writeShell1(char c)
+{
+  write(fileno(Shellout), &c, 1);
+}
+
+void
+writeShells(const char* s)
+{
+  int l = strlen(s);
+  write(fileno(Shellout), s, l);
+}
+
+void
+writeTtyShell1(char c)
+{
+  write(fileno(Shellout), &c, 1);
+}
+
+void
+writeTtyShells(const char* s)
+{
+  int l = strlen(s);
+  write(fileno(Shellout), s, l);
+}
+

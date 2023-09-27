@@ -7,13 +7,11 @@
 #define NO_VFORK
 #define HAVE_SETREUID
 
-// #include "app.h"
-// #include "config.h"
-// #include "fep.h"
 #include "terms.h"
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -54,21 +52,21 @@ typedef struct termio TERMPARAM;
 #else
 typedef struct
 {
-  struct sgttyb m_ttyb;   /* TIOCGETP */
-  struct tchars m_tchars; /* TIOCGETC */
+  struct sgttyb m_ttyb;      /* TIOCGETP */
+  struct tchars m_tchars;    /* TIOCGETC */
 #ifdef TIOCLGET
-  int m_lmode; /* TIOCLGET */
+  int m_lmode;               /* TIOCLGET */
 #endif /* TIOCLGET */
 #ifdef TIOCGETD
-  int m_ldisc; /* TIOCGETD */
+  int m_ldisc;               /* TIOCGETD */
 #endif /* TIOCGETD */
 #ifdef TIOCGLTC
-  struct ltchars m_ltchars; /* TIOCGLTC */
+  struct ltchars m_ltchars;  /* TIOCGLTC */
 #endif /* TIOCGLTC */
 
 #ifdef sony_news
 #ifdef TIOCKGET
-  int km_con; /* TIOCKGET */
+  int km_con;                /* TIOCKGET */
 #endif /* TIOCKGET */
 #ifdef TIOCKGETC
   struct jtchars km_jtchars; /* TIOCKGETC */
@@ -104,7 +102,7 @@ extern TERMPARAM d_ioval;
 #endif
 
 TERMPARAM d_ioval;
-int tty;
+int g_term_tty;
 #ifdef TIOCSWINSZ
 struct winsize d_winsize;
 #endif /* TIOCSWINSZ */
@@ -219,7 +217,7 @@ get_winsize()
 #ifdef TIOCSWINSZ
   extern int lines, columns;
 
-  ioctl(tty, TIOCGWINSZ, &d_winsize);
+  ioctl(g_term_tty, TIOCGWINSZ, &d_winsize);
   if (d_winsize.ws_col == 0) {
     d_winsize.ws_col = columns;
   } else {
@@ -230,7 +228,7 @@ get_winsize()
   } else {
     lines = d_winsize.ws_row;
   }
-  ioctl(tty, TIOCSWINSZ, &d_winsize);
+  ioctl(g_term_tty, TIOCSWINSZ, &d_winsize);
 #endif /* TIOCSWINSZ */
 }
 
@@ -240,7 +238,7 @@ set_tty()
   int er;
   TERMPARAM ioval;
 
-  GET_TTY(tty, &d_ioval);
+  GET_TTY(g_term_tty, &d_ioval);
   ioval = d_ioval;
 
 #if defined TERMIOS || defined TERMIO
@@ -274,7 +272,7 @@ set_tty()
   ioval.m_ttyb.sg_flags = RAW;
 #endif
 
-  er = SET_TTY(tty, &ioval);
+  er = SET_TTY(g_term_tty, &ioval);
 
   initFep();
 
@@ -290,14 +288,14 @@ void
 reset_tty()
 {
   reset_tty_without_close();
-  close(tty);
+  close(g_term_tty);
 }
 
 void
 reset_tty_without_close()
 {
   termFep();
-  SET_TTY(tty, &d_ioval);
+  SET_TTY(g_term_tty, &d_ioval);
 }
 
 void
@@ -344,5 +342,31 @@ set_tty_sane(int tty)
 void
 tty_ready()
 {
-  tty = open(ttyname(0), O_RDWR);
+  g_term_tty = open(ttyname(0), O_RDWR);
+}
+
+void
+writes(const char* s)
+{
+  int l = strlen(s);
+
+  write(g_term_tty, s, l);
+}
+
+void
+write1(char c)
+{
+  write(g_term_tty, &c, 1);
+}
+
+void
+writeShTty(const char* s, int l)
+{
+  write(g_term_tty, s, l);
+}
+
+void
+writeTty(const char* s, int l)
+{
+  write(g_term_tty, s, l);
 }

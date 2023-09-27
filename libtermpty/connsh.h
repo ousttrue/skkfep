@@ -1,7 +1,7 @@
 #pragma once
 #include <stdio.h>
 
-extern int tty, Shellfd;
+extern int Shellfd;
 extern int ShellPID;
 extern FILE* Shellout;
 
@@ -13,3 +13,17 @@ getDevice(int* master, int* slave);
 
 void
 freeDevice();
+
+void
+writeShell1(char c);
+
+void
+writeShells(const char* s);
+
+void
+writeTtyShell1(char c);
+
+
+void
+writeTtyShells(const char* s);
+

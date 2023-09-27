@@ -30,3 +30,15 @@ tty_ready();
 
 void
 init_signals();
+
+void
+writes(const char* s);
+
+void
+write1(char c);
+
+void
+writeShTty(const char* s, int l);
+
+void
+writeTty(const char* s, int l);

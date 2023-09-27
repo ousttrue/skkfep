@@ -1,5 +1,4 @@
 #include "terms.h"
-#include "readwrite.h"
 #include "stty.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -334,4 +333,10 @@ rubout(int n)
   csrLeft(n);
   erase(n);
   csrLeft(n);
+}
+
+void
+bell()
+{
+  write1('\007');
 }

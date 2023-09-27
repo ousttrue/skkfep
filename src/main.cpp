@@ -1,7 +1,6 @@
 #include "app.h"
 #include "keybind.h"
 #include "kkconv.h"
-#include "readwrite.h"
 #include "terms.h"
 #include "version.h"
 #include <pwd.h>
