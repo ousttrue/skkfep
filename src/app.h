@@ -18,9 +18,12 @@ public:
     return s_instance;
   }
 
+  bool Initialize(const char* UserDicName, const char* cmd, char** args);
+  int Run();
+
   void Abort();
   void Exit(int code);
-  void Reset(const char *msg);
+  void Reset(const char* msg);
 
   void PtyFree();
 

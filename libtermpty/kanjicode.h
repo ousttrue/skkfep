@@ -24,7 +24,6 @@ struct code_mode {
 	char	so_len;	
 };
 
-extern kanjicode OutCode,WriteCode;
 extern struct code_mode codeMode[8];
 
 #define SIcode(c)	codeMode[c].sicode

@@ -5,6 +5,7 @@
 #include "fep.h"
 #include "kkconv.h"
 #include "romkan.h"
+#include <stdio.h>
 
 char* KanaKey = DEFAULT_KANAKEY;
 static KeymapPtr lastKeymap;

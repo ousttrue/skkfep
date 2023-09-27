@@ -1,6 +1,9 @@
 #pragma once
 #include "kanjicode.h"
 struct KanjiStatus;
+extern kanjicode OutCode, WriteCode;
+#define KANJIBS_DEFAULT 0     /* 0 -> shift out / 1 -> don't shift out  */
+extern char KanjiBS;
 
 char
 read1();

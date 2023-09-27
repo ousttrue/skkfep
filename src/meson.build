@@ -1,9 +1,9 @@
 executable('skkfep', [
+  'main.cpp',
   'app.cpp',
   'fep.cpp',
   'keybind.cpp',
   'kkconv.cpp',
-  'version.cpp',
   'skklib.cpp',
   'keymap.cpp',
   'etc.cpp',

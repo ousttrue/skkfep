@@ -1,5 +1,7 @@
 #pragma once
 
+extern char* KanaKey;
+
 enum EscapeBehavior
 {
   NoEsc = 0,
@@ -34,8 +36,6 @@ extern Keymap KanaKeymap, ZenkakuKeymap, KanjiInputKeymap, OkuriInputKeymap,
 extern const char* modeString[];
 
 extern KeymapPtr CurrentKeymap;
-
-extern char UserDicName[];
 
 extern EscapeBehavior CurrentEscapeBehavior, LastEscapeBehavior;
 

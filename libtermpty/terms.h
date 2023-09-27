@@ -1,4 +1,5 @@
 #pragma once
+extern char ReverseStatus;
 
 bool
 getTCstr();

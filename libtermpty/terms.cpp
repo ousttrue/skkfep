@@ -1,11 +1,8 @@
 #include "terms.h"
-// #include "app.h"
-// #include "config.h"
-// #include "fep.h"
 #include "readwrite.h"
 #include "stty.h"
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <termcap.h>
 #include <unistd.h>
@@ -24,7 +21,7 @@ char *T_TS, *T_FS, *T_SS, *T_HS, *T_ES;
 int columns, lines;
 StatusType status;
 
-extern char ReverseStatus;
+char ReverseStatus = 0;
 
 #define GETSTR(v, s)                                                           \
   {                                                                            \
@@ -113,6 +110,8 @@ getTCstr()
   if ((env = getenv("COLUMNS")) != NULL) {
     columns = atoi(env);
   }
+
+  return true;
 }
 
 void

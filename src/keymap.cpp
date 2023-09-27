@@ -4,6 +4,7 @@
 #include "keybind.h"
 #include "kkconv.h"
 #include "romkan.h"
+#include <stdio.h>
 
 SparseKeymapBody _NormalKeymap[] = {
   CTRL_T,
@@ -846,34 +847,20 @@ SparseKeymapBody _SelectionKeymap[] = {
 SparseKeymap SelectionKeymap = { fxthru, _SelectionKeymap };
 
 SparseKeymapBody _CodeInputKeymap[] = {
-  CTRL_C, romkan::cancelCode,
-  CTRL_G, romkan::cancelCode,
-  CTRL_J, romkan::enterCode,
-  CTRL_M, romkan::enterCode,
-  CTRL_T, romkan::toKana,
-  '0',    romkan::codein,
-  '1',    romkan::codein,
-  '2',    romkan::codein,
-  '3',    romkan::codein,
-  '4',    romkan::codein,
-  '5',    romkan::codein,
-  '6',    romkan::codein,
-  '7',    romkan::codein,
-  '8',    romkan::codein,
-  '9',    romkan::codein,
-  'A',    romkan::codein,
-  'B',    romkan::codein,
-  'C',    romkan::codein,
-  'D',    romkan::codein,
-  'E',    romkan::codein,
-  'F',    romkan::codein,
-  'a',    romkan::codein,
-  'b',    romkan::codein,
-  'c',    romkan::codein,
-  'd',    romkan::codein,
-  'e',    romkan::codein,
-  'f',    romkan::codein,
-  '\0',   NULL,
+  CTRL_C, romkan::cancelCode, CTRL_G, romkan::cancelCode,
+  CTRL_J, romkan::enterCode,  CTRL_M, romkan::enterCode,
+  CTRL_T, romkan::toKana,     '0',    romkan::codein,
+  '1',    romkan::codein,     '2',    romkan::codein,
+  '3',    romkan::codein,     '4',    romkan::codein,
+  '5',    romkan::codein,     '6',    romkan::codein,
+  '7',    romkan::codein,     '8',    romkan::codein,
+  '9',    romkan::codein,     'A',    romkan::codein,
+  'B',    romkan::codein,     'C',    romkan::codein,
+  'D',    romkan::codein,     'E',    romkan::codein,
+  'F',    romkan::codein,     'a',    romkan::codein,
+  'b',    romkan::codein,     'c',    romkan::codein,
+  'd',    romkan::codein,     'e',    romkan::codein,
+  'f',    romkan::codein,     '\0',   NULL,
 };
 
 SparseKeymap CodeInputKeymap = { nulcmd, _CodeInputKeymap };

@@ -707,11 +707,9 @@ kanaBS(char c)
     for (i = 1; i < n; i++)
       iKanaC(con[i]);
   } else {
-#ifdef KANJIBS
     if (KanjiBS)
       writeShell1(c);
     else
-#endif
       thru(c);
   }
 }

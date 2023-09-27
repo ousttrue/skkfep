@@ -14,6 +14,11 @@
 #define WORD_BUF_LEN 128
 #define OKURI_LEN 8
 
+#define PRESERVE_ON_FAILURE 1 /* preserve candidate on conversion failure */
+char PreserveOnFailure = PRESERVE_ON_FAILURE;
+short BlockTty;
+char OkuriFirst;
+
 #define VOWEL(c)                                                               \
   ((c) == 'a' || (c) == 'i' || (c) == 'u' || (c) == 'e' || (c) == 'o')
 
@@ -314,7 +319,7 @@ okuriBS(char c)
   } else {
     romkan::cancelConso();
     for (i = 0; i < n; i++)
-      okKanaC(con[i]/*, 0*/);
+      okKanaC(con[i] /*, 0*/);
   }
   kanjiInputEffect(1);
 }

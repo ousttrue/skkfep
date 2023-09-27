@@ -1,7 +1,7 @@
 #include "readwrite.h"
 // #include "config.h"
-#include "ctrlcode.h"
 #include "connsh.h"
+#include "ctrlcode.h"
 // #include "fep.h"
 #include <ctype.h>
 #include <stdio.h>
@@ -11,6 +11,8 @@
 #ifdef DEBUG
 extern FILE* wrlog;
 #endif
+
+char KanjiBS = KANJIBS_DEFAULT;
 
 #define INTERNALCODE euc
 #define NATIVECODE euc /* EUC Kanji code */
@@ -103,13 +105,11 @@ checkStatusAndConvCode(char c,
           stat->kanjiMode = KS_BYTE1;
           stat->lastByte = c;
         }
-#ifdef KANJIBS
         else if (KanjiBS && c == CTRL_H) {
           buf[0] = c;
           *optr = buf;
           *olen = 1;
         }
-#endif
         else {
           stat->kanjiMode = KS_NOKANJI;
           ostat->kanjiMode = KS_NOKANJI;
@@ -145,13 +145,11 @@ checkStatusAndConvCode(char c,
     case KS_BYTE2:
       if (c == ESC_CODE)
         stat->kanjiMode = KS_KESC;
-#ifdef KANJIBS
       else if (KanjiBS && c == CTRL_H) {
         buf[0] = c;
         *optr = buf;
         *olen = 1;
       }
-#endif
       else if (iscntrl(c)) {
         stat->kanjiMode = KS_NOKANJI;
         ostat->kanjiMode = KS_NOKANJI;

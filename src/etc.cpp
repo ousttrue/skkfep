@@ -1,11 +1,9 @@
 #include "etc.h"
 #include "config.h"
-#include "fep.h"
 #include "readwrite.h"
 #include "terms.h"
-#include <signal.h>
-#include <stdio.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 static const char* lastmodestr;
 static const char* curmodestr;

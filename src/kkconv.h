@@ -1,5 +1,9 @@
 #pragma once
 
+extern short BlockTty;
+extern char PreserveOnFailure;
+extern char OkuriFirst;
+
 void
 kkBeg(char);
 void
@@ -21,13 +25,13 @@ void
 kKanaV(char c);
 
 void
-okKanaV(char c/*, char first*/);
+okKanaV(char c /*, char first*/);
 
 void
 kKanaC(char c);
 
 void
-okKanaC(char c/*, char first*/);
+okKanaC(char c /*, char first*/);
 
 void
 kZenAl(char c);

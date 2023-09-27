@@ -1,5 +1,19 @@
 #pragma once
 
+#define SKK_MODE 0
+#define KANA_MODE 1
+#define ZENEI_MODE 2
+#define KKANA_MODE 3
+#define KINPUT_MODE 4
+#define KSELECT_MODE 5
+
+#define MAX_CONSO 5
+extern char LastConso[MAX_CONSO]; /* LastConso[0] is always '\0' */
+extern short Nconso;
+extern char SmallTU;
+extern short Kindex;
+
+
 namespace romkan {
 
 void

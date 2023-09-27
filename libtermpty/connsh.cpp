@@ -24,11 +24,8 @@
 #endif
 
 #define DEVICELEN 16
-#define DEFAULT_SHELL "/bin/csh"
 
-char ShellName[64] = "";
 FILE *Shellout, *Shellin;
-char** ShellArg = NULL;
 
 #if !defined(HAVE_BSD_OPENPTY) && !defined(IRIX)
 #ifdef HPUX
@@ -106,26 +103,13 @@ extern int errno;
 #endif /* NO_SETEUID */
 
 void
-establishShell(void (*onSigChild)(int))
+establishShell(const char* ShellName, char** ShellArg, void (*onSigChild)(int))
 {
   static int i, master, slave, currentPid;
   static char procName[32];
   char* p;
   struct passwd* pwent;
 
-  if (ShellName[0] == '\0') {
-    if ((p = getenv("SHELL")) != NULL) {
-      strcpy(ShellName, p);
-      ShellArg = NULL;
-    } else {
-      pwent = getpwuid(getuid());
-      if (pwent && pwent->pw_shell)
-        strcpy(ShellName, pwent->pw_shell);
-      if (ShellName[0] == '\0')
-        strcpy(ShellName, DEFAULT_SHELL);
-      ShellArg = NULL;
-    }
-  }
   getDevice(&master, &slave);
 
   currentPid = getpid();
@@ -197,7 +181,8 @@ establishShell(void (*onSigChild)(int))
     close(slave);
 
     seteuid(getuid());
-    p = &ShellName[strlen(ShellName)];
+
+    auto p = &ShellName[strlen(ShellName)];
     while (ShellName <= p && *p != '/')
       p--;
     if (*p == '/')
