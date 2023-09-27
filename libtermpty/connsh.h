@@ -5,7 +5,7 @@ extern int tty, Shellfd;
 extern int ShellPID;
 extern FILE* Shellout;
 
-void
+bool
 establishShell(const char* ShellName, char** ShellArg, void (*onSigChild)(int));
 
 void

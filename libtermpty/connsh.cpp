@@ -102,7 +102,7 @@ extern int errno;
 #endif /* HAVE_SETREUID */
 #endif /* NO_SETEUID */
 
-void
+bool
 establishShell(const char* ShellName, char** ShellArg, void (*onSigChild)(int))
 {
   static int i, master, slave, currentPid;
@@ -125,7 +125,7 @@ establishShell(const char* ShellName, char** ShellArg, void (*onSigChild)(int))
 
   if ((i = vfork()) < 0) {
     fprintf(stderr, "fork error\n");
-    abort();
+    return false;
   }
 
   if (i == 0) { /* child */
@@ -203,6 +203,8 @@ establishShell(const char* ShellName, char** ShellArg, void (*onSigChild)(int))
   Shellout = fdopen(master, "w");
   Shellin = fdopen(master, "r");
   Shellfd = master;
+
+  return true;
 }
 
 /*

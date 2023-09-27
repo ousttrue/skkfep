@@ -17,15 +17,9 @@
 
 #define IF_STOPPED(x) WIFSTOPPED(x)
 
-App::
-App()
-{
-}
+App::App() {}
 
-App::~
-App()
-{
-}
+App::~App() {}
 
 void
 App::Exit(int code)
@@ -98,7 +92,7 @@ App::Initialize(const char* UserDicName, const char* cmd, char** args)
 
   toAsc({});
 
-  establishShell(cmd, args, [](int) {
+  auto ok = establishShell(cmd, args, [](int) {
     int cpid;
     int statusp;
 
@@ -111,6 +105,7 @@ App::Initialize(const char* UserDicName, const char* cmd, char** args)
 #endif /* NO_SUSPEND */
       App::Instance().Exit(0);
   });
+  return ok;
 }
 
 #define SH_BUF_SIZ 256

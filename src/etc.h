@@ -1,10 +1,11 @@
 #pragma once
+#include "romkan.h"
 
 void
 sleep_ms(int n);
 
 void
-showmode(int s);
+showmode(SkkModes s);
 
 void
 showcurmode();
