@@ -18,10 +18,10 @@ def to_utf8(vals: List[str]):
 
 def main(path: pathlib.Path):
     content = path.read_text()
-    for l in content.splitlines():
+    for i, l in enumerate(content.splitlines()):
         m = PAT.findall(l)
         if m:
-            print(to_utf8(m))
+            print(i, to_utf8(m))
 
 
 if __name__ == '__main__':

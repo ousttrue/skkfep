@@ -72,17 +72,10 @@ Keymap KanaKeymap = {
   romkan::flthru,
   romkan::flthru,
 /*	,		-		.		/	*/
-#ifndef KUTOUTEN
   romkan::iZenAl,
   romkan::iZenEx,
   romkan::iZenAl,
   kkBegA,
-#else
-  iZenEx,
-  iZenEx,
-  iZenEx,
-  kkBegA,
-#endif
   /*	0		1		2		3	*/
   romkan::flthru,
   romkan::flthru,

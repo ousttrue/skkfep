@@ -10,9 +10,5 @@ CC = gcc DEFINE = -DUSE_LOCALE OPTIMIZE = -g EXTRALIBS =
 
 #define DEFAULT_KANAKEY "^j"
 
-/* By Y. Kaneko */
-/*#define KUTOUTEN        /* "."->maru, ","->ten */
-
-
 #define NET_LEARN_MODE LearnPermanent /* Write back words obtained from */
                                       /* SKK server			  */
