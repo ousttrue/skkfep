@@ -11,8 +11,6 @@
 #define NIL 0
 #define T 1
 
-#define INTERNALCODE euc
-
 #define SKK_MODE 0
 #define KANA_MODE 1
 #define ZENEI_MODE 2
@@ -33,8 +31,8 @@
 #endif
 
 #define ZENKAKU1(c, code)                                                      \
-  ((code) == euc ? (((c)&0x80) == 0x80)                                        \
-                 : (((c)&0xe0) == 0xa0 || (((c)&0xe0) == 0xc0)))
+  ((code) == euc ? (((c) & 0x80) == 0x80)                                      \
+                 : (((c) & 0xe0) == 0xa0 || (((c) & 0xe0) == 0xc0)))
 
 /*
  * Macros for select()
@@ -55,13 +53,6 @@ typedef int SignalFunc;
 typedef void SignalFunc;
 #endif
 
-typedef enum
-{
-  NoStatusLine = 0,
-  HaveStatusLine,
-  UseBottomLine
-} StatusType;
-
 /*
  *	GLOBAL VARIABLES
  */
@@ -70,8 +61,6 @@ extern int tty, Shellfd;
 
 extern char *T_ce, *T_kr, *T_kl, *T_cr, *T_bt, *T_ta, *T_sc, *T_rc, *T_so,
   *T_se, *T_us, *T_ue, *T_cl;
-
-extern FILE *Shellin, *Shellout;
 
 #define MAX_CONSO 5
 extern char LastConso[MAX_CONSO]; /* LastConso[0] is always '\0' */

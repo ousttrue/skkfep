@@ -1,23 +1,16 @@
-cc = meson.get_compiler('c')
-termcap_dep = cc.find_library('termcap', required: true)
-
 executable('skkfep', [
   'app.cpp',
   'fep.cpp',
-  'readwrite.cpp',
   'keybind.cpp',
-  'connsh.cpp',
   'kkconv.cpp',
   'version.cpp',
-  'terms.cpp',
-  'stty.cpp',
   'skklib.cpp',
   'keymap.cpp',
   'etc.cpp',
   'romkan.cpp',
   ],
   install: true,
-  dependencies: [termcap_dep],
+  dependencies: [termpty_dep],
   c_args: [
     '-DUSE_LOCALE',
     '-Wno-implicit-function-declaration', 
@@ -35,4 +28,3 @@ executable('skkfep', [
     '-Wno-unused-function',
   ],
 )
-

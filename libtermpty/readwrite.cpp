@@ -1,16 +1,21 @@
 #include "readwrite.h"
-#include "config.h"
+// #include "config.h"
 #include "ctrlcode.h"
-#include "fep.h"
-#include <unistd.h>
+#include "connsh.h"
+// #include "fep.h"
 #include <ctype.h>
+#include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #ifdef DEBUG
 extern FILE* wrlog;
 #endif
 
-kanjicode OutCode = NATIVECODE, WriteCode = NATIVECODE;
+#define INTERNALCODE euc
+#define NATIVECODE euc /* EUC Kanji code */
+kanjicode OutCode = NATIVECODE;
+kanjicode WriteCode = NATIVECODE;
 
 struct KanjiStatus
 {

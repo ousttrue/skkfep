@@ -1,7 +1,7 @@
 #include "connsh.h"
-#include "app.h"
-#include "config.h"
-#include "fep.h"
+// #include "app.h"
+// #include "config.h"
+// #include "fep.h"
 #include "stty.h"
 #include "terms.h"
 #include <errno.h>
@@ -105,25 +105,8 @@ extern int errno;
 #endif /* HAVE_SETREUID */
 #endif /* NO_SETEUID */
 
-#define IF_STOPPED(x) WIFSTOPPED(x)
-static void
-chld_changed(int)
-{
-  int cpid;
-  int statusp;
-
-  reset_tty_without_close();
-#ifndef NO_SUSPEND
-  cpid = wait((int*)&statusp);
-  if (cpid != -1 && IF_STOPPED(statusp)) { /* suspend */
-    kill(0, SIGTSTP);
-  } else
-#endif /* NO_SUSPEND */
-    App::Instance().Exit(0);
-}
-
 void
-establishShell()
+establishShell(void (*onSigChild)(int))
 {
   static int i, master, slave, currentPid;
   static char procName[32];
@@ -150,7 +133,8 @@ establishShell()
   set_winsize(master);
   setEnvirons();
 
-  signal(SIGCHLD, chld_changed);
+  signal(SIGCHLD, onSigChild);
+
 #ifdef APOLLO
   signal(SIGCLD, chld_exit);
 #endif

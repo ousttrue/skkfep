@@ -5,7 +5,7 @@ extern int ShellPID;
 extern FILE* Shellout;
 
 void
-establishShell();
+establishShell(void (*onSigChild)(int));
 
 void
 getDevice(int* master, int* slave);

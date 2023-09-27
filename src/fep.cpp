@@ -19,9 +19,12 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <wait.h>
 
 #define SH_BUF_SIZ 256
 #define FLUSH_TIMEOUT 300000 /* timeout ( micro-sec ) */
+
+#define IF_STOPPED(x) WIFSTOPPED(x)
 
 static char shellBuf[SH_BUF_SIZ];
 
@@ -157,7 +160,9 @@ susp_cont(int)
 {
   signal(SIGTSTP, suspend);
   reset_tty_without_close();
-  set_tty();
+  if (!set_tty()) {
+    App::Instance().Exit(-1);
+  }
   kill(ShellPID, SIGCONT);
 }
 #endif
@@ -328,17 +333,33 @@ options:\n\
 
   /* Initialize */
   setKanaKey();
-  getTCstr();
+  if (!getTCstr()) {
+    App::Instance().Exit(-1);
+  }
   tty_ready();
   get_winsize();
-  set_tty();
+  if (!set_tty()) {
+    App::Instance().Exit(-1);
+  }
   init_signals();
 
   App::Instance().OpenDictionary(UserDicName);
 
   toAsc({});
 
-  establishShell();
+  establishShell([](int) {
+    int cpid;
+    int statusp;
+
+    reset_tty_without_close();
+#ifndef NO_SUSPEND
+    cpid = wait((int*)&statusp);
+    if (cpid != -1 && IF_STOPPED(statusp)) { /* suspend */
+      kill(0, SIGTSTP);
+    } else
+#endif /* NO_SUSPEND */
+      App::Instance().Exit(0);
+  });
 
   /* Preparation for select() */
 

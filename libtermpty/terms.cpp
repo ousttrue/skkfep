@@ -1,10 +1,11 @@
 #include "terms.h"
-#include "app.h"
-#include "config.h"
-#include "fep.h"
+// #include "app.h"
+// #include "config.h"
+// #include "fep.h"
 #include "readwrite.h"
 #include "stty.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <termcap.h>
 #include <unistd.h>
@@ -32,7 +33,7 @@ extern char ReverseStatus;
     adjstr(&v, &pt);                                                           \
   }
 
-void
+bool
 getTCstr()
 {
   int suc;
@@ -65,7 +66,7 @@ getTCstr()
     T_rc = NULL;
   if ((T_sc == NULL) || (T_rc == NULL)) {
     fprintf(stderr, "Your terminal cannot save/restore cursor.\n");
-    App::Instance().Exit(-1);
+    return false;
   }
   GETSTR(T_so, "so"); /* standout mode */
   GETSTR(T_se, "se"); /* standout mode end */
@@ -182,57 +183,6 @@ setEnvirons()
   }
 #endif
 }
-
-#ifndef HAVE_SETENV
-setenv(key, value, flag) char* key, *value;
-int flag;
-{
-  char* p;
-#ifndef HAVE_PUTENV
-  char **e, **ne, **newenv;
-  int l, el, i;
-  extern char** environ;
-#endif
-
-  if ((flag == 0) && (getenv(key) != NULL)) {
-    return 0;
-  }
-  p = (char*)malloc(strlen(key) + strlen(value) + 2);
-  if (p == NULL) {
-    return -1;
-  }
-  sprintf(p, "%s=%s", key, value);
-#ifdef HAVE_PUTENV
-  return (putenv(p) == 0) ? (0) : (-1);
-#else
-  l = strlen(key);
-  for (e = environ, i = 0; *e != NULL; e++, i++) {
-    if (strncmp(*e, key, l) == 0 && (*e)[l] == '=') {
-      el = strlen(*e) - l - 1;
-      if (el >= strlen(value)) {
-        strcpy(*e + l + 1, value);
-        return 0;
-      } else {
-        for (; *e != NULL; e++, i++) {
-          *e = *(e + 1);
-        }
-        i--;
-        break;
-      }
-    }
-  }
-  newenv = (char**)malloc((i + 2) * sizeof(char*));
-  if (newenv == NULL)
-    return -1;
-  for (e = environ, ne = newenv; *e != NULL; *(ne++) = *(e++))
-    ;
-  *(ne++) = p;
-  *ne = NULL;
-  environ = newenv;
-  return 0;
-#endif
-}
-#endif /* not HAVE_SETENV */
 
 void
 adjstr(char** buf, char** ptr)

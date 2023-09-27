@@ -1,6 +1,6 @@
 #pragma once
 
-void
+bool
 getTCstr();
 
 void

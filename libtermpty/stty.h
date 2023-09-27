@@ -1,11 +1,19 @@
 #pragma once
+
+enum StatusType
+{
+  NoStatusLine = 0,
+  HaveStatusLine,
+  UseBottomLine
+};
+
 void
 set_winsize(int tty);
 
 void
 get_winsize();
 
-void
+bool
 set_tty();
 
 void
@@ -22,4 +30,3 @@ tty_ready();
 
 void
 init_signals();
-

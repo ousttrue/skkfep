@@ -1,7 +1,15 @@
 #include "stty.h"
-#include "app.h"
-#include "config.h"
-#include "fep.h"
+
+#define LINUX
+#define SYSV
+#define TERMIOS
+#define HAVE_SETENV
+#define NO_VFORK
+#define HAVE_SETREUID
+
+// #include "app.h"
+// #include "config.h"
+// #include "fep.h"
 #include "terms.h"
 #include <fcntl.h>
 #include <stdio.h>
@@ -226,7 +234,7 @@ get_winsize()
 #endif /* TIOCSWINSZ */
 }
 
-void
+bool
 set_tty()
 {
   int er;
@@ -271,10 +279,11 @@ set_tty()
   initFep();
 
   if (er == -1) {
+    return false;
     printf("Error occured\n");
     reset_tty();
-    App::Instance().Exit(-1);
   }
+  return true;
 }
 
 void
