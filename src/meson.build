@@ -2,6 +2,7 @@ cc = meson.get_compiler('c')
 termcap_dep = cc.find_library('termcap', required: true)
 
 executable('skkfep', [
+  'app.cpp',
   'fep.cpp',
   'readwrite.cpp',
   'keybind.cpp',

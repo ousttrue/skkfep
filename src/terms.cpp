@@ -1,4 +1,5 @@
 #include "terms.h"
+#include "app.h"
 #include "config.h"
 #include "fep.h"
 #include "readwrite.h"
@@ -64,7 +65,7 @@ getTCstr()
     T_rc = NULL;
   if ((T_sc == NULL) || (T_rc == NULL)) {
     fprintf(stderr, "Your terminal cannot save/restore cursor.\n");
-    Exit(-1);
+    App::Instance().Exit(-1);
   }
   GETSTR(T_so, "so"); /* standout mode */
   GETSTR(T_se, "se"); /* standout mode end */

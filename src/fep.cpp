@@ -1,4 +1,5 @@
 #include "fep.h"
+#include "app.h"
 #include "config.h"
 #include "connsh.h"
 #include "etc.h"
@@ -24,8 +25,6 @@
 static char shellBuf[SH_BUF_SIZ];
 
 KeymapPtr CurrentKeymap;
-char UserDicName[64];
-Dictionary* UserDic;
 #ifdef SYSTEM_DIC_NAME
 Dictionary SystemDic;
 #endif
@@ -154,6 +153,7 @@ main(int argc, char* argv[], char* envp[])
   char* debfile = "rwlog";
 #endif
   guess_system_kanji_code();
+  char UserDicName[64];
   /* Arguments */
   for (i = 1; i < argc; i++) {
     if (!strncmp(argv[i], "-o", 2))
@@ -232,12 +232,8 @@ options:\n\
   set_tty();
   set_int();
 
-  if (*UserDicName == '\0') {
-    strcpy(UserDicName, getenv("HOME"));
-    strcat(UserDicName, "/");
-    strcat(UserDicName, USER_DIC_NAME);
-  }
-  UserDic = openSKK(UserDicName);
+  App::Instance().OpenDictionary(UserDicName);
+
   toAsc({});
 
   establishShell();

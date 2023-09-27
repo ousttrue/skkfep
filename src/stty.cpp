@@ -1,10 +1,11 @@
 #include "stty.h"
-#include "skklib.h"
+#include "app.h"
 #include "config.h"
 #include "connsh.h"
 #include "etc.h"
 #include "fep.h"
 #include "keybind.h"
+#include "skklib.h"
 #include "terms.h"
 #include <fcntl.h>
 #include <signal.h>
@@ -41,7 +42,6 @@
 #include <sys/ioctl.h>
 #endif /* TERMIOS || TERMIO */
 
-
 #if defined TERMIOS || defined TERMIO
 #ifdef TERMIOS
 typedef struct termios TERMPARAM;
@@ -51,21 +51,21 @@ typedef struct termio TERMPARAM;
 #else
 typedef struct
 {
-  struct sgttyb m_ttyb;      /* TIOCGETP */
-  struct tchars m_tchars;    /* TIOCGETC */
+  struct sgttyb m_ttyb;   /* TIOCGETP */
+  struct tchars m_tchars; /* TIOCGETC */
 #ifdef TIOCLGET
-  int m_lmode;               /* TIOCLGET */
+  int m_lmode; /* TIOCLGET */
 #endif /* TIOCLGET */
 #ifdef TIOCGETD
-  int m_ldisc;               /* TIOCGETD */
+  int m_ldisc; /* TIOCGETD */
 #endif /* TIOCGETD */
 #ifdef TIOCGLTC
-  struct ltchars m_ltchars;  /* TIOCGLTC */
+  struct ltchars m_ltchars; /* TIOCGLTC */
 #endif /* TIOCGLTC */
 
 #ifdef sony_news
 #ifdef TIOCKGET
-  int km_con;                /* TIOCKGET */
+  int km_con; /* TIOCKGET */
 #endif /* TIOCKGET */
 #ifdef TIOCKGETC
   struct jtchars km_jtchars; /* TIOCKGETC */
@@ -281,7 +281,7 @@ set_tty()
   if (er == -1) {
     printf("Error occured\n");
     reset_tty();
-    Exit(-1);
+    App::Instance().Exit(-1);
   }
 }
 
@@ -351,7 +351,7 @@ reset_exit(int)
 {
   reset_tty();
   signal(SIGCHLD, SIG_DFL);
-  Exit(-1);
+  App::Instance().Exit(-1);
 }
 
 void
@@ -359,7 +359,7 @@ segv_exit(int)
 {
   reset_tty();
   fprintf(stderr, "SEGMENTATION VIOLATION\n");
-  Abort();
+  App::Instance().Abort();
 }
 
 #ifdef HPUX
@@ -392,7 +392,7 @@ chld_changed(int)
     kill(0, SIGTSTP);
   } else
 #endif /* NO_SUSPEND */
-    Exit(0);
+    App::Instance().Exit(0);
 #endif /* AIX */
 }
 
@@ -401,7 +401,7 @@ iot_exit(int)
 {
   reset_tty();
   fprintf(stderr, "Abort.\n");
-  Abort();
+  App::Instance().Abort();
 }
 
 void
@@ -409,7 +409,7 @@ hup_exit(int)
 {
   reset_tty();
   fprintf(stderr, "Hungup\n");
-  Exit(-1);
+  App::Instance().Exit(-1);
 }
 
 void
@@ -417,7 +417,7 @@ int_exit(int)
 {
   reset_tty();
   fprintf(stderr, "Interrupt\n");
-  Exit(-1);
+  App::Instance().Exit(-1);
 }
 
 void
@@ -425,7 +425,7 @@ pipe_exit(int)
 {
   reset_tty();
   fprintf(stderr, "Pipe down\n");
-  Exit(-1);
+  App::Instance().Exit(-1);
 }
 
 void
@@ -433,7 +433,7 @@ term_exit(int)
 {
   reset_tty();
   fprintf(stderr, "Terminate\n");
-  Exit(-1);
+  App::Instance().Exit(-1);
 }
 
 #ifndef NO_SUSPEND
@@ -524,31 +524,4 @@ set_int()
 #endif
   signal(SIGUSR1, sig_usr1);
   signal(SIGUSR2, sig_usr2);
-}
-
-void
-saveJisyo()
-{
-  if (UserDic != NULL) {
-    printf("Saving JISYO...\n");
-    closeSKK(UserDic, UserDicName);
-  }
-}
-
-void
-Exit(int v)
-{
-  freeDevice();
-  saveJisyo();
-  exit(v);
-}
-
-void
-Abort()
-{
-  freeDevice();
-  saveJisyo();
-  signal(SIGQUIT, SIG_DFL);
-  signal(SIGIOT, SIG_DFL);
-  abort();
 }

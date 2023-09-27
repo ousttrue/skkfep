@@ -219,7 +219,7 @@ getCandList(FILE* f, DicList* ditem, int okuri)
 }
 
 void
-closeSKK(Dictionary* dic, char* dicname)
+closeSKK(Dictionary* dic, const char* dicname)
 {
   FILE* f;
   DicList* dlist;
@@ -279,7 +279,7 @@ closeSKK(Dictionary* dic, char* dicname)
 /* #define DEBUG_MERGE /* debug dictionary merge */
 
 void
-mergeDictionary(Dictionary* dic, char* dicname)
+mergeDictionary(Dictionary* dic, const char* dicname)
 {
   FILE* f;
   CandList* cand;

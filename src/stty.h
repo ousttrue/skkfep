@@ -24,13 +24,4 @@ void
 set_int();
 
 void
-saveJisyo();
-
-void
-Exit(int v);
-
-void
-Abort();
-
-void
 chld_changed(int);

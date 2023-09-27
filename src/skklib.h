@@ -48,7 +48,6 @@ struct Dictionary
   Hash** dhash;
   time_t mtime;
 };
-extern Dictionary* UserDic;
 
 Dictionary*
 openSKK(const char* dicname);
@@ -63,10 +62,10 @@ CandList*
 getCandList(FILE* f, DicList* ditem, int okuri);
 
 void
-closeSKK(Dictionary* dic, char* dicname);
+closeSKK(Dictionary* dic, const char* dicname);
 
 void
-mergeDictionary(Dictionary* dic, char* dicname);
+mergeDictionary(Dictionary* dic, const char* dicname);
 
 /* flags for printCand() */
 #define NOFREE_CAND 0

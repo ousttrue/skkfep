@@ -20,6 +20,5 @@ CC = gcc DEFINE = -DUSE_LOCALE OPTIMIZE = -g EXTRALIBS =
 #define NET_LEARN_MODE LearnPermanent /* Write back words obtained from */
                                       /* SKK server			  */
 
-#define USER_DIC_NAME "~/.skk/SKK-JISYO.L"
 
 #define NATIVECODE euc /* EUC Kanji code */

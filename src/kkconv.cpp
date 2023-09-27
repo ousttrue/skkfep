@@ -1,4 +1,5 @@
 #include "kkconv.h"
+#include "app.h"
 #include "config.h"
 #include "etc.h"
 #include "fep.h"
@@ -333,7 +334,7 @@ kkconv(char c)
   showmode(KSELECT_MODE);
 
   WordBuf[WordBufLen] = '\0';
-  CurrentCand = getCand(UserDic, WordBuf);
+  CurrentCand = getCand(App::Instance().UserDic, WordBuf);
   if (CurrentCand) {
     originalDicItem = CurrentCand->dicitem;
     if (OkuriInput)
