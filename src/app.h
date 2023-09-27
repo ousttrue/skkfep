@@ -20,6 +20,7 @@ public:
 
   void Abort();
   void Exit(int code);
+  void Reset(const char *msg);
 
   void PtyFree();
 

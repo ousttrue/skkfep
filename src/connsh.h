@@ -1,4 +1,8 @@
 #pragma once
+#include <stdio.h>
+
+extern int ShellPID;
+extern FILE* Shellout;
 
 void
 establishShell();

@@ -1,14 +1,9 @@
 #include "stty.h"
 #include "app.h"
 #include "config.h"
-#include "connsh.h"
-#include "etc.h"
 #include "fep.h"
-#include "keybind.h"
-#include "skklib.h"
 #include "terms.h"
 #include <fcntl.h>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -105,9 +100,6 @@ int tty;
 #ifdef TIOCSWINSZ
 struct winsize d_winsize;
 #endif /* TIOCSWINSZ */
-
-extern int ShellPID;
-extern FILE* Shellout;
 
 #if !defined(TERMIOS) && !defined(TERMIO)
 static int
@@ -344,184 +336,4 @@ void
 tty_ready()
 {
   tty = open(ttyname(0), O_RDWR);
-}
-
-void
-reset_exit(int)
-{
-  reset_tty();
-  signal(SIGCHLD, SIG_DFL);
-  App::Instance().Exit(-1);
-}
-
-void
-segv_exit(int)
-{
-  reset_tty();
-  fprintf(stderr, "SEGMENTATION VIOLATION\n");
-  App::Instance().Abort();
-}
-
-#ifdef HPUX
-#define IF_STOPPED(x) WIFSTOPPED((x).w_stopval)
-#else /* not HPUX */
-#define IF_STOPPED(x) WIFSTOPPED(x)
-#endif /* not HPUX */
-
-void
-chld_changed(int)
-{
-  int cpid;
-/* #ifdef _AIX */
-#if defined(_AIX) || defined(NECEWS) || defined(SOLARIS2)
-  int statusp;
-  reset_tty_without_close();
-  cpid = wait(&statusp);
-  if (cpid != -1 && IF_STOPPED(statusp)) { /* suspend */
-    kill(0, SIGTSTP);
-  } else
-    Exit(0);
-
-#else /* not AIX */
-  int statusp;
-
-  reset_tty_without_close();
-#ifndef NO_SUSPEND
-  cpid = wait((int*)&statusp);
-  if (cpid != -1 && IF_STOPPED(statusp)) { /* suspend */
-    kill(0, SIGTSTP);
-  } else
-#endif /* NO_SUSPEND */
-    App::Instance().Exit(0);
-#endif /* AIX */
-}
-
-void
-iot_exit(int)
-{
-  reset_tty();
-  fprintf(stderr, "Abort.\n");
-  App::Instance().Abort();
-}
-
-void
-hup_exit(int)
-{
-  reset_tty();
-  fprintf(stderr, "Hungup\n");
-  App::Instance().Exit(-1);
-}
-
-void
-int_exit(int)
-{
-  reset_tty();
-  fprintf(stderr, "Interrupt\n");
-  App::Instance().Exit(-1);
-}
-
-void
-pipe_exit(int)
-{
-  reset_tty();
-  fprintf(stderr, "Pipe down\n");
-  App::Instance().Exit(-1);
-}
-
-void
-term_exit(int)
-{
-  reset_tty();
-  fprintf(stderr, "Terminate\n");
-  App::Instance().Exit(-1);
-}
-
-#ifndef NO_SUSPEND
-void
-suspend(int)
-{
-  reset_tty_without_close();
-  signal(SIGTSTP, SIG_DFL);
-  kill(0, SIGTSTP);
-}
-
-void
-susp_cont(int)
-{
-  signal(SIGTSTP, suspend);
-  reset_tty_without_close();
-  set_tty();
-  kill(ShellPID, SIGCONT);
-}
-#endif
-
-#ifdef SIGWINCH
-void
-winchange(int)
-{
-  int tty;
-  signal(SIGWINCH, SIG_IGN);
-  if (Shellout != NULL)
-    tty = fileno(Shellout);
-  else
-    tty = 1; /* stdout */
-  get_winsize();
-  set_winsize(tty);
-  initFep();
-  showcurmode();
-  signal(SIGWINCH, winchange);
-}
-#endif
-
-void
-sig_usr1(int)
-{
-  signal(SIGUSR1, SIG_IGN);
-  initFep();
-  toggleEscape(ViEsc);
-  signal(SIGUSR1, sig_usr1);
-}
-
-void
-sig_usr2(int)
-{
-  signal(SIGUSR2, SIG_IGN);
-  initFep();
-  toggleEscape(EmacsEsc);
-  signal(SIGUSR2, sig_usr2);
-}
-
-void
-sig_int(int)
-{
-  signal(SIGHUP, SIG_IGN);
-  initFep();
-  toggleEscape(NoEsc);
-  signal(SIGHUP, sig_int);
-}
-
-void
-set_int()
-{
-  signal(SIGHUP, hup_exit);
-  signal(SIGINT, sig_int);
-  /*	signal(SIGQUIT,iot_exit); */
-  signal(SIGILL, reset_exit);
-  signal(SIGIOT, iot_exit);
-  signal(SIGFPE, reset_exit);
-#ifndef LINUX
-  signal(SIGBUS, bus_exit);
-#endif
-  signal(SIGSEGV, segv_exit);
-  signal(SIGPIPE, pipe_exit);
-  signal(SIGTERM, term_exit);
-#ifndef NO_SUSPEND
-  signal(SIGTSTP, suspend);
-  signal(SIGCONT, susp_cont);
-#endif
-#ifdef SIGWINCH
-  signal(SIGWINCH, winchange);
-#endif
-  signal(SIGUSR1, sig_usr1);
-  signal(SIGUSR2, sig_usr2);
 }

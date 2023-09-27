@@ -21,7 +21,5 @@ void
 tty_ready();
 
 void
-set_int();
+init_signals();
 
-void
-chld_changed(int);

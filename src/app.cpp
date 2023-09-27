@@ -1,14 +1,21 @@
 #include "app.h"
 #include "connsh.h"
 #include "skklib.h"
+#include "stty.h"
 #include <signal.h>
 #include <sstream>
 
 #define USER_DIC_NAME ".skk/SKK-JISYO.L"
 
-App::App(){}
+App::
+App()
+{
+}
 
-App::~App(){}
+App::~
+App()
+{
+}
 
 void
 App::Exit(int code)
@@ -26,6 +33,14 @@ App::Abort()
   signal(SIGQUIT, SIG_DFL);
   signal(SIGIOT, SIG_DFL);
   abort();
+}
+
+void
+App::Reset(const char* msg)
+{
+  reset_tty();
+  fprintf(stderr, "%s\n", msg);
+  Exit(-1);
 }
 
 void
