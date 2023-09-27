@@ -1,5 +1,7 @@
 #pragma once
 
+namespace romkan {
+
 void
 iKanaV(char c);
 
@@ -62,3 +64,5 @@ enterCode(char);
 
 void
 hira2kata(char* buf);
+
+} // namespace

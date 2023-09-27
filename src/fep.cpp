@@ -321,7 +321,7 @@ thru(char c)
 void
 toAsc(char c)
 {
-  flushKana();
+  romkan::flushKana();
   setKeymap(&CurrentKeymap, convertKeymap(&NormalKeymap));
   showmode(SKK_MODE);
 }
@@ -329,7 +329,7 @@ toAsc(char c)
 void
 toZenA(char c)
 {
-  flushKana();
+  romkan::flushKana();
   setKeymap(&CurrentKeymap, ZenkakuKeymap);
   showmode(ZENEI_MODE);
 }
@@ -344,7 +344,7 @@ thruToAsc(char c)
 void
 toEsc(char c)
 {
-  flushKana();
+  romkan::flushKana();
   setKeymap(&CurrentKeymap, convertKeymap(&EscapedKeymap));
   showmode(SKK_MODE);
 }
@@ -360,7 +360,7 @@ void
 thruBack(char c)
 {
   thru(c);
-  toKana(c);
+  romkan::toKana(c);
 }
 
 void

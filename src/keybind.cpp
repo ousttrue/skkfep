@@ -60,11 +60,11 @@ setKanaKey()
   int k;
   k = code(KanaKey);
   printf("KanaKey=^%c\n", k ^ 0x40);
-  changeKey(&NormalKeymap, toKana, k);
+  changeKey(&NormalKeymap, romkan::toKana, k);
   changeKey(&SelectionKeymap, fixIt, k);
-  changeKey(&CodeInputKeymap, toKana, k);
+  changeKey(&CodeInputKeymap, romkan::toKana, k);
   KanaKeymap[k] = nulcmd;
-  ZenkakuKeymap[k] = toKana;
+  ZenkakuKeymap[k] = romkan::toKana;
   KanjiInputKeymap[k] = kfFix;
   OkuriInputKeymap[k] = okfFix;
   KAlphaInputKeymap[k] = kfFix;
@@ -77,7 +77,7 @@ setEscape(EscapeBehavior b)
     return;
   if (b == NoEsc) {
     changeKey(&SelectionKeymap, thruFixItToAsc, EXTRA_CODE);
-    KanaKeymap[ESC_CODE] = flthru;
+    KanaKeymap[ESC_CODE] = romkan::flthru;
     ZenkakuKeymap[ESC_CODE] = thru;
     KanjiInputKeymap[ESC_CODE] = nulcmd;
     KAlphaInputKeymap[ESC_CODE] = nulcmd;

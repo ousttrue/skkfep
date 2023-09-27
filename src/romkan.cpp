@@ -447,6 +447,7 @@ short Kindex;
 short Nconso;
 static const char* (*CurrentTab)[5] = HiraTab;
 
+namespace romkan {
 void
 iKanaV(char c)
 {
@@ -829,3 +830,5 @@ hira2kata(char* buf)
       i++;
   }
 }
+
+} // namespace
