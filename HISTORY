@@ -1,249 +1,249 @@
------- version 0.21 $@$G$NJQ99(J
+------ version 0.21 での変更
 From: Yutaka Kaneko <kaneko@rcais.tohoku.ac.jp>
 
-  $@6b;R$G$9!#(J
-  skkfep$@MQ$X$N(Jpatch$@$G$9!#Gd$j$O!"(J
-    HP-UX$@$GF0$$$?!#(J
-    $@6gFIE@$r!V!"!#!W$K$7$?!#(J
-    -e $@%*%W%7%g%s$G%3%^%s%I$KB3$1$F0z?t$r=q$1$k$h$&$K$7$?!#(J
-	$@Nc!'(J  skkfep -e vi fep.c
-$@$H$$$C$?$H$3$m$G$9!#(J
+  金子です。
+  skkfep用へのpatchです。売りは、
+    HP-UXで動いた。
+    句読点を「、。」にした。
+    -e オプションでコマンドに続けて引数を書けるようにした。
+	例：  skkfep -e vi fep.c
+といったところです。
 
------- version 0.22 $@$G$NJQ99(J
+------ version 0.22 での変更
 From: Yutaka Kaneko <kaneko@rcais.tohoku.ac.jp>
-  $@6b;R7/(Jpatch$@Bh#2CF$G$9!#(J
-  skkfep -k<key> option$@$NDI2C(J
-    -kj, -k\n, -k^j $@Ey$r;XDj$9$k$H(JC-j$@$,JQ49%-!<$K$J$j$^$9(J
-  sgtty$@$N>l9g!"$$$m$$$m(Jioctl$@$9$k$h$&$K$7$^$7$?!#(J
-    $@6qBNE*$K$O(JTIOC{SETC,SETD,LSET,SLTC}$@$H(Jsony_news$@$N>l9g$N(J
-    TIOC{KSET,KSETC}$@!#(Jnews$@$G$N4A;z2=$1$,$J$/$J$j$^$9!#(J
+  金子君patch第２弾です。
+  skkfep -k<key> optionの追加
+    -kj, -k¥n, -k^j 等を指定するとC-jが変換キーになります
+  sgttyの場合、いろいろioctlするようにしました。
+    具体的にはTIOC{SETC,SETD,LSET,SLTC}とsony_newsの場合の
+    TIOC{KSET,KSETC}。newsでの漢字化けがなくなります。
 
------- version 0.23 $@$G$NJQ99(J
+------ version 0.23 での変更
 From: Yutaka Kaneko <kaneko@rcais.tohoku.ac.jp>
-  $@6b;R7/(Jpatch$@Bh#3CF$G$9!#(J
-  SystemDic$@$rC5$9$h$&$K$7$F$7$^$$$^$7$?!#(J
-  UserDic$@$K!V$h$_!W$,B8:_$7$J$$$H$-!"(JSystemDic$@$rC5$7$K$$$-$^$9!#(J
-    $@$3$l$G$OIT==J,$J$N$OL@Gr$G$9$,!"(J
-    skkserv$@$KBP1~$9$k$^$G$N$D$J$.$K$O$J$k$G$7$g$&!#(J
+  金子君patch第３弾です。
+  SystemDicを探すようにしてしまいました。
+  UserDicに「よみ」が存在しないとき、SystemDicを探しにいきます。
+    これでは不十分なのは明白ですが、
+    skkservに対応するまでのつなぎにはなるでしょう。
 
-    $@$G$b!"%W%m%;%9$,5pBg$K$J$k$%!#(J
+    でも、プロセスが巨大になるぅ。
 
------- version 0.24 $@$G$NJQ99(J
-   skkserv $@$KBP1~$7$^$7$?!%(Jskkserv $@$N%[%9%HL>$O!$4D6-JQ?t(J
-   SKKSERVER $@$G;XDj$7$^$9!%(J(aito)
+------ version 0.24 での変更
+   skkserv に対応しました．skkserv のホスト名は，環境変数
+   SKKSERVER で指定します．(aito)
 
------- version 0.25 $@$G$NJQ99(J
-   skkserv $@$+$i$N<-=q0z$-$r%^%8%a$K$d$k$3$H$K$7$^$7$?!#(J
-   $@$^$?!"$?$/$5$s$N%G!<%?$r$?$lN.$9$HF0:n$,JQ$K$J$k%P%0$r(J
-   fix $@$7$?$H;W$$$^$9!#(J (aito)
+------ version 0.25 での変更
+   skkserv からの辞書引きをマジメにやることにしました。
+   また、たくさんのデータをたれ流すと動作が変になるバグを
+   fix したと思います。 (aito)
 
------- version 0.26 $@$G$NJQ99(J
-   skkserv $@$G8!:w$r<:GT$9$k$H$=$l0J9_JQ49$,$G$-$J$/$J$k(J
-   $@%P%0$N(J fix$@!%(J
-   SJIS $@$,$A$c$s$HF0$+$J$+$C$?$H$$$&%P%0$N(J fix.
+------ version 0.26 での変更
+   skkserv で検索を失敗するとそれ以降変換ができなくなる
+   バグの fix．
+   SJIS がちゃんと動かなかったというバグの fix.
    (aito)
 
 ------ version 0.27 
-   $@4A;zJQ49Cf$K(J l $@$G(J SKK $@%b!<%I$KLa$C$?$H$-$K!$J8;z$K%"(J
-   $@%s%@!<%i%$%s$,$D$$$?$^$^$G!$$7$+$bF~NOCf$NJ8;z$,(J flush
-   $@$5$l$J$$!$$H$$$&%P%0$N(J fix$@!%(J(aito)
+   漢字変換中に l で SKK モードに戻ったときに，文字にア
+   ンダーラインがついたままで，しかも入力中の文字が flush
+   されない，というバグの fix．(aito)
 
 ------ version 0.28
-   $@Aw$j$,$J$N=hM}$G<j$rH4$$$F$$$?$N$rD>$7$?!#(J(aito)
+   送りがなの処理で手を抜いていたのを直した。(aito)
 
 ------ version 0.29
-   System-V (R3 and R4) $@$KBP1~!#(J(kaneko)
+   System-V (R3 and R4) に対応。(kaneko)
 
 ------ version 0.32
-   JIS $@BP1~$K$9$k$?$a!$4A;z%3!<%IJQ49$^$o$j$rBgI}$KJQ99!%(J(aito)
+   JIS 対応にするため，漢字コード変換まわりを大幅に変更．(aito)
 
 ------ version 0.33
-   Shell $@B&$r(J JIS $@$K$7$F$$$k$H$-!$(J^H $@$KBP$7$F(J shift-out $@$rAw$k$+$I$&$+(J
-   $@$rA*Br$G$-$k$h$&$K$7$?!%(J(aito)
-   $@$+$JF~NO;~$KBgJ8;z$r(J2$@2sB3$1$FF~NO$9$k$H%"%s%@!<%i%$%s$,$D$-$C$Q$J$7(J
-   $@$K$J$k$H$$$&%P%0$N(J fix (aito)
+   Shell 側を JIS にしているとき，^H に対して shift-out を送るかどうか
+   を選択できるようにした．(aito)
+   かな入力時に大文字を2回続けて入力するとアンダーラインがつきっぱなし
+   になるというバグの fix (aito)
 
 ------ version 0.34
-   $@K:$l$?(J :-)
+   忘れた :-)
 
 ------ version 0.35
-   $@!V=P$9!W$H$$$C$?Aw$j$,$J$r;}$D8uJd$KBP$7$F!$(J"DaSu" $@$G$O$J$/(J "DaSU"
-   $@$HF~NO$7$F$7$^$C$?>l9g$K!$JQ49$,<:GT$9$k$@$1$G$J$/(J ^H $@$r0l8DB?$/Aw$C(J
-   $@$F$7$^$&$H$$$&%P%0$N(J fix$@!%$D$$$G$K!$(J"DaSU" $@$H$$$&F~NO$G$b!V=P$9!W$K(J
-   $@JQ49$G$-$k$h$&$K$7$?!%(J(aito)
+   「出す」といった送りがなを持つ候補に対して，"DaSu" ではなく "DaSU"
+   と入力してしまった場合に，変換が失敗するだけでなく ^H を一個多く送っ
+   てしまうというバグの fix．ついでに，"DaSU" という入力でも「出す」に
+   変換できるようにした．(aito)
 
 ------ version 0.36
-   version 0.35 $@$G3F5!<o$KBP1~$7$F$$$J$+$C$?ItJ,$N(J fix (aito)
+   version 0.35 で各機種に対応していなかった部分の fix (aito)
 
 ------ version 0.37
-   dhi $@"*(J $@$G$#!$(J jya $@"*(J $@$8$c(J $@$H$$$&%m!<%^;z$+$JJQ49$r5v$9!%(J(watanabe)
+   dhi → でぃ， jya → じゃ というローマ字かな変換を許す．(watanabe)
 
 ------ version 0.38
-   skkserv $@$+$i0z$$$?C18l$N3X=,J}K!$r#3<oN`A*Br$G$-$k$h$&$K$7$?!%(J
-   ($@3X=,$J$7!$3X=,$9$k$,%m!<%+%k<-=q$K=q$-La$5$J$$!$3X=,$7$F%m!<%+%k<-=q(J
-   $@$K=q$-La$9!$$N#3$D(J) (aito)
+   skkserv から引いた単語の学習方法を３種類選択できるようにした．
+   (学習なし，学習するがローカル辞書に書き戻さない，学習してローカル辞書
+   に書き戻す，の３つ) (aito)
 
 ------ version 0.39
    kfthru() bug fix (thanks to kuroki)
 
 ------ version 0.40
-   $@Aw$j$,$J$N$D$$$?C18l$N<!8uJd$r(J skkserv $@$+$i8!:w$9$k$H!$3X=,$7$?<-=q$r(J
-   $@=q$-$@$9$H$-$K0[>o$,5/$3$k%P%0$r(J fix (thanks to kuroki)
+   送りがなのついた単語の次候補を skkserv から検索すると，学習した辞書を
+   書きだすときに異常が起こるバグを fix (thanks to kuroki)
 
 ------ version 0.41
-   thi $@"*(J $@$F$#(J $@$H$$$&JQ49$r5v$9!%(J(aito)
-   $@4A;zJQ49Cf!$8uJdA*BrCf$K(J C-g $@$G%-%c%s%;%k$,$-$/$h$&$K$7$?!%(J(aito)
+   thi → てぃ という変換を許す．(aito)
+   漢字変換中，候補選択中に C-g でキャンセルがきくようにした．(aito)
 
 ------ version 0.42
-   $@4A;zF~NOCf$K%+%?%+%J$K$7$F4A;zF~NO%b!<%I$rH4$1$k$H!$%b!<%II=<($,(J
-   $@!V$+$J!W$N$^$^%+%?%+%J%b!<%I$K$J$C$F$$$k$H$$$&%P%0$N(J fix$@!%(J(aito)
+   漢字入力中にカタカナにして漢字入力モードを抜けると，モード表示が
+   「かな」のままカタカナモードになっているというバグの fix．(aito)
 
 ------ version 0.43
-   $@%f!<%6<-=q$NCf$N(J okuri-nasi entries $@$NCf$K(J "[" $@$,4^$^$l$F$$$k;~$K(J
-   $@<-=q$,$&$^$/FI$a$J$$(J bug $@$r(J fix (aito; $@El<G$N;01:2m90$5$s$N<(:6$K(J
-   $@$h$k(J)
-   'n' $@$rF~NO$7$F5-9f!&1Q?t;z$rF~NO$7$?$H$-$K!$!V$s!W$KJQ49$5$l$J$$(J
-   bug $@$r(J fix (aito)
+   ユーザ辞書の中の okuri-nasi entries の中に "[" が含まれている時に
+   辞書がうまく読めない bug を fix (aito; 東芝の三浦雅弘さんの示唆に
+   よる)
+   'n' を入力して記号・英数字を入力したときに，「ん」に変換されない
+   bug を fix (aito)
    (Posted to fj.sources)
 
 ------ version 0.44
-   $@JQ49<:GT;~$K!$F~NO$7$?J8;z$,L$3NDj>uBV$K$J$k%*%W%7%g%s$rDI2C(J(aito;
-   $@ElBg$N:{ItE/O:$5$s$N<(:6$K$h$k(J)
-   kterm $@$G$N(J ts $@%(%s%H%j$N=q$-$+$?$NNc$K$^$A$,$$$,$"$C$?!%(J(aito; $@El(J
-   $@KLBg$NNkLZ2m?M$5$s$N<(:6$K$h$k(J)
-   skkfep $@5/F08e$KN)$A$"$,$k%7%'%k$N(J tty $@@_Dj$K%P%0$,$"$C$?!%(J(aito;
-   $@ElKLBg$NNkLZ2m?M$5$s$N<(:6$K$h$k(J)
+   変換失敗時に，入力した文字が未確定状態になるオプションを追加(aito;
+   東大の笹部哲郎さんの示唆による)
+   kterm での ts エントリの書きかたの例にまちがいがあった．(aito; 東
+   北大の鈴木雅人さんの示唆による)
+   skkfep 起動後に立ちあがるシェルの tty 設定にバグがあった．(aito;
+   東北大の鈴木雅人さんの示唆による)
 
 ------ version 0.50
-   $@Aw$j$,$JF~NO%b!<%I$H$=$NB>$N%b!<%I$N4X78$r(J SKK $@$K6a$E$1$?!%(J(aito)
-   $@Aw$j$,$JF~NOCf$H1Q;zF~NOCf$K(J C-g $@$,$-$/$h$&$K$7$?!%(J(aito; $@7W;;5!(J
-   $@2J3X8&5f=j$N9-@n$5$s$N<(:6$K$h$k(J)
-   ESC $@$G(J SKK $@%b!<%I$KLa$k%*%W%7%g%s$r$D$1$?!%(J($@%7%c!<%W$NA}0f=SG7$5$s(J
-   $@$N<(:6$K$h$k(J)
+   送りがな入力モードとその他のモードの関係を SKK に近づけた．(aito)
+   送りがな入力中と英字入力中に C-g がきくようにした．(aito; 計算機
+   科学研究所の広川さんの示唆による)
+   ESC で SKK モードに戻るオプションをつけた．(シャープの増井俊之さん
+   の示唆による)
    (Posted to fj.sources)
 
 ------ version 0.51
-   $@C18lF~NO%b!<%I$G$NA43Q5-9fF~NO$,JQ$@$C$?$N$r(J fix$@!%(J(aito)
-   $@0lIt$N5!<o$G!$5/F08e$N%7%'%k$N(J tty $@$N@_Dj$,0-$+$C$?$N$r(J fix$@!%(J(
-   aito; $@ElKLBg$NNkLZ2m?M$5$s$N<(:6$K$h$k(J)
-   $@<-=q%(%s%H%j$,$&$^$/FI$a$J$$>l9g!$$^$?<-=q%5%$%:$,(J0$@$N>l9g$K(J core
-   dump $@$9$k%P%0$r(J fix$@!%(J($@>>2<$NKYFbJ]=($5$s$N<(:6$K$h$k(J)
+   単語入力モードでの全角記号入力が変だったのを fix．(aito)
+   一部の機種で，起動後のシェルの tty の設定が悪かったのを fix．(
+   aito; 東北大の鈴木雅人さんの示唆による)
+   辞書エントリがうまく読めない場合，また辞書サイズが0の場合に core
+   dump するバグを fix．(松下の堀内保秀さんの示唆による)
 
 ------ version 0.60
-   status line $@$N$J$$C<Kv$G$b(Jstatus $@$,I=<($5$l$k$h$&JQ99!%(J(kaneko)
-   $@5/F0$5$l$k%7%'%k$NCf$G!$4D6-JQ?t(J SKKFEP_VERSION $@$H(J SKKFEP_PID
-   $@$r%;%C%H$9$k$h$&$K$7$?!%(J(kaneko)
-   $@<-=q$N%5%$%:$,(J0$@$N$H$-$K$O<-=q$N%P%C%/%"%C%W$r:n$i$J$$$h$&$K$7$?!%(J
+   status line のない端末でもstatus が表示されるよう変更．(kaneko)
+   起動されるシェルの中で，環境変数 SKKFEP_VERSION と SKKFEP_PID
+   をセットするようにした．(kaneko)
+   辞書のサイズが0のときには辞書のバックアップを作らないようにした．
    (kaneko)
-   $@!VFI$_$r%Q%i%a!<%?$H$9$kI=8=!W$,<-=qCf$K$"$C$?$H$-!$Aw$j$,$J(J
-   $@%(%s%H%j$rI=$o$9%3%a%s%H$,$D$$$F$7$^$&%P%0$r(Jfix$@!%(J(aito; $@7W;;5!(J
-   $@2J3X8&5f=j$N9-@n$5$s$N<(:6$K$h$k(J)
-   $@;R2;F~NOCf$K(J C-g $@$GCfCG$7$?$H$-!$F~NOESCf$N;R2;$,;D$C$F$7$^$&(J
-   $@%P%0$r(J fix$@!%(J(aito; $@7W;;5!2J3X8&5f=j$N9-@n$5$s$N<(:6$K$h$k(J)
-   $@<-=q$r%;!<%V$7$?$H$-!$(Jpermission $@$r%;!<%VA0$N$b$N$H9g$o$;$k$h$&(J
-   $@$K$7$?!%(J(aito; $@El5~Bg3X$N<r0f$5$s$N<(:6$K$h$k(J)
-   status line $@$N$J$$C<Kv$r;HMQ$7$F$$$k$H$-!$4A;z%3!<%IF~NO$r$9$k$H(J
-   $@%+!<%=%k$,(J status line $@$NCf$K;D$k%P%0$r(J fix (aito)
-   status line $@$rH?E>$9$k%*%W%7%g%s$rDI2C(J (aito)
+   「読みをパラメータとする表現」が辞書中にあったとき，送りがな
+   エントリを表わすコメントがついてしまうバグをfix．(aito; 計算機
+   科学研究所の広川さんの示唆による)
+   子音入力中に C-g で中断したとき，入力途中の子音が残ってしまう
+   バグを fix．(aito; 計算機科学研究所の広川さんの示唆による)
+   辞書をセーブしたとき，permission をセーブ前のものと合わせるよう
+   にした．(aito; 東京大学の酒井さんの示唆による)
+   status line のない端末を使用しているとき，漢字コード入力をすると
+   カーソルが status line の中に残るバグを fix (aito)
+   status line を反転するオプションを追加 (aito)
    (Posted to fj.sources)
 
 ------ version 0.61
-   $@;R2;$NF~NOESCf$GAw$j$,$J$NF~NO$r;O$a$k$H!$JQ49$,$&$^$/$$$+$J$$$H(J
-   $@F1;~$K;z$,2=$1$k$H$$$&%P%0$N(J fix (aito)
+   子音の入力途中で送りがなの入力を始めると，変換がうまくいかないと
+   同時に字が化けるというバグの fix (aito)
 
 ------ version 0.62 Wed May 12 1993
-   $@4A;zJQ49J8;zNs$NCf$K(J1$@%P%$%HJ8;z$r4^$a!$$=$l$r(J BS $@$G>C5n$9$k$H;z2=$1(J
-   $@$9$k$H$$$&%P%0$N(J fix (aito)
-   $@!V$s!W$N<!$+$iAw$j$,$J$,;O$^$k4A;z(J($@!V46$8$k!W!V4X$9$k!W$J$I(J)$@$NJQ49$,(J
-   $@$&$^$/$$$+$J$$$H$$$&%P%0$N(J fix (aito)
+   漢字変換文字列の中に1バイト文字を含め，それを BS で消去すると字化け
+   するというバグの fix (aito)
+   「ん」の次から送りがなが始まる漢字(「感じる」「関する」など)の変換が
+   うまくいかないというバグの fix (aito)
 
-   SONY NEWS$@$N(Jtty$@2s$j$G$9$,!"(Jsgtty$@$r;H$C$?$H$-$K$D$$$F$O4A;z2s(J
-   $@$j$N:F@_Dj$b$7$F$$$k$N$G$9$,!"(JTERMIOS$@$r;H$&$h$&$K$9$k$H!"4A(J
-   $@;z2s$j$,@_Dj$5$l$^$;$s!#$=$3$G!"(Jconfig-sony.h$@$N(JTERMIOS$@$N(J
-   define$@$r%3%a%s%H%"%&%H$7$^$7$?!#(J(kaneko)
-   HPUX 9.0$@$N(J/usr/include/termio.h$@$G$O(JECHOKE$@$,Dj5A$5$l$F$$$J$$(J
-   $@$h$&$J$N$G!"(J#ifndef ECHOKE $@$rF~$l$F$*$-$^$7$?!#(J(kaneko)
+   SONY NEWSのtty回りですが、sgttyを使ったときについては漢字回
+   りの再設定もしているのですが、TERMIOSを使うようにすると、漢
+   字回りが設定されません。そこで、config-sony.hのTERMIOSの
+   defineをコメントアウトしました。(kaneko)
+   HPUX 9.0の/usr/include/termio.hではECHOKEが定義されていない
+   ようなので、#ifndef ECHOKE を入れておきました。(kaneko)
 
-   $@8E$$(J BSD $@7O$N(J OS $@$G$O!$(Jtolower() $@$N;EMM$K$h$j$&$^$/F0$+$J$$(J
-   $@$H$$$&LdBj$KBP1~!%$^$?!$(JOMRON Luna, 386BSD $@$KBP1~(J($@5~ETBg3X$N(J
-   $@0KF#(J $@9/;K$5$s$K$h$k(J)
-   $@2>A[(Jtty $@$rF@$k$H$-$K!$(Jtty* $@$H(J pty* $@$,AH$GF@$i$l$k$^$G(J open $@$r(J
-   $@;n$9$h$&$KJQ99(J(aito;$@5~ETBg3X$N0KF#(J $@9/;K$5$s$N<(:6$K$h$k(J) 
+   古い BSD 系の OS では，tolower() の仕様によりうまく動かない
+   という問題に対応．また，OMRON Luna, 386BSD に対応(京都大学の
+   伊藤 康史さんによる)
+   仮想tty を得るときに，tty* と pty* が組で得られるまで open を
+   試すように変更(aito;京都大学の伊藤 康史さんの示唆による) 
 
 ------ version 0.70 Thu May 20 1993
-   skkfep $@$r=*$o$k$H$-$K!$8D?M<-=q$KJQ99$,$"$C$?>l9g$K$O!$%W%m%;%9(J
-   $@$N;}$D<-=q$H8D?M<-=q$H$r%^!<%8$7$F$+$iJ]B8$9$k$h$&$K$7$?!%(J(aito)
-   $@Aw$j$"$j$N8uJd$K$D$$$F!$?7$?$K<-=q$K%;!<%V$5$l$k8uJd$,$"$k$H!$(J
-   $@$=$l0J30$N8uJd$,<-=q$K%;!<%V$5$l$J$$$H$$$&%P%0$N(J fix (aito)
+   skkfep を終わるときに，個人辞書に変更があった場合には，プロセス
+   の持つ辞書と個人辞書とをマージしてから保存するようにした．(aito)
+   送りありの候補について，新たに辞書にセーブされる候補があると，
+   それ以外の候補が辞書にセーブされないというバグの fix (aito)
 
 ------ version 0.71
-   $@K:$l$?(J
+   忘れた
 
 ------ version 0.72
-   Newline code $@$N07$$$,$*$+$7$/$J$k$3$H$,$"$k%P%0$r(Jfix(aito; $@ElKL(J
-   $@Bg3X$NBlK\$5$s$N<(:6$K$h$k(J)
+   Newline code の扱いがおかしくなることがあるバグをfix(aito; 東北
+   大学の滝本さんの示唆による)
 
 ------ version 0.73
-   $@Aw$j$"$j%(%s%H%j$K$"$k9`L\$rJQ49$9$k$H$-!$EPO?$5$l$F$$$J$$Aw$j(J
-   $@$,$J$GJQ49$9$k$H8mF0:n$9$k%P%0$r(Jfix(aito)
+   送りありエントリにある項目を変換するとき，登録されていない送り
+   がなで変換すると誤動作するバグをfix(aito)
 
 ------ version 0.74 Wed May 18 1994
-   $@8D?M<-=q$KFI$_$N%(%s%H%j$,$J$$C18l$rJQ49$9$k$H!$<-=q%;!<%V(J
-   $@$N$H$-$KL58B%k!<%W$K4Y$k$H$$$&%P%0$r(J fix (aito)
+   個人辞書に読みのエントリがない単語を変換すると，辞書セーブ
+   のときに無限ループに陥るというバグを fix (aito)
 
-    skkfep-0.71 $@$K$*$$$F!"(Jskkfep $@=*N;;~$KAw$j$"$j$N8l$,$J$$$H(J
-  (skk $@$r;HMQ3+;OD>8e$N<-=q$G$O9M$($i$l$k>uBV$G$"$k(J)$@!"<-=q$K(J
+    skkfep-0.71 において、skkfep 終了時に送りありの語がないと
+  (skk を使用開始直後の辞書では考えられる状態である)、辞書に
         ;; okuri-ari entries.
         ;; okuri-nasi entries.
-  $@$N3F%(%s%H%j$,=PNO$5$l$J$$!#(J($@ElKLBg3X$N>.NS(J $@=$J?$5$s$K$h$k(J)
+  の各エントリが出力されない。(東北大学の小林 修平さんによる)
 
 ------ version 0.80
-   $@@\F,8l!$@\Hx8l$KBP1~!%(J
+   接頭語，接尾語に対応．
 ------ version 0.81
-   -viesc, -emacsesc $@%b!<%I$rDI2C$7$F$_$?!%(J
+   -viesc, -emacsesc モードを追加してみた．
 ------ version 0.82
-   $@8q9>$5$s(J (sgphk1@ipcs.shizuoka.ac.jp) $@$K$h$k2~NI!%(J
-   1) $@%&%#%s%I%&$r%j%5%$%:$9$k$H%O%s%0%"%C%W$7$F$?$s$G$9$,!"$=$N860x$O(J
-      select $@$,3d9~$_$5$l$k$3$H$G$7$?!#(Jselect $@$NJV$7CM(J $@$H(J errno $@$r8+$F(J
-      $@:FEY(J select $@$r$9$k$h$&$K$7$^$7$?!#(J
+   鯉江さん (sgphk1@ipcs.shizuoka.ac.jp) による改良．
+   1) ウィンドウをリサイズするとハングアップしてたんですが、その原因は
+      select が割込みされることでした。select の返し値 と errno を見て
+      再度 select をするようにしました。
 
-   2) $@4A;z%3!<%I$r<+F0H=JL$9$k$N$rIU$1$F$_$^$7$?!#(J
-      $@$&$A$N(J HP $@$G$O(J LANG=japanses $@$N$H$-$O(J sjis $@$K$J$C$F$$$k$N$G(J
-      #ifdef..#endif $@$G$+$3$C$F$"$j$^$9!#$[$+$N(J HP $@$G$O$I$&$J$C$F$$$k(J
-      $@$+CN$j$^$;$s!#(J
+   2) 漢字コードを自動判別するのを付けてみました。
+      うちの HP では LANG=japanses のときは sjis になっているので
+      #ifdef..#endif でかこってあります。ほかの HP ではどうなっている
+      か知りません。
 
-   3) $@%]!<%HHV9f$N%P%$%H%*!<%@JQ49$rIU$1$^$7$?!#(J
+   3) ポート番号のバイトオーダ変換を付けました。
 
-   4) $@%7%0%J%k$r<u$1$H$k$H%O%s%I%i$,%G%U%)%k%H$KLa$5$l$F$7$^$&$N$G(J
-      $@:F@_Dj$r$9$k$h$&$K$7$^$7$?!#(J
+   4) シグナルを受けとるとハンドラがデフォルトに戻されてしまうので
+      再設定をするようにしました。
 
-   5) $@%X%k%W$N%a%C%;!<%8$K(J -viesc -emacsesc $@$rDI2C$7$^$7$?!#(J
-      -esc $@$N%a%C%;!<%8$r$+$($^$7$?!#(J
+   5) ヘルプのメッセージに -viesc -emacsesc を追加しました。
+      -esc のメッセージをかえました。
 
-   6) $@%&%$%s%I%&%5%$%:$,JQ99$5$l$?$i%9%F!<%?%9$r:FI=<($9$k$h$&$K$7$^$7$?!#(J
+   6) ウインドウサイズが変更されたらステータスを再表示するようにしました。
 
-   keymap.c $@$NDj5A$,4V0c$C$F$$$?$?$a!$(Jsegmentation fault $@$r5/$3$9(J
-   $@$3$H$,$"$C$?%P%0$N(Jfix.
-   SIGHUP,SIGUSR1,SIGUSR2 $@$G%(%9%1!<%W%b!<%I$N@Z$j$+$($,$G$-$k$h$&$K$7$?!%(J
+   keymap.c の定義が間違っていたため，segmentation fault を起こす
+   ことがあったバグのfix.
+   SIGHUP,SIGUSR1,SIGUSR2 でエスケープモードの切りかえができるようにした．
 
 -- version 0.83
-   SIGHUP $@$r(J SIGTERM $@$KJQ99(J
+   SIGHUP を SIGTERM に変更
 
 -- version 0.83b
-   $@>p$1$J$$%P%0BP1~(J :-<
+   情けないバグ対応 :-<
 
 -- version 0.84
-   q $@%-!<$K$h$k%+%?%+%JJQ49$X$NBP1~(J(aito; $@ElKLBg3X$N2CF#$5$s$N<(:6$K(J
-   $@$h$k(J)
+   q キーによるカタカナ変換への対応(aito; 東北大学の加藤さんの示唆に
+   よる)
 
-   NEC$@Cf8&$N@>DM$5$s$K$h$k(J NEC EWS4800 $@$X$NBP1~(J
+   NEC中研の西塚さんによる NEC EWS4800 への対応
 
 -- version 0.85 (24 Dec. 1996)
-   $@F`NI@hC<2J3X5;=QBg3X1!Bg3X$N0KF#9/;K$5$s$K$h$kBgI}$J(J bugfix
-   (memory leak $@BP1~(J)
+   奈良先端科学技術大学院大学の伊藤康史さんによる大幅な bugfix
+   (memory leak 対応)
 
 -- version 0.86 (25 Feb. 1997)
-   $@El5~Bg3X$N9uBt?r9($5$s$K$h$k(J Solaris 2.x $@BP1~(J
+   東京大学の黒沢崇宏さんによる Solaris 2.x 対応
 
 -- version 0.87 (21 Jan. 1998)
-   $@Gr;3$?$+$f$-$5$s$K$h$k(J EWS4800 $@HG$N(J bugfix
+   白山たかゆきさんによる EWS4800 版の bugfix
