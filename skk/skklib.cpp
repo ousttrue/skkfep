@@ -13,182 +13,6 @@
 #define _NEW(type) ((type*)malloc(sizeof(struct type)))
 #define _NEW2(type, add) ((type*)malloc(sizeof(struct type) + (add)))
 
-Dictionary::Dictionary(std::string_view path)
-  : m_path(path)
-{
-  this->dhash = (Hash**)calloc(HASHSIZE, sizeof(Hash));
-  this->okuriAriFirst = NULL;
-  this->okuriNasiFirst = NULL;
-  this->dlist = NULL;
-  if (auto f = fopen(m_path.c_str(), "r")) {
-
-    struct stat st;
-    fstat(fileno(f), &st);
-
-    char buf[512];
-    int okuriAri = 1;
-    DicList* ditem2 = NULL;
-    DicList* globaldic = NULL;
-    while (!feof(f)) {
-      char c;
-      while ((c = fgetc(f)) == ' ' || c == '\t' || c == '\n')
-        ;
-      if (feof(f))
-        break;
-      if (c == ';') { /* comment */
-        int i = 0;
-        while (c != '\n' && !feof(f)) {
-          c = fgetc(f);
-          buf[i++] = c;
-        }
-        buf[i] = '\0';
-        if (!strncmp(buf, "; okuri-ari entries.", 20)) {
-          okuriAri = 1;
-        } else if (!strncmp(buf, "; okuri-nasi entries.", 21)) {
-          okuriAri = 0;
-        }
-        continue;
-      }
-      {
-        char* p;
-        for (buf[0] = c, p = buf + 1; !feof(f) && (*p = fgetc(f)) != ' '; p++) {
-        }
-        *p = '\0';
-      }
-      auto ditem = _NEW2(DicList, strlen(buf));
-      ditem->nextitem = NULL;
-      if (ditem2)
-        ditem2->nextitem = ditem;
-      if (globaldic == NULL)
-        globaldic = ditem;
-      strcpy(ditem->kanaword, buf);
-      ditem->cand = getCandList(f, ditem, okuriAri);
-      addHash(dhash, ditem);
-      ditem2 = ditem;
-      if (okuriAri) {
-        if (!this->okuriAriFirst)
-          this->okuriAriFirst = ditem2;
-      } else {
-        if (!this->okuriNasiFirst)
-          this->okuriNasiFirst = ditem2;
-      }
-    }
-    this->dlist = globaldic;
-    this->mtime = st.st_mtime;
-    fclose(f);
-  }
-}
-
-Dictionary::~Dictionary()
-{
-  int old = 0;
-  std::string buf;
-  /* backup skk-jisyo if jisyo is not empty. */
-  buf += m_path;
-  buf += ".BAK";
-  struct stat sbuf;
-  if ((stat(m_path.c_str(), &sbuf) == 0) && (sbuf.st_size != 0)) {
-    if (this->mtime < sbuf.st_mtime) {
-      printf("The dictionary is changed. merging...\n");
-      mergeDictionary(this, m_path.c_str());
-    }
-    rename(m_path.c_str(), buf.c_str());
-    old = 1;
-  }
-  if (auto f = fopen(m_path.c_str(), "w")) {
-    fprintf(f, ";; okuri-ari entries.\n");
-    DicList* globaldic = this->dlist;
-    DicList* dlist2;
-    int okuri = 1;
-    for (dlist = globaldic; dlist != NULL;
-         dlist2 = dlist, dlist = dlist->nextitem, free(dlist2)) {
-      auto wd = dlist->kanaword;
-      auto l = strlen(wd);
-      if (okuri && (!isConjugate(wd, l))) {
-        fprintf(f, ";; okuri-nasi entries.\n");
-        okuri = 0;
-      }
-      fprintf(f, "%s ", dlist->kanaword);
-      printCand(dlist->cand, f, FREE_CAND);
-    }
-    fclose(f);
-    if (old)
-      chmod(m_path.c_str(), sbuf.st_mode);
-
-    for (int l = 0; l < HASHSIZE; l++) {
-      Hash* h1;
-      Hash* h2;
-      for (h1 = this->dhash[l]; h1; h1 = h2) {
-        h2 = h1->next;
-        free(h1);
-      }
-    }
-    free(this->dhash);
-  }
-}
-
-/*
- * Check if word is an OKURI-ARI entry or not
- */
-int
-isConjugate(char word[], int l)
-{
-  int r;
-  if ((word[0] & 0x80) || word[0] == '#') {
-    if (word[l - 1] & 0x80)
-      r = 0;
-    else
-      r = (word[l - 1] != '#');
-  } else
-    r = 0;
-  return r;
-}
-
-/*
- * Add new word entry to the dictionary
- */
-DicList*
-addNewItem(Dictionary* dic, char* word, CandList* clist)
-{
-  DicList* ditem;
-  int l = strlen(word);
-
-  ditem = _NEW2(DicList, l);
-  strcpy(ditem->kanaword, word);
-  ditem->cand = clist;
-  addHash(dic->dhash, ditem);
-  if (isConjugate(word, l)) {
-    if (dic->okuriAriFirst) {
-      ditem->nextitem = dic->okuriAriFirst->nextitem;
-      dic->okuriAriFirst->nextitem = ditem;
-    } else {
-      if (dic->dlist) {
-        dic->okuriAriFirst = ditem;
-        ditem->nextitem = dic->okuriNasiFirst;
-        dic->dlist = ditem;
-      } else {
-        dic->dlist = ditem;
-        dic->okuriAriFirst = ditem;
-      }
-    }
-  } else {
-    if (dic->okuriNasiFirst) {
-      ditem->nextitem = dic->okuriNasiFirst->nextitem;
-      dic->okuriNasiFirst->nextitem = ditem;
-    } else {
-      if (dic->dlist) {
-        ditem->nextitem = dic->dlist->nextitem;
-        dic->dlist->nextitem = ditem;
-        dic->okuriNasiFirst = ditem;
-      } else {
-        dic->dlist = ditem;
-        dic->okuriNasiFirst = ditem;
-      }
-    }
-  }
-  return ditem;
-}
-
 CandList*
 getCandList(FILE* f, DicList* ditem, int okuri)
 {
@@ -253,82 +77,8 @@ getCandList(FILE* f, DicList* ditem, int okuri)
   return citem0;
 }
 
-/* #define DEBUG_MERGE /* debug dictionary merge */
-
 void
-mergeDictionary(Dictionary* dic, const char* dicname)
-{
-  FILE* f;
-  CandList* cand;
-  CandList* dcand;
-  DicList* ditem;
-  char *p, c;
-  int i;
-#ifdef DEBUG_MERGE
-  DicList change[10];
-  int n = 0;
-#endif
-
-  auto buf = (char*)malloc(512);
-  if ((f = fopen(dicname, "r")) == NULL) {
-    free(buf);
-    return;
-  }
-  while (!feof(f)) {
-    while ((c = fgetc(f)) == ' ' || c == '\t' || c == '\n')
-      ;
-    if (feof(f))
-      break;
-    if (c == ';') { /* comment */
-      while (c != '\n' && !feof(f)) {
-        c = fgetc(f);
-      }
-      continue;
-    }
-    for (buf[0] = c, p = buf + 1; !feof(f) && (*p = fgetc(f)) != ' '; p++) {
-    }
-    *p = '\0';
-    i = strlen(buf);
-    dcand = getCand(dic, buf);
-    if (dcand == NULL) {
-      cand = getCandList(f, NULL, isConjugate(buf, i));
-      ditem = addNewItem(dic, buf, cand);
-      for (; cand; cand = cand->nextcand)
-        cand->dicitem = ditem;
-#ifdef DEBUG_MERGE
-      change[n++] = ditem;
-#endif
-    } else {
-      cand = getCandList(f, dcand->dicitem, isConjugate(buf, i));
-      cand = deleteCand(cand, dcand);
-      if (cand) {
-        dcand->dicitem->cand = cand;
-        while (cand->nextcand != NULL)
-          cand = cand->nextcand;
-        cand->nextcand = dcand;
-        dcand->prevcand = cand;
-#ifdef DEBUG_MERGE
-        change[n++] = dcand->dicitem;
-#endif
-      }
-    }
-  }
-  fclose(f);
-#ifdef DEBUG_MERGE
-  for (i = 0; i < n; i++) {
-    printf("i=%d; ", i);
-    fflush(stdout);
-    printf("register(%d): %s (%x)", i, change[i]->kanaword, change[i]->cand);
-    fflush(stdout);
-    printCand(change[i]->cand, stdout, NOFREE_CAND);
-    putchar('\n');
-  }
-#endif
-  free(buf);
-}
-
-void
-printCand(CandList* cl, FILE* f, int fre)
+printCand(CandList* cl, FILE* f, PrintCandTypes fre)
 {
   CandList* clist;
   CandList* clist2;
@@ -352,77 +102,7 @@ printCand(CandList* cl, FILE* f, int fre)
   fputc('\n', f);
 }
 
-static char*
-allocStr(const char* s)
-{
-  int l = strlen(s);
-  char* p = (char*)malloc(l + 1);
-
-  strcpy(p, s);
-  return p;
-}
-
-int
-hashVal(const char* s)
-{
-  int n = 0;
-
-  while (*s) {
-    n += (*s) * (*s);
-    s++;
-  }
-  return n % HASHSIZE;
-}
-
-void
-addHash(Hash** hash, DicList* ditem)
-{
-  Hash* h;
-  Hash* hh;
-  int v;
-  char buf[256];
-
-  v = hashVal(ditem->kanaword);
-  h = _NEW(Hash);
-  h->h_index = ditem;
-  h->length = strlen(ditem->kanaword);
-  h->next = hash[v];
-  hash[v] = h;
-}
-
-CandList*
-getCand(Dictionary* dic, char* s)
-{
-  int l, v;
-  Hash* h;
-
-  l = strlen(s);
-  v = hashVal(s);
-  for (h = dic->dhash[v]; h != NULL; h = h->next) {
-    if (h->length != l || strcmp(h->h_index->kanaword, s))
-      continue;
-    return h->h_index->cand;
-  }
-  return NULL;
-}
-
-void
-selectCand(CandList** first, CandList* cand)
-{
-  if (cand->prevcand) {
-    cand->prevcand->nextcand = cand->nextcand;
-    if (cand->nextcand)
-      cand->nextcand->prevcand = cand->prevcand;
-    cand->prevcand = NULL;
-  }
-  if (*first != cand) {
-    (*first)->prevcand = cand;
-    cand->nextcand = *first;
-    *first = cand;
-  }
-}
-
-void
+static void
 freeCand(CandList* cl)
 {
   CandList* clist;
@@ -466,6 +146,16 @@ deleteCand(CandList* frlist, CandList* itlist)
   return frlist;
 }
 
+static char*
+allocStr(const char* s)
+{
+  int l = strlen(s);
+  char* p = (char*)malloc(l + 1);
+
+  strcpy(p, s);
+  return p;
+}
+
 CandList*
 firstCand(CandList* l)
 {
@@ -474,24 +164,21 @@ firstCand(CandList* l)
   return l;
 }
 
-CandList*
-searchOkuri(CandList* cl, char* okuri, CandList*** newfirst)
+std::tuple<CandList**, CandList*>
+searchOkuri(CandList* cl, const char* okuri)
 {
-  CandList* ll;
-  CandList** nc;
-
-  for (ll = cl; ll != NULL; ll = ll->nextcand) {
+  CandList** newfirst = nullptr;
+  for (auto ll = cl; ll != NULL; ll = ll->nextcand) {
     if (ll->okuri && !strcmp(ll->candword, okuri)) {
-      if (newfirst)
-        *newfirst = &(ll->okuri);
-      return ll->okuri;
+      newfirst = &ll->okuri;
+      return { newfirst, ll->okuri };
     }
   }
   if (newfirst && cl->dicitem) {
     if (cl->dicitem->cand->okuri) {
-      return NULL;
+      return {};
     }
-    *newfirst = &(cl->dicitem->cand);
+    newfirst = &(cl->dicitem->cand);
   }
-  return cl;
+  return { newfirst, cl };
 }

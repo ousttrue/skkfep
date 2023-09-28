@@ -7,6 +7,7 @@
 #include <malloc.h>
 #include <string>
 #include <time.h>
+#include <tuple>
 
 /*
  * Structure for Dictionary
@@ -30,68 +31,22 @@ struct CandList
   char candword[1];
 };
 
-struct Hash
-{
-  DicList* h_index;
-  short length;
-  Hash* next;
-};
-
-#define HASHSIZE 256
-
-struct Dictionary
-{
-  std::string m_path;
-
-  DicList* dlist;
-
-  DicList* okuriAriFirst;
-  DicList* okuriNasiFirst;
-  Hash** dhash;
-  time_t mtime;
-
-  Dictionary(std::string_view path);
-  ~Dictionary();
-};
-
-int
-isConjugate(char word[], int l);
-
-DicList*
-addNewItem(Dictionary dic, char* word, CandList clist);
+std::tuple<CandList**, CandList*>
+searchOkuri(CandList* cl, const char* okuri);
 
 CandList*
 getCandList(FILE* f, DicList* ditem, int okuri);
 
-void
-mergeDictionary(Dictionary* dic, const char* dicname);
-
-/* flags for printCand() */
-#define NOFREE_CAND 0
-#define FREE_CAND 1
-void
-printCand(CandList* cl, FILE* f, int fre);
-
-int
-hashVal(const char* s);
-
-void
-addHash(Hash** hash, DicList* ditem);
-
-CandList*
-getCand(Dictionary* dic, char* s);
-
-void
-selectCand(CandList** first, CandList* cand);
-
-void
-freeCand(CandList* cl);
-
 CandList*
 deleteCand(CandList* frlist, CandList* itlist);
 
-CandList*
-firstCand(CandList* l);
+/* flags for printCand() */
+enum PrintCandTypes
+{
+  NOFREE_CAND,
+  FREE_CAND,
+};
 
-CandList*
-searchOkuri(CandList* cl, char* okuri, CandList*** newfirst);
+void
+printCand(CandList* cl, FILE* f, PrintCandTypes fre);
+

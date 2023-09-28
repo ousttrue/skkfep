@@ -3,7 +3,8 @@
 #include "fep.h"
 #include "keybind.h"
 #include "kkconv.h"
-#include "skklib.h"
+// #include "skklib.h"
+#include "dictinary.h"
 #include "stty.h"
 #include "terms.h"
 #include <signal.h>

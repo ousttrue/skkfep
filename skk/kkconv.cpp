@@ -6,6 +6,7 @@
 #include "keybind.h"
 #include "romkan.h"
 #include "skklib.h"
+#include "dictinary.h"
 #include "stty.h"
 #include "terms.h"
 #include <ctype.h>
@@ -339,12 +340,14 @@ kkconv(char c)
   showmode(KSELECT_MODE);
 
   WordBuf[WordBufLen] = '\0';
-  CurrentCand = getCand(App::Instance().UserDic, WordBuf);
+  CurrentCand = App::Instance().UserDic->getCand(WordBuf);
   if (CurrentCand) {
     originalDicItem = CurrentCand->dicitem;
-    if (OkuriInput)
-      CurrentCand = searchOkuri(CurrentCand, OkuriBuf, &FirstCandEntry);
-    else
+    if (OkuriInput) {
+      auto [f, c] = searchOkuri(CurrentCand, OkuriBuf);
+      FirstCandEntry = f;
+      CurrentCand = c;
+    } else
       FirstCandEntry = &(CurrentCand->dicitem->cand);
   } else {
     FirstCandEntry = NULL;
