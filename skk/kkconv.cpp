@@ -1,12 +1,12 @@
 #include "kkconv.h"
 #include "app.h"
 #include "connsh.h"
+#include "dictinary.h"
 #include "etc.h"
 #include "fep.h"
 #include "keybind.h"
 #include "romkan.h"
 #include "skklib.h"
-#include "dictinary.h"
 #include "stty.h"
 #include "terms.h"
 #include <ctype.h>
@@ -438,7 +438,7 @@ void
 showCand()
 {
   kanjiSelectionEffect(1);
-  writes(CurrentCand->candword);
+  writes(CurrentCand->candword.c_str());
   if (OkuriInput) {
     writes(OkuriBuf);
   }
@@ -447,9 +447,7 @@ showCand()
 static void
 showNextCand(CandList* nextcand)
 {
-  int l;
-
-  l = strlen(CurrentCand->candword);
+  auto l = CurrentCand->candword.size();
   if (OkuriInput)
     l += strlen(OkuriBuf);
   kanjiSelectionEffect(0);
@@ -458,7 +456,7 @@ showNextCand(CandList* nextcand)
   csrLeft(l);
   kanjiSelectionEffect(1);
   CurrentCand = nextcand;
-  writes(CurrentCand->candword);
+  writes(CurrentCand->candword.c_str());
   if (OkuriInput)
     writes(OkuriBuf);
 }
@@ -483,13 +481,11 @@ nxCand(char)
 void
 pvCand(char)
 {
-  int l;
-
   if (CurrentCand->prevcand && CurrentCand->prevcand->okuri) {
     CurrentCand = CurrentCand->prevcand;
     pvCand({});
   }
-  l = strlen(CurrentCand->candword);
+  auto l = CurrentCand->candword.size();
   if (OkuriInput)
     l += strlen(OkuriBuf);
   kanjiSelectionEffect(0);
@@ -499,7 +495,7 @@ pvCand(char)
   if (CurrentCand->prevcand) {
     kanjiSelectionEffect(1);
     CurrentCand = CurrentCand->prevcand;
-    writes(CurrentCand->candword);
+    writes(CurrentCand->candword.c_str());
     if (OkuriInput)
       writes(OkuriBuf);
   } else {
@@ -550,15 +546,13 @@ clearOkuri()
 void
 fixIt(char c)
 {
-  int l;
-
   kanjiSelectionEffect(0);
   if (CurrentCand != NULL) {
-    l = strlen(CurrentCand->candword);
+    auto l = CurrentCand->candword.size();
     if (OkuriInput)
       l += strlen(OkuriBuf);
     csrLeft(l);
-    writeShells(CurrentCand->candword);
+    writeShells(CurrentCand->candword.c_str());
     if (OkuriInput) {
       writeShells(OkuriBuf);
     }
@@ -586,12 +580,9 @@ thruFixItToEsc(char c)
 void
 cancelSel(char c)
 {
-  int l;
-  DicList* dlist;
-
   kanjiSelectionEffect(0);
   if (CurrentCand != NULL) {
-    l = strlen(CurrentCand->candword);
+    auto l = CurrentCand->candword.size();
     if (OkuriInput)
       l += strlen(OkuriBuf);
     rubout(l);

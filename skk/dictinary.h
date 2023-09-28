@@ -19,6 +19,8 @@ private:
 public:
   Dictionary(std::string_view path);
   ~Dictionary();
+  Dictionary(const Dictionary&) = delete;
+  Dictionary& operator=(const Dictionary&) = delete;
   CandList* getCand(const char* s) const;
 
 private:

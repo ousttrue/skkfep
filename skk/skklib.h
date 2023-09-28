@@ -4,49 +4,50 @@
  * by A.ITO November, 1991
  */
 #pragma once
-#include <malloc.h>
 #include <string>
 #include <time.h>
 #include <tuple>
 
-/*
- * Structure for Dictionary
- */
 struct DicList
 {
-  struct CandList* cand;
-  struct DicList* nextitem;
-  char kanaword[1];
+  struct CandList* cand = nullptr;
+  struct DicList* nextitem = nullptr;
+  std::string kanaword;
+
+  DicList(const char* word)
+    : kanaword(word)
+  {
+  }
 };
 
-/*
- * Structure for Candidate
- */
+enum class PrintCandTypes
+{
+  NOFREE_CAND,
+  FREE_CAND,
+};
+
 struct CandList
 {
-  CandList* okuri;
-  CandList* nextcand;
-  CandList* prevcand;
-  DicList* dicitem;
-  char candword[1];
+  CandList* okuri = nullptr;
+  CandList* nextcand = nullptr;
+  CandList* prevcand = nullptr;
+  DicList* dicitem = nullptr;
+  std::string candword;
+
+private:
+  CandList(const char* word)
+    : candword(word)
+  {
+  }
+
+public:
+  static CandList* getCandList(FILE* f, DicList* ditem, int okuri);
+
+  void print(FILE* f, PrintCandTypes fre);
 };
 
 std::tuple<CandList**, CandList*>
 searchOkuri(CandList* cl, const char* okuri);
 
 CandList*
-getCandList(FILE* f, DicList* ditem, int okuri);
-
-CandList*
 deleteCand(CandList* frlist, CandList* itlist);
-
-/* flags for printCand() */
-enum PrintCandTypes
-{
-  NOFREE_CAND,
-  FREE_CAND,
-};
-
-void
-printCand(CandList* cl, FILE* f, PrintCandTypes fre);
-

@@ -10,11 +10,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#define _NEW(type) ((type*)malloc(sizeof(struct type)))
-#define _NEW2(type, add) ((type*)malloc(sizeof(struct type) + (add)))
-
 CandList*
-getCandList(FILE* f, DicList* ditem, int okuri)
+CandList::getCandList(FILE* f, DicList* ditem, int okuri)
 {
   char buf[256];
   CandList* citem = nullptr;
@@ -32,12 +29,9 @@ getCandList(FILE* f, DicList* ditem, int okuri)
       for (p = buf; (*p = fgetc(f)) != '/'; p++)
         ;
       *p = '\0';
-      citem = _NEW2(CandList, strlen(buf));
-      citem->okuri = NULL;
-      citem->nextcand = NULL;
+      citem = new CandList(buf);
       citem->prevcand = citem2;
       citem->dicitem = ditem;
-      strcpy(citem->candword, buf);
       ccitem2 = citem;
       for (;;) {
         if ((c = fgetc(f)) == ']')
@@ -45,9 +39,7 @@ getCandList(FILE* f, DicList* ditem, int okuri)
         for (buf[0] = c, p = buf + 1; (*p = fgetc(f)) != '/'; p++)
           ;
         *p = '\0';
-        ccitem = _NEW2(CandList, strlen(buf));
-        ccitem->nextcand = NULL;
-        strcpy(ccitem->candword, buf);
+        ccitem = new CandList(buf);
         if (ccitem2 == citem) {
           ccitem2->okuri = ccitem;
           ccitem->prevcand = NULL;
@@ -61,12 +53,9 @@ getCandList(FILE* f, DicList* ditem, int okuri)
       for (buf[0] = c, p = buf + 1; (*p = fgetc(f)) != '/'; p++)
         ;
       *p = '\0';
-      citem = _NEW2(CandList, strlen(buf));
-      citem->okuri = NULL;
-      citem->nextcand = NULL;
+      citem = new CandList(buf);
       citem->prevcand = citem2;
       citem->dicitem = ditem;
-      strcpy(citem->candword, buf);
     }
     if (citem2)
       citem2->nextcand = citem;
@@ -78,7 +67,7 @@ getCandList(FILE* f, DicList* ditem, int okuri)
 }
 
 void
-printCand(CandList* cl, FILE* f, PrintCandTypes fre)
+CandList::print(FILE* f, PrintCandTypes fre)
 {
   CandList* clist;
   CandList* clist2;
@@ -86,18 +75,19 @@ printCand(CandList* cl, FILE* f, PrintCandTypes fre)
   CandList* cclist2;
 
   fputc('/', f);
-  for (clist = cl; clist != NULL;
-       clist2 = clist, clist = clist->nextcand, (fre ? (free(clist2), 0) : 0)) {
+  for (clist = this; clist != NULL; clist2 = clist,
+      clist = clist->nextcand,
+      (fre == PrintCandTypes::FREE_CAND ? (delete (clist2), 0) : 0)) {
     if (clist->okuri) {
-      fprintf(f, "[%s/", clist->candword);
+      fprintf(f, "[%s/", clist->candword.c_str());
       for (cclist = clist->okuri; cclist != NULL; cclist2 = cclist,
           cclist = cclist->nextcand,
-          (fre ? (free(cclist2), 0) : 0)) {
-        fprintf(f, "%s/", cclist->candword);
+          (fre == PrintCandTypes::FREE_CAND ? (delete (cclist2), 0) : 0)) {
+        fprintf(f, "%s/", cclist->candword.c_str());
       }
       fputs("]/", f);
     } else
-      fprintf(f, "%s/", clist->candword);
+      fprintf(f, "%s/", clist->candword.c_str());
   }
   fputc('\n', f);
 }
@@ -105,16 +95,14 @@ printCand(CandList* cl, FILE* f, PrintCandTypes fre)
 static void
 freeCand(CandList* cl)
 {
-  CandList* clist;
   CandList* clist2;
-  CandList* cclist;
   CandList* cclist2;
 
-  for (clist = cl; clist != NULL;
-       clist2 = clist, clist = clist->nextcand, free(clist2)) {
+  for (auto clist = cl; clist != NULL;
+       clist2 = clist, clist = clist->nextcand, delete clist2) {
     if (clist->okuri) {
-      for (cclist = clist->okuri; cclist != NULL;
-           cclist2 = cclist, cclist = cclist->nextcand, free(cclist2))
+      for (auto cclist = clist->okuri; cclist != NULL;
+           cclist2 = cclist, cclist = cclist->nextcand, delete cclist2)
         ;
     }
   }
@@ -126,7 +114,7 @@ deleteCand(CandList* frlist, CandList* itlist)
   CandList* l;
   while (itlist != NULL) {
     for (l = frlist; l != NULL; l = l->nextcand) {
-      if (!strcmp(itlist->candword, l->candword)) {
+      if (itlist->candword == l->candword) {
         if (l->prevcand == NULL) {
           frlist = l->nextcand;
           if (l->nextcand)
@@ -146,16 +134,6 @@ deleteCand(CandList* frlist, CandList* itlist)
   return frlist;
 }
 
-static char*
-allocStr(const char* s)
-{
-  int l = strlen(s);
-  char* p = (char*)malloc(l + 1);
-
-  strcpy(p, s);
-  return p;
-}
-
 CandList*
 firstCand(CandList* l)
 {
@@ -169,7 +147,7 @@ searchOkuri(CandList* cl, const char* okuri)
 {
   CandList** newfirst = nullptr;
   for (auto ll = cl; ll != NULL; ll = ll->nextcand) {
-    if (ll->okuri && !strcmp(ll->candword, okuri)) {
+    if (ll->okuri && ll->candword == okuri) {
       newfirst = &ll->okuri;
       return { newfirst, ll->okuri };
     }

@@ -1,10 +1,7 @@
 #include "dictinary.h"
 #include "skklib.h"
-#include <malloc.h>
 #include <string.h>
 #include <sys/stat.h>
-
-#define _NEW2(type, add) ((type*)malloc(sizeof(struct type) + (add)))
 
 #define HASHSIZE 256
 struct Hash
@@ -28,8 +25,9 @@ hashVal(const char* s)
 
 // Check if word is an OKURI-ARI entry or not
 static bool
-isConjugate(const char* word, int l)
+isConjugate(std::string_view word)
 {
+  auto l = word.size();
   int r;
   if ((word[0] & 0x80) || word[0] == '#') {
     if (word[l - 1] & 0x80)
@@ -80,14 +78,12 @@ Dictionary::Dictionary(std::string_view path)
         }
         *p = '\0';
       }
-      auto ditem = _NEW2(DicList, strlen(buf));
-      ditem->nextitem = NULL;
+      auto ditem = new DicList(buf);
       if (ditem2)
         ditem2->nextitem = ditem;
       if (globaldic == NULL)
         globaldic = ditem;
-      strcpy(ditem->kanaword, buf);
-      ditem->cand = getCandList(f, ditem, okuriAri);
+      ditem->cand = CandList::getCandList(f, ditem, okuriAri);
       addHash(ditem);
       ditem2 = ditem;
       if (okuriAri) {
@@ -126,15 +122,14 @@ Dictionary::~Dictionary()
     DicList* dlist2;
     int okuri = 1;
     for (dlist = globaldic; dlist != NULL;
-         dlist2 = dlist, dlist = dlist->nextitem, free(dlist2)) {
+         dlist2 = dlist, dlist = dlist->nextitem, delete dlist2) {
       auto wd = dlist->kanaword;
-      auto l = strlen(wd);
-      if (okuri && (!isConjugate(wd, l))) {
+      if (okuri && (!isConjugate(wd))) {
         fprintf(f, ";; okuri-nasi entries.\n");
         okuri = 0;
       }
-      fprintf(f, "%s ", dlist->kanaword);
-      printCand(dlist->cand, f, FREE_CAND);
+      fprintf(f, "%s ", dlist->kanaword.c_str());
+      dlist->cand->print(f, PrintCandTypes::FREE_CAND);
     }
     fclose(f);
     if (old)
@@ -148,14 +143,10 @@ Dictionary::~Dictionary()
 DicList*
 Dictionary::addNewItem(const char* word, CandList* clist)
 {
-  DicList* ditem;
-  int l = strlen(word);
-
-  ditem = _NEW2(DicList, l);
-  strcpy(ditem->kanaword, word);
+  auto ditem = new DicList(word);
   ditem->cand = clist;
   addHash(ditem);
-  if (isConjugate(word, l)) {
+  if (isConjugate(word)) {
     if (this->okuriAriFirst) {
       ditem->nextitem = this->okuriAriFirst->nextitem;
       this->okuriAriFirst->nextitem = ditem;
@@ -190,10 +181,10 @@ Dictionary::addNewItem(const char* word, CandList* clist)
 CandList*
 Dictionary::getCand(const char* s) const
 {
-  auto l = strlen(s);
+  int l = strlen(s);
   auto v = hashVal(s);
   for (auto h = this->dhash[v]; h != NULL; h = h->next) {
-    if (h->length != l || strcmp(h->h_index->kanaword, s))
+    if (h->length != l || h->h_index->kanaword != s)
       continue;
     return h->h_index->cand;
   }
@@ -203,10 +194,10 @@ Dictionary::getCand(const char* s) const
 void
 Dictionary::addHash(DicList* ditem)
 {
-  auto v = hashVal(ditem->kanaword);
+  auto v = hashVal(ditem->kanaword.c_str());
   auto h = std::make_shared<Hash>();
   h->h_index = ditem;
-  h->length = strlen(ditem->kanaword);
+  h->length = ditem->kanaword.size();
   h->next = dhash[v];
   dhash[v] = h;
 }
@@ -214,51 +205,52 @@ Dictionary::addHash(DicList* ditem)
 void
 Dictionary::mergeDictionary(const char* dicname)
 {
-  FILE* f;
-  CandList* cand;
-  CandList* dcand;
-  DicList* ditem;
-  char *p, c;
-  int i;
+  // FILE* f;
+  // CandList* cand;
+  // CandList* dcand;
+  // DicList* ditem;
+  // char *p, c;
+  // int i;
 
-  auto buf = (char*)malloc(512);
-  if ((f = fopen(dicname, "r")) == NULL) {
-    free(buf);
-    return;
-  }
-  while (!feof(f)) {
-    while ((c = fgetc(f)) == ' ' || c == '\t' || c == '\n')
-      ;
-    if (feof(f))
-      break;
-    if (c == ';') { /* comment */
-      while (c != '\n' && !feof(f)) {
-        c = fgetc(f);
+  std::string buf;
+  if (auto f = fopen(dicname, "r")) {
+    while (!feof(f)) {
+      char c;
+      while ((c = fgetc(f)) == ' ' || c == '\t' || c == '\n')
+        ;
+      if (feof(f))
+        break;
+      if (c == ';') { /* comment */
+        while (c != '\n' && !feof(f)) {
+          c = fgetc(f);
+        }
+        continue;
       }
-      continue;
-    }
-    for (buf[0] = c, p = buf + 1; !feof(f) && (*p = fgetc(f)) != ' '; p++) {
-    }
-    *p = '\0';
-    i = strlen(buf);
-    dcand = this->getCand(buf);
-    if (dcand == NULL) {
-      cand = getCandList(f, NULL, isConjugate(buf, i));
-      ditem = this->addNewItem(buf, cand);
-      for (; cand; cand = cand->nextcand)
-        cand->dicitem = ditem;
-    } else {
-      cand = getCandList(f, dcand->dicitem, isConjugate(buf, i));
-      cand = deleteCand(cand, dcand);
-      if (cand) {
-        dcand->dicitem->cand = cand;
-        while (cand->nextcand != NULL)
-          cand = cand->nextcand;
-        cand->nextcand = dcand;
-        dcand->prevcand = cand;
+      buf.push_back(c);
+      while (!feof(f)) {
+        buf.push_back(fgetc(f));
+        if (buf.back() == ' ') {
+          break;
+        }
+      }
+      auto dcand = this->getCand(buf.c_str());
+      if (dcand == NULL) {
+        auto cand = CandList::getCandList(f, NULL, isConjugate(buf));
+        auto ditem = this->addNewItem(buf.c_str(), cand);
+        for (; cand; cand = cand->nextcand)
+          cand->dicitem = ditem;
+      } else {
+        auto cand = CandList::getCandList(f, dcand->dicitem, isConjugate(buf));
+        cand = deleteCand(cand, dcand);
+        if (cand) {
+          dcand->dicitem->cand = cand;
+          while (cand->nextcand != NULL)
+            cand = cand->nextcand;
+          cand->nextcand = dcand;
+          dcand->prevcand = cand;
+        }
       }
     }
+    fclose(f);
   }
-  fclose(f);
-  free(buf);
 }
