@@ -1,5 +1,7 @@
 #include "dictinary.h"
 #include "skklib.h"
+#include <assert.h>
+#include <fstream>
 #include <string.h>
 #include <sys/stat.h>
 
@@ -12,13 +14,11 @@ struct Hash
 };
 
 static int
-hashVal(const char* s)
+hashVal(std::string_view s)
 {
   int n = 0;
-
-  while (*s) {
-    n += (*s) * (*s);
-    s++;
+  for (auto c : s) {
+    n += (c) * (c);
   }
   return n % HASHSIZE;
 }
@@ -47,55 +47,63 @@ Dictionary::Dictionary(std::string_view path)
 
     struct stat st;
     fstat(fileno(f), &st);
+    this->mtime = st.st_mtime;
 
-    char buf[512];
-    int okuriAri = 1;
-    DicList* ditem2 = NULL;
-    DicList* globaldic = NULL;
-    while (!feof(f)) {
-      char c;
-      while ((c = fgetc(f)) == ' ' || c == '\t' || c == '\n')
-        ;
-      if (feof(f))
-        break;
-      if (c == ';') { /* comment */
-        int i = 0;
-        while (c != '\n' && !feof(f)) {
-          c = fgetc(f);
-          buf[i++] = c;
-        }
-        buf[i] = '\0';
-        if (!strncmp(buf, "; okuri-ari entries.", 20)) {
-          okuriAri = 1;
-        } else if (!strncmp(buf, "; okuri-nasi entries.", 21)) {
+    DicList* lastItem = NULL;
+    bool okuriAri = true;
+    char buf[4096];
+    while (auto l = fgets(buf, std::size(buf), f)) {
+      // skip white space
+      std::string_view line(l);
+      assert(line.back() == '\n');
+      while (line.size() &&
+             (line[0] == ' ' || line[0] == '\t' || line[0] == '\n')) {
+        line = line.substr(1);
+      }
+      if (line.empty()) {
+        continue;
+      }
+
+      // comment
+      if (line[0] == ';') {
+        if (line.starts_with("; okuri-ari entries.")) {
+          okuriAri = true;
+        } else if (line.starts_with("; okuri-nasi entries.")) {
           okuriAri = 0;
         }
         continue;
       }
-      {
-        char* p;
-        for (buf[0] = c, p = buf + 1; !feof(f) && (*p = fgetc(f)) != ' '; p++) {
-        }
-        *p = '\0';
+
+      // 見出し語
+      auto space = line.find(' ');
+      if (space == std::string::npos) {
+        // ?
+        continue;
       }
-      auto ditem = new DicList(buf);
-      if (ditem2)
-        ditem2->nextitem = ditem;
-      if (globaldic == NULL)
-        globaldic = ditem;
-      ditem->cand = CandList::getCandList(f, ditem, okuriAri);
+      auto word = line.substr(0, space);
+      line = line.substr(space + 1);
+
+      // new item
+      auto ditem = new DicList(word);
+      if (!dlist) {
+        dlist = ditem;
+      }
+      if (lastItem) {
+        lastItem->nextitem = ditem;
+      }
+
+      // candidate
+      ditem->cand = CandList::getCandList(line, ditem, okuriAri);
       addHash(ditem);
-      ditem2 = ditem;
+      lastItem = ditem;
       if (okuriAri) {
         if (!this->okuriAriFirst)
-          this->okuriAriFirst = ditem2;
+          this->okuriAriFirst = lastItem;
       } else {
         if (!this->okuriNasiFirst)
-          this->okuriNasiFirst = ditem2;
+          this->okuriNasiFirst = lastItem;
       }
     }
-    this->dlist = globaldic;
-    this->mtime = st.st_mtime;
     fclose(f);
   }
 }
@@ -141,7 +149,7 @@ Dictionary::~Dictionary()
  * Add new word entry to the dictionary
  */
 DicList*
-Dictionary::addNewItem(const char* word, CandList* clist)
+Dictionary::addNewItem(std::string_view word, CandList* clist)
 {
   auto ditem = new DicList(word);
   ditem->cand = clist;
@@ -179,12 +187,11 @@ Dictionary::addNewItem(const char* word, CandList* clist)
 }
 
 CandList*
-Dictionary::getCand(const char* s) const
+Dictionary::getCand(std::string_view s) const
 {
-  int l = strlen(s);
   auto v = hashVal(s);
-  for (auto h = this->dhash[v]; h != NULL; h = h->next) {
-    if (h->length != l || h->h_index->kanaword != s)
+  for (auto h = this->dhash[v]; h; h = h->next) {
+    if (h->length != s.size() || h->h_index->kanaword != s)
       continue;
     return h->h_index->cand;
   }
@@ -214,33 +221,41 @@ Dictionary::mergeDictionary(const char* dicname)
 
   std::string buf;
   if (auto f = fopen(dicname, "r")) {
-    while (!feof(f)) {
-      char c;
-      while ((c = fgetc(f)) == ' ' || c == '\t' || c == '\n')
-        ;
-      if (feof(f))
-        break;
-      if (c == ';') { /* comment */
-        while (c != '\n' && !feof(f)) {
-          c = fgetc(f);
-        }
+    char buf[512];
+    while (auto l = fgets(buf, std::size(buf), f)) {
+      // skip white space
+      std::string_view line(l);
+      while (line.size() &&
+             (line[0] == ' ' || line[0] == '\t' || line[0] == '\n')) {
+        line = line.substr(1);
+      }
+      if (line.empty()) {
         continue;
       }
-      buf.push_back(c);
-      while (!feof(f)) {
-        buf.push_back(fgetc(f));
-        if (buf.back() == ' ') {
-          break;
-        }
+
+      // comment
+      if (line[0] == ';') {
+        continue;
       }
-      auto dcand = this->getCand(buf.c_str());
-      if (dcand == NULL) {
-        auto cand = CandList::getCandList(f, NULL, isConjugate(buf));
-        auto ditem = this->addNewItem(buf.c_str(), cand);
+
+      // 見出し語
+      auto space = line.find(' ');
+      if (space == std::string::npos) {
+        // ?
+        continue;
+      }
+      auto word = line.substr(0, space);
+      line = line.substr(space + 1);
+
+      auto dcand = this->getCand(word);
+      if (!dcand) {
+        auto cand = CandList::getCandList(line, NULL, isConjugate(buf));
+        auto ditem = this->addNewItem(word, cand);
         for (; cand; cand = cand->nextcand)
           cand->dicitem = ditem;
       } else {
-        auto cand = CandList::getCandList(f, dcand->dicitem, isConjugate(buf));
+        auto cand =
+          CandList::getCandList(line, dcand->dicitem, isConjugate(buf));
         cand = deleteCand(cand, dcand);
         if (cand) {
           dcand->dicitem->cand = cand;

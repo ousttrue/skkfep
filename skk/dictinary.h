@@ -21,10 +21,10 @@ public:
   ~Dictionary();
   Dictionary(const Dictionary&) = delete;
   Dictionary& operator=(const Dictionary&) = delete;
-  CandList* getCand(const char* s) const;
+  CandList* getCand(std::string_view s) const;
 
 private:
-  DicList* addNewItem(const char* word, CandList* clist);
+  DicList* addNewItem(std::string_view word, CandList* clist);
   void addHash(DicList* ditem);
   void mergeDictionary(const char* dicname);
 };

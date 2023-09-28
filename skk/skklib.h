@@ -8,13 +8,14 @@
 #include <time.h>
 #include <tuple>
 
+// 見出し
 struct DicList
 {
   struct CandList* cand = nullptr;
   struct DicList* nextitem = nullptr;
   std::string kanaword;
 
-  DicList(const char* word)
+  DicList(std::string_view word)
     : kanaword(word)
   {
   }
@@ -26,6 +27,7 @@ enum class PrintCandTypes
   FREE_CAND,
 };
 
+// 変換候補
 struct CandList
 {
   CandList* okuri = nullptr;
@@ -35,13 +37,15 @@ struct CandList
   std::string candword;
 
 private:
-  CandList(const char* word)
+  CandList(std::string_view word)
     : candword(word)
   {
   }
 
 public:
-  static CandList* getCandList(FILE* f, DicList* ditem, int okuri);
+  static CandList* getCandList(std::string_view buf,
+                               DicList* ditem,
+                               bool okuri);
 
   void print(FILE* f, PrintCandTypes fre);
 };

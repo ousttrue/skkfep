@@ -5,62 +5,80 @@
  */
 
 #include "skklib.h"
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
 CandList*
-CandList::getCandList(FILE* f, DicList* ditem, int okuri)
+CandList::getCandList(std::string_view line, DicList* ditem, bool okuri)
 {
-  char buf[256];
-  CandList* citem = nullptr;
-  CandList* citem2 = nullptr;
-  CandList* citem0 = NULL;
-  CandList* ccitem;
-  CandList* ccitem2;
-  char c, *p;
+  if (line.empty()) {
+    assert(false);
+    return {};
+  }
+  if (line[0] != '/') {
+    assert(false);
+    return {};
+  }
+  if (line.back() == '\n') {
+    line = line.substr(0, line.size() - 1);
+  }
+  line = line.substr(1);
 
-  citem2 = NULL;
-  while ((c = fgetc(f)) != '\n' && !feof(f)) {
-    if (c == '/')
-      continue;
-    if (okuri && c == '[') {
-      for (p = buf; (*p = fgetc(f)) != '/'; p++)
-        ;
-      *p = '\0';
-      citem = new CandList(buf);
-      citem->prevcand = citem2;
-      citem->dicitem = ditem;
-      ccitem2 = citem;
-      for (;;) {
-        if ((c = fgetc(f)) == ']')
-          break;
-        for (buf[0] = c, p = buf + 1; (*p = fgetc(f)) != '/'; p++)
-          ;
-        *p = '\0';
-        ccitem = new CandList(buf);
-        if (ccitem2 == citem) {
-          ccitem2->okuri = ccitem;
-          ccitem->prevcand = NULL;
-        } else {
-          ccitem2->nextcand = ccitem;
-          ccitem->prevcand = ccitem2;
-        }
-        ccitem2 = ccitem;
-      }
+  CandList* citem0 = nullptr;
+  CandList* citem2 = nullptr;
+  while (line.size() > 0) {
+    auto pos = line.find('/');
+    std::string_view buf;
+    if (pos == std::string_view::npos) {
+      // no tail '/'
+      buf = line;
+      line = {};
     } else {
-      for (buf[0] = c, p = buf + 1; (*p = fgetc(f)) != '/'; p++)
-        ;
-      *p = '\0';
+      buf = line.substr(0, pos);
+      line = line.substr(pos + 1);
+    }
+
+    auto citem = new CandList(buf);
+
+    if (okuri && buf[0] == '[') {
+      assert(false);
+      //   for (p = buf; (*p = fgetc(f)) != '/'; p++)
+      //     ;
+      //   *p = '\0';
+      //   citem = new CandList(buf);
+      //   citem->prevcand = citem2;
+      //   citem->dicitem = ditem;
+      //   ccitem2 = citem;
+      //   for (;;) {
+      //     if ((c = fgetc(f)) == ']')
+      //       break;
+      //     for (buf[0] = c, p = buf + 1; (*p = fgetc(f)) != '/'; p++)
+      //       ;
+      //     *p = '\0';
+      //     ccitem = new CandList(buf);
+      //     if (ccitem2 == citem) {
+      //       ccitem2->okuri = ccitem;
+      //       ccitem->prevcand = NULL;
+      //     } else {
+      //       ccitem2->nextcand = ccitem;
+      //       ccitem->prevcand = ccitem2;
+      //     }
+      //     ccitem2 = ccitem;
+      //   }
+    } else {
       citem = new CandList(buf);
       citem->prevcand = citem2;
       citem->dicitem = ditem;
     }
-    if (citem2)
+
+    if (citem2) {
       citem2->nextcand = citem;
-    else
+    } else {
       citem0 = citem;
+    }
     citem2 = citem;
   }
   return citem0;
