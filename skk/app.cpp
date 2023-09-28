@@ -53,9 +53,9 @@ App::PtyFree()
 }
 
 void
-App::OpenDictionary(const char* path)
+App::OpenDictionary(std::string_view path)
 {
-  if (path && path[0]) {
+  if (path.empty()) {
     std::stringstream ss;
     ss << getenv("HOME") << "/" << USER_DIC_NAME;
     UserDicName = ss.str();
@@ -73,7 +73,7 @@ App::SaveJisyo()
 }
 
 bool
-App::Initialize(const char* UserDicName, const char* cmd, char** args)
+App::Initialize(std::string_view UserDicName, const char* cmd, char** args)
 {
   /* Initialize */
   setKanaKey();

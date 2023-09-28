@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <string_view>
 
 class App
 {
@@ -18,7 +19,7 @@ public:
     return s_instance;
   }
 
-  bool Initialize(const char* UserDicName, const char* cmd, char** args);
+  bool Initialize(std::string_view UserDicName, const char* cmd, char** args);
   int Run();
 
   void Abort();
@@ -27,6 +28,6 @@ public:
 
   void PtyFree();
 
-  void OpenDictionary(const char* path);
+  void OpenDictionary(std::string_view path);
   void SaveJisyo();
 };

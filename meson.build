@@ -1,4 +1,4 @@
-project('skkfep', 'cpp', 'c', default_options: [])
+project('skkfep', 'cpp', 'c', default_options: ['cpp_std=c++20'])
 subdir('libtermpty')
 subdir('skk')
 

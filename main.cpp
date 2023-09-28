@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <wait.h>
 
-char UserDicName[64];
+std::string UserDicName;
 
 #define DEFAULT_SHELL "/bin/bash"
 char ShellName[64] = "";
@@ -23,7 +23,7 @@ ParseArgs(int argc, char** argv)
     if (!strncmp(argv[i], "-k", 2))
       KanaKey = argv[i] + 2;
     else if (!strcmp(argv[i], "-udic"))
-      strcpy(UserDicName, argv[++i]);
+      UserDicName = argv[++i];
     else if (!strcmp(argv[i], "-e")) {
       strcpy(ShellName, argv[++i]);
       ShellArg = argv + i;
