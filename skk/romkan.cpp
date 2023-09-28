@@ -1,5 +1,4 @@
 #include "romkan.h"
-#include "config.h"
 #include "connsh.h"
 #include "etc.h"
 #include "fep.h"
@@ -304,7 +303,7 @@ flushKana()
 }
 
 void
-inputKanaVowel(char c, void (*output)(const char*))
+inputKanaVowel(char c, const OutFunc &output)
 {
   int vowelnum;
 
@@ -340,7 +339,7 @@ inputKanaVowel(char c, void (*output)(const char*))
 }
 
 void
-inputKanaConso(char c, void (*output)(const char*), void (*flush)(int))
+inputKanaConso(char c, const OutFunc &output, void (*flush)(int))
 
 {
   char notOverwrite = 0;
@@ -454,7 +453,7 @@ inputKanaConso(char c, void (*output)(const char*), void (*flush)(int))
 }
 
 void
-flushLastConso(char c, void (*output)(const char*), void (*flush)(int))
+flushLastConso(char c, const OutFunc &output, void (*flush)(int))
 {
   if (Nconso == 0)
     return;
@@ -528,14 +527,14 @@ kanaBS(char c)
 }
 
 void
-inputZenkakuAlpha(char c, void (*output)(const char*))
+inputZenkakuAlpha(char c, const OutFunc &output)
 
 {
   output(ZenkakuAlpha[c - ' ']);
 }
 
 void
-inputZenkakuEx(char c, void (*output)(const char*))
+inputZenkakuEx(char c, const OutFunc &output)
 {
   switch (c) {
     case '-':

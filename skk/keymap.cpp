@@ -1,4 +1,3 @@
-#include "config.h"
 #include "ctrlcode.h"
 #include "fep.h"
 #include "keybind.h"

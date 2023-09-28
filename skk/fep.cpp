@@ -1,11 +1,9 @@
 #include "fep.h"
 #include "app.h"
-#include "config.h"
 #include "connsh.h"
 #include "etc.h"
 #include "keybind.h"
 #include "romkan.h"
-#include "skklib.h"
 #include "stty.h"
 #include "terms.h"
 #include <errno.h>
@@ -112,9 +110,6 @@ init_signals()
     signal(SIGCHLD, SIG_DFL);
     App::Instance().Exit(-1);
   });
-#ifndef LINUX
-  signal(SIGBUS, bus_exit);
-#endif
   signal(SIGSEGV, [](int) {
     reset_tty();
     fprintf(stderr, "SEGMENTATION VIOLATION\n");

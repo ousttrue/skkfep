@@ -1,6 +1,5 @@
 #include "kkconv.h"
 #include "app.h"
-#include "config.h"
 #include "connsh.h"
 #include "etc.h"
 #include "fep.h"

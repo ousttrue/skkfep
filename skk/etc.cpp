@@ -1,5 +1,4 @@
 #include "etc.h"
-#include "config.h"
 #include "stty.h"
 #include "terms.h"
 #include <sys/time.h>

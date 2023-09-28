@@ -1,4 +1,7 @@
 #pragma once
+#include <functional>
+
+using OutFunc = std::function<void(const char* s)>;
 
 enum SkkModes
 {
@@ -55,13 +58,13 @@ void
 flushKana();
 
 void
-inputKanaVowel(char c, void (*output)(const char*));
+inputKanaVowel(char c, const OutFunc& output);
 
 void
-inputKanaConso(char c, void (*output)(const char*), void (*flush)(int));
+inputKanaConso(char c, const OutFunc& output, void (*flush)(int));
 
 void
-flushLastConso(char c, void (*output)(const char*), void (*flush)(int));
+flushLastConso(char c, const OutFunc& output, void (*flush)(int));
 
 void
 toKana(char c);
@@ -76,10 +79,10 @@ void
 kanaBS(char c);
 
 void
-inputZenkakuAlpha(char c, void (*output)(const char*));
+inputZenkakuAlpha(char c, const OutFunc& output);
 
 void
-inputZenkakuEx(char c, void (*output)(const char*));
+inputZenkakuEx(char c, const OutFunc& output);
 
 void
 codeinMsg();
