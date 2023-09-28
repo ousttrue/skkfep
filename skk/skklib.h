@@ -3,10 +3,9 @@
  *
  * by A.ITO November, 1991
  */
-
-#ifndef SKKLIB_H
-#define SKKLIB_H
+#pragma once
 #include <malloc.h>
+#include <string>
 #include <time.h>
 
 /*
@@ -42,15 +41,18 @@ struct Hash
 
 struct Dictionary
 {
+  std::string m_path;
+
   DicList* dlist;
+
   DicList* okuriAriFirst;
   DicList* okuriNasiFirst;
   Hash** dhash;
   time_t mtime;
-};
 
-Dictionary*
-openSKK(const char* dicname);
+  Dictionary(std::string_view path);
+  ~Dictionary();
+};
 
 int
 isConjugate(char word[], int l);
@@ -60,9 +62,6 @@ addNewItem(Dictionary dic, char* word, CandList clist);
 
 CandList*
 getCandList(FILE* f, DicList* ditem, int okuri);
-
-void
-closeSKK(Dictionary* dic, const char* dicname);
 
 void
 mergeDictionary(Dictionary* dic, const char* dicname);
@@ -96,5 +95,3 @@ firstCand(CandList* l);
 
 CandList*
 searchOkuri(CandList* cl, char* okuri, CandList*** newfirst);
-
-#endif /* SKKLIB_H */

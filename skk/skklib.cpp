@@ -13,82 +13,118 @@
 #define _NEW(type) ((type*)malloc(sizeof(struct type)))
 #define _NEW2(type, add) ((type*)malloc(sizeof(struct type) + (add)))
 
-/*
- * Open SKK
- */
-Dictionary*
-openSKK(const char* dicname)
+Dictionary::Dictionary(std::string_view path)
+  : m_path(path)
 {
-  FILE* f;
-  DicList* ditem;
-  DicList* ditem2;
-  DicList* globaldic;
-  char buf[512];
-  char *p, c;
-  Hash** dhash;
-  Dictionary* dic;
-  int i, nitem = 0;
-  int okuriAri = 1;
+  this->dhash = (Hash**)calloc(HASHSIZE, sizeof(Hash));
+  this->okuriAriFirst = NULL;
+  this->okuriNasiFirst = NULL;
+  this->dlist = NULL;
+  if (auto f = fopen(m_path.c_str(), "r")) {
 
-  dhash = (Hash**)calloc(HASHSIZE, sizeof(Hash));
-  dic = _NEW(Dictionary);
-  dic->dhash = dhash;
-  dic->okuriAriFirst = NULL;
-  dic->okuriNasiFirst = NULL;
-  dic->dlist = NULL;
-  ditem2 = NULL;
-  globaldic = NULL;
-  if ((f = fopen(dicname, "r")) == NULL) {
-    return dic;
-  }
+    struct stat st;
+    fstat(fileno(f), &st);
 
-  struct stat st;
-  fstat(fileno(f), &st);
-  while (!feof(f)) {
-    while ((c = fgetc(f)) == ' ' || c == '\t' || c == '\n')
-      ;
-    if (feof(f))
-      break;
-    if (c == ';') { /* comment */
-      i = 0;
-      while (c != '\n' && !feof(f)) {
-        c = fgetc(f);
-        buf[i++] = c;
+    char buf[512];
+    int okuriAri = 1;
+    DicList* ditem2 = NULL;
+    DicList* globaldic = NULL;
+    while (!feof(f)) {
+      char c;
+      while ((c = fgetc(f)) == ' ' || c == '\t' || c == '\n')
+        ;
+      if (feof(f))
+        break;
+      if (c == ';') { /* comment */
+        int i = 0;
+        while (c != '\n' && !feof(f)) {
+          c = fgetc(f);
+          buf[i++] = c;
+        }
+        buf[i] = '\0';
+        if (!strncmp(buf, "; okuri-ari entries.", 20)) {
+          okuriAri = 1;
+        } else if (!strncmp(buf, "; okuri-nasi entries.", 21)) {
+          okuriAri = 0;
+        }
+        continue;
       }
-      buf[i] = '\0';
-      if (!strncmp(buf, "; okuri-ari entries.", 20)) {
-        okuriAri = 1;
-      } else if (!strncmp(buf, "; okuri-nasi entries.", 21)) {
-        okuriAri = 0;
+      {
+        char* p;
+        for (buf[0] = c, p = buf + 1; !feof(f) && (*p = fgetc(f)) != ' '; p++) {
+        }
+        *p = '\0';
       }
-      continue;
+      auto ditem = _NEW2(DicList, strlen(buf));
+      ditem->nextitem = NULL;
+      if (ditem2)
+        ditem2->nextitem = ditem;
+      if (globaldic == NULL)
+        globaldic = ditem;
+      strcpy(ditem->kanaword, buf);
+      ditem->cand = getCandList(f, ditem, okuriAri);
+      addHash(dhash, ditem);
+      ditem2 = ditem;
+      if (okuriAri) {
+        if (!this->okuriAriFirst)
+          this->okuriAriFirst = ditem2;
+      } else {
+        if (!this->okuriNasiFirst)
+          this->okuriNasiFirst = ditem2;
+      }
     }
-    nitem++;
-    for (buf[0] = c, p = buf + 1; !feof(f) && (*p = fgetc(f)) != ' '; p++) {
-    }
-    *p = '\0';
-    ditem = _NEW2(DicList, strlen(buf));
-    ditem->nextitem = NULL;
-    if (ditem2)
-      ditem2->nextitem = ditem;
-    if (globaldic == NULL)
-      globaldic = ditem;
-    strcpy(ditem->kanaword, buf);
-    ditem->cand = getCandList(f, ditem, okuriAri);
-    addHash(dhash, ditem);
-    ditem2 = ditem;
-    if (okuriAri) {
-      if (!dic->okuriAriFirst)
-        dic->okuriAriFirst = ditem2;
-    } else {
-      if (!dic->okuriNasiFirst)
-        dic->okuriNasiFirst = ditem2;
-    }
+    this->dlist = globaldic;
+    this->mtime = st.st_mtime;
+    fclose(f);
   }
-  fclose(f);
-  dic->dlist = globaldic;
-  dic->mtime = st.st_mtime;
-  return dic;
+}
+
+Dictionary::~Dictionary()
+{
+  int old = 0;
+  std::string buf;
+  /* backup skk-jisyo if jisyo is not empty. */
+  buf += m_path;
+  buf += ".BAK";
+  struct stat sbuf;
+  if ((stat(m_path.c_str(), &sbuf) == 0) && (sbuf.st_size != 0)) {
+    if (this->mtime < sbuf.st_mtime) {
+      printf("The dictionary is changed. merging...\n");
+      mergeDictionary(this, m_path.c_str());
+    }
+    rename(m_path.c_str(), buf.c_str());
+    old = 1;
+  }
+  if (auto f = fopen(m_path.c_str(), "w")) {
+    fprintf(f, ";; okuri-ari entries.\n");
+    DicList* globaldic = this->dlist;
+    DicList* dlist2;
+    int okuri = 1;
+    for (dlist = globaldic; dlist != NULL;
+         dlist2 = dlist, dlist = dlist->nextitem, free(dlist2)) {
+      auto wd = dlist->kanaword;
+      auto l = strlen(wd);
+      if (okuri && (!isConjugate(wd, l))) {
+        fprintf(f, ";; okuri-nasi entries.\n");
+        okuri = 0;
+      }
+      fprintf(f, "%s ", dlist->kanaword);
+      printCand(dlist->cand, f, FREE_CAND);
+    }
+    fclose(f);
+    if (old)
+      chmod(m_path.c_str(), sbuf.st_mode);
+
+    for (int l = 0; l < HASHSIZE; l++) {
+      Hash* h1;
+      Hash* h2;
+      for (h1 = this->dhash[l]; h1; h1 = h2) {
+        h2 = h1->next;
+        free(h1);
+      }
+    }
+    free(this->dhash);
+  }
 }
 
 /*
@@ -215,64 +251,6 @@ getCandList(FILE* f, DicList* ditem, int okuri)
     citem2 = citem;
   }
   return citem0;
-}
-
-void
-closeSKK(Dictionary* dic, const char* dicname)
-{
-  FILE* f;
-  DicList* dlist;
-  DicList* dlist2;
-  DicList* globaldic = dic->dlist;
-  int okuri = 1;
-  int l;
-  char* wd;
-  struct stat sbuf;
-  int old = 0;
-
-  auto buf = (char*)malloc(256);
-  /* backup skk-jisyo if jisyo is not empty. */
-  sprintf(buf, "%s.BAK", dicname);
-  if ((stat(dicname, &sbuf) == 0) && (sbuf.st_size != 0)) {
-    if (dic->mtime < sbuf.st_mtime) {
-      printf("The dictionary is changed. merging...\n");
-      mergeDictionary(dic, dicname);
-    }
-    rename(dicname, buf);
-    old = 1;
-  }
-  if ((f = fopen(dicname, "w")) == NULL) {
-    free(buf);
-    return;
-  }
-
-  fprintf(f, ";; okuri-ari entries.\n");
-  for (dlist = globaldic; dlist != NULL;
-       dlist2 = dlist, dlist = dlist->nextitem, free(dlist2)) {
-    wd = dlist->kanaword;
-    l = strlen(wd);
-    if (okuri && (!isConjugate(wd, l))) {
-      fprintf(f, ";; okuri-nasi entries.\n");
-      okuri = 0;
-    }
-    fprintf(f, "%s ", dlist->kanaword);
-    printCand(dlist->cand, f, FREE_CAND);
-  }
-  fclose(f);
-  if (old)
-    chmod(dicname, sbuf.st_mode);
-
-  for (l = 0; l < HASHSIZE; l++) {
-    Hash* h1;
-    Hash* h2;
-    for (h1 = dic->dhash[l]; h1; h1 = h2) {
-      h2 = h1->next;
-      free(h1);
-    }
-  }
-  free(dic->dhash);
-  free(dic);
-  free(buf);
 }
 
 /* #define DEBUG_MERGE /* debug dictionary merge */

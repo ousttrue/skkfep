@@ -60,7 +60,7 @@ App::OpenDictionary(std::string_view path)
     ss << getenv("HOME") << "/" << USER_DIC_NAME;
     UserDicName = ss.str();
   }
-  UserDic = openSKK(UserDicName.c_str());
+  UserDic = new Dictionary(UserDicName.c_str());
 }
 
 void
@@ -68,7 +68,7 @@ App::SaveJisyo()
 {
   if (UserDic) {
     printf("Saving JISYO...\n");
-    closeSKK(UserDic, UserDicName.c_str());
+    delete UserDic;
   }
 }
 
