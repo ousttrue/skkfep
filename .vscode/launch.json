@@ -5,6 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "lldb",
+            "request": "launch",
+            "name": "lldb",
+            "program": "${workspaceFolder}/prefix/bin/skkfep",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "terminal": "integrated",
+        },
+        {
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",

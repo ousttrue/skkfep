@@ -3,7 +3,6 @@ skk_lib = static_library('skk', [
   'fep.cpp',
   'keybind.cpp',
   'kkconv.cpp',
-  'skklib.cpp',
   'keymap.cpp',
   'etc.cpp',
   'romkan.cpp',

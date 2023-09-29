@@ -6,10 +6,10 @@
 #include "fep.h"
 #include "keybind.h"
 #include "romkan.h"
-#include "skklib.h"
 #include "stty.h"
 #include "terms.h"
 #include <ctype.h>
+#include <optional>
 #include <string.h>
 
 #define WORD_BUF_LEN 128
@@ -25,8 +25,50 @@ char OkuriFirst;
 
 static char WordBuf[WORD_BUF_LEN];
 static int WordBufLen;
-static CandList* CurrentCand;
-static CandList** FirstCandEntry;
+
+struct Context
+{
+  const CandList* List = nullptr;
+  std::list<std::string>::const_iterator Cand;
+
+  Context() {}
+
+  Context(const CandList* list)
+    : List(list)
+  {
+    if (List) {
+      Cand = List->begin();
+    }
+  }
+
+  bool IsEnabled()
+  {
+    if (List && Cand != List->end()) {
+      return true;
+    }
+    return false;
+  }
+
+  bool Increment()
+  {
+    if (IsEnabled()) {
+      ++Cand;
+      return true;
+    }
+    return false;
+  }
+
+  bool Decrement()
+  {
+    if (IsEnabled() && Cand != List->begin()) {
+      --Cand;
+      return true;
+    }
+    return false;
+  }
+};
+
+static Context Current;
 static short OkuriInput;
 static char OkuriBuf[OKURI_LEN];
 static int OkuriBufLen;
@@ -329,7 +371,6 @@ void
 kkconv(char c)
 {
   int l;
-  DicList* originalDicItem = NULL;
 
   kanjiInputEffect(0);
   romkan::flushLastConso('\0', bufferedInput, NULL);
@@ -340,12 +381,11 @@ kkconv(char c)
   showmode(KSELECT_MODE);
 
   WordBuf[WordBufLen] = '\0';
-  CurrentCand = App::Instance().UserDic->getCand(WordBuf);
-  if (CurrentCand) {
-    originalDicItem = CurrentCand->dicitem;
-    FirstCandEntry = &(CurrentCand->dicitem->cand);
+  Current.List = App::Instance().UserDic->getCand(WordBuf);
+  if (Current.List) {
+    Current.Cand = Current.List->begin();
   } else {
-    FirstCandEntry = NULL;
+    Current.Cand = {};
   }
 
   l = WordBufLen;
@@ -354,7 +394,10 @@ kkconv(char c)
   rubout(l);
   setKeymap(&CurrentKeymap, convertKeymap(&SelectionKeymap));
 
-  if (CurrentCand == NULL) {
+  if (Current.IsEnabled()) {
+    showCand();
+    BlockTty = 1;
+  } else {
     /* Really, enter register mode */
     if (PreserveOnFailure) {
       bell();
@@ -362,14 +405,6 @@ kkconv(char c)
     } else {
       endKanjiInput();
     }
-  } else {
-    if (CurrentCand->dicitem == NULL && originalDicItem) {
-      CurrentCand->dicitem = originalDicItem;
-      if (!OkuriInput)
-        FirstCandEntry = &(CurrentCand->dicitem->cand);
-    }
-    showCand();
-    BlockTty = 1;
   }
 }
 
@@ -426,54 +461,54 @@ void
 showCand()
 {
   kanjiSelectionEffect(1);
-  writes(CurrentCand->candword.c_str());
+  writes(Current.Cand->c_str());
   if (OkuriInput) {
     writes(OkuriBuf);
   }
 }
 
-static void
-showNextCand(CandList* nextcand)
+int
+clearCurrent()
 {
-  auto l = CurrentCand->candword.size();
+  auto l = Current.Cand->size();
   if (OkuriInput)
     l += strlen(OkuriBuf);
+
+  csrLeft(l);
   kanjiSelectionEffect(0);
-  csrLeft(l);
   erase(l);
-  csrLeft(l);
-  kanjiSelectionEffect(1);
-  CurrentCand = nextcand;
-  writes(CurrentCand->candword.c_str());
-  if (OkuriInput)
-    writes(OkuriBuf);
+  return l;
 }
 
 void
 nxCand(char)
 {
-  auto nextcand = CurrentCand->nextcand;
-  if (nextcand) {
-    showNextCand(nextcand);
-  }
+  auto l = clearCurrent();
+
+  Current.Increment();
+
+  // draw
+  csrLeft(l);
+  kanjiSelectionEffect(1);
+  writes(Current.Cand->c_str());
+
+  if (OkuriInput)
+    writes(OkuriBuf);
 }
 
 void
 pvCand(char)
 {
-  auto l = CurrentCand->candword.size();
-  if (OkuriInput)
-    l += strlen(OkuriBuf);
-  kanjiSelectionEffect(0);
-  csrLeft(l);
-  erase(l);
-  csrLeft(l);
-  if (CurrentCand->prevcand) {
+  auto l = clearCurrent();
+
+  if (Current.Decrement()) {
+    csrLeft(l);
     kanjiSelectionEffect(1);
-    CurrentCand = CurrentCand->prevcand;
-    writes(CurrentCand->candword.c_str());
+    writes(Current.Cand->c_str());
+
     if (OkuriInput)
       writes(OkuriBuf);
+
   } else {
     backToKanjiInput();
   }
@@ -523,12 +558,12 @@ void
 fixIt(char c)
 {
   kanjiSelectionEffect(0);
-  if (CurrentCand != NULL) {
-    auto l = CurrentCand->candword.size();
+  if (Current.IsEnabled()) {
+    auto l = Current.Cand->size();
     if (OkuriInput)
       l += strlen(OkuriBuf);
     csrLeft(l);
-    writeShells(CurrentCand->candword.c_str());
+    writeShells(Current.Cand->c_str());
     if (OkuriInput) {
       writeShells(OkuriBuf);
     }
@@ -557,8 +592,8 @@ void
 cancelSel(char c)
 {
   kanjiSelectionEffect(0);
-  if (CurrentCand != NULL) {
-    auto l = CurrentCand->candword.size();
+  if (Current.IsEnabled()) {
+    auto l = Current.Cand->size();
     if (OkuriInput)
       l += strlen(OkuriBuf);
     rubout(l);

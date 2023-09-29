@@ -1,19 +1,19 @@
 #pragma once
+#include <list>
 #include <memory>
 #include <string>
+#include <time.h>
+#include <unordered_map>
 #include <vector>
-struct Hash;
-struct DicList;
-struct CandList;
+
+using CandList = std::list<std::string>;
 
 struct Dictionary
 {
 private:
   std::string m_path;
-  DicList* dlist = nullptr;
-  DicList* okuriAriFirst = nullptr;
-  DicList* okuriNasiFirst = nullptr;
-  std::vector<std::shared_ptr<Hash>> dhash;
+  std::unordered_map<std::string, CandList> m_okuriAri;
+  std::unordered_map<std::string, CandList> m_okuriNasi;
   time_t mtime;
 
 public:
@@ -21,10 +21,9 @@ public:
   ~Dictionary();
   Dictionary(const Dictionary&) = delete;
   Dictionary& operator=(const Dictionary&) = delete;
-  CandList* getCand(std::string_view s) const;
+
+  const CandList* getCand(std::string_view s) const;
 
 private:
-  DicList* addNewItem(std::string_view word, CandList* clist);
-  void addHash(DicList* ditem);
-  void mergeDictionary(const char* dicname);
+  void mergeDictionary(const std::string& dicname);
 };
