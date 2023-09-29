@@ -30,7 +30,6 @@ enum class PrintCandTypes
 // 変換候補
 struct CandList
 {
-  CandList* okuri = nullptr;
   CandList* nextcand = nullptr;
   CandList* prevcand = nullptr;
   DicList* dicitem = nullptr;

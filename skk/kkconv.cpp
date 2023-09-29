@@ -452,15 +452,7 @@ showNextCand(CandList* nextcand)
 void
 nxCand(char)
 {
-  CandList* nextcand;
-  CandList* nnextcand;
-
-  nextcand = CurrentCand->nextcand;
-  nnextcand = CurrentCand;
-  while (nextcand && nextcand->okuri) {
-    nnextcand = nextcand;
-    nextcand = nnextcand->nextcand;
-  }
+  auto nextcand = CurrentCand->nextcand;
   if (nextcand) {
     showNextCand(nextcand);
   }
@@ -469,10 +461,6 @@ nxCand(char)
 void
 pvCand(char)
 {
-  if (CurrentCand->prevcand && CurrentCand->prevcand->okuri) {
-    CurrentCand = CurrentCand->prevcand;
-    pvCand({});
-  }
   auto l = CurrentCand->candword.size();
   if (OkuriInput)
     l += strlen(OkuriBuf);

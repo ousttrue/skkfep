@@ -87,25 +87,12 @@ CandList::getCandList(std::string_view line, DicList* ditem, bool okuri)
 void
 CandList::print(FILE* f, PrintCandTypes fre)
 {
-  CandList* clist;
   CandList* clist2;
-  CandList* cclist;
-  CandList* cclist2;
-
   fputc('/', f);
-  for (clist = this; clist != NULL; clist2 = clist,
-      clist = clist->nextcand,
-      (fre == PrintCandTypes::FREE_CAND ? (delete (clist2), 0) : 0)) {
-    if (clist->okuri) {
-      fprintf(f, "[%s/", clist->candword.c_str());
-      for (cclist = clist->okuri; cclist != NULL; cclist2 = cclist,
-          cclist = cclist->nextcand,
-          (fre == PrintCandTypes::FREE_CAND ? (delete (cclist2), 0) : 0)) {
-        fprintf(f, "%s/", cclist->candword.c_str());
-      }
-      fputs("]/", f);
-    } else
-      fprintf(f, "%s/", clist->candword.c_str());
+  for (auto clist = this; clist != NULL; clist2 = clist,
+            clist = clist->nextcand,
+            (fre == PrintCandTypes::FREE_CAND ? (delete (clist2), 0) : 0)) {
+    fprintf(f, "%s/", clist->candword.c_str());
   }
   fputc('\n', f);
 }
@@ -114,15 +101,8 @@ static void
 freeCand(CandList* cl)
 {
   CandList* clist2;
-  CandList* cclist2;
-
   for (auto clist = cl; clist != NULL;
        clist2 = clist, clist = clist->nextcand, delete clist2) {
-    if (clist->okuri) {
-      for (auto cclist = clist->okuri; cclist != NULL;
-           cclist2 = cclist, cclist = cclist->nextcand, delete cclist2)
-        ;
-    }
   }
 }
 
@@ -159,4 +139,3 @@ firstCand(CandList* l)
     l = l->prevcand;
   return l;
 }
-
