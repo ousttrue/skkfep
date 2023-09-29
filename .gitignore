@@ -4,3 +4,6 @@
 /genMakefile
 /jc
 /skkfep
+
+/subprojects/*
+!/subprojects/gtest.wrap

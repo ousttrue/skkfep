@@ -6,3 +6,6 @@ executable('skkfep', 'main.cpp',
   install: true,
   dependencies: [termpty_dep, skk_dep],
 )
+
+subdir('tests')
+

@@ -1,4 +1,6 @@
 #pragma once
+#include <stdint.h>
+#include <string>
 
 enum SkkModes
 {
@@ -27,3 +29,31 @@ mode_string(SkkModes m)
       return "単語選択";
   }
 }
+
+struct PreEdit
+{
+  // internal raw input
+  std::string Input;
+  // show user interface
+  std::string Display;
+};
+
+struct SkkResult
+{
+  // write child pty
+  std::string Output;
+  // write stdout
+  PreEdit Predit;
+  SkkModes Mode;
+};
+
+class Skk
+{
+public:
+  Skk();
+  ~Skk();
+  Skk(const Skk&) = delete;
+  Skk& operator=(const Skk&) = delete;
+
+  SkkResult input(uint8_t c);
+};

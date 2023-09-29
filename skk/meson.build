@@ -7,6 +7,7 @@ skk_lib = static_library('skk', [
   'etc.cpp',
   'romkan.cpp',
   'dictionary.cpp',
+  'skk.cpp',
   ],
   dependencies: [termpty_dep],
 )
