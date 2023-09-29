@@ -177,7 +177,7 @@ void
 toAsc(char c)
 {
   romkan::flushKana();
-  setKeymap(&CurrentKeymap, convertKeymap(&NormalKeymap));
+  setKeymap(&CurrentKeymap, convertKeymap(NormalKeymap));
   showmode(SKK_MODE);
 }
 
@@ -185,7 +185,7 @@ void
 toZenA(char c)
 {
   romkan::flushKana();
-  setKeymap(&CurrentKeymap, ZenkakuKeymap);
+  setKeymap(&CurrentKeymap, &ZenkakuKeymap);
   showmode(ZENEI_MODE);
 }
 
@@ -200,7 +200,7 @@ void
 toEsc(char c)
 {
   romkan::flushKana();
-  setKeymap(&CurrentKeymap, convertKeymap(&EscapedKeymap));
+  setKeymap(&CurrentKeymap, convertKeymap(EscapedKeymap));
   showmode(SKK_MODE);
 }
 

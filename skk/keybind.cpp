@@ -138,27 +138,12 @@ toggleEscape(EscapeBehavior b)
 }
 
 KeymapPtr
-convertKeymap(SparseKeymap* skm)
+convertKeymap(const SparseKeymap& skm)
 {
   static Keymap keymap_body;
-  int i;
-
-  for (i = 0; i < 128; i++)
-    keymap_body[i] = skm->defaultfunc;
-  overrideKeymap(keymap_body, skm);
-  return keymap_body;
-}
-
-void
-overrideKeymap(KeymapPtr km, SparseKeymap* skm)
-{
-  int i, c;
-
-  for (i = 0; skm->keymap[i].function != NULL; i++) {
-    c = (unsigned char)skm->keymap[i].key;
-    if (c < 128)
-      km[c] = skm->keymap[i].function;
-  }
+  keymap_body.setall(skm.defaultfunc);
+  keymap_body.overrideKeymap(skm.keymap);
+  return &keymap_body;
 }
 
 int

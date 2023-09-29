@@ -175,6 +175,6 @@ App::Input(uint8_t c)
     write(fileno(Shellout), &c, 1);
   } else {
     // ascii
-    (*CurrentKeymap[c])(c /*, o*/);
+    (*CurrentKeymap)[c](c /*, o*/);
   }
 }

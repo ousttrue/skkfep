@@ -1,7 +1,6 @@
 #pragma once
+#include <stddef.h>
 #include <stdint.h>
-
-extern const char* KanaKey;
 
 enum EscapeBehavior
 {
@@ -12,21 +11,48 @@ enum EscapeBehavior
   ToggleEsc
 };
 
-using KeymapPtr = void (**)(char);
-typedef void (*Keymap[128])(char);
+using KeyFunc = void (*)(char);
+
 struct SparseKeymapBody
 {
   uint8_t key = 0;
-  void (*function)(char) = nullptr;
+  KeyFunc function = nullptr;
 };
-extern SparseKeymapBody _ViEscKeymap[];
-extern SparseKeymapBody _EmacsEscKeymap[];
 
 struct SparseKeymap
 {
-  void (*defaultfunc)(char);
+  KeyFunc defaultfunc;
   SparseKeymapBody* keymap;
 };
+struct Keymap
+{
+  KeyFunc Keymap[128];
+
+  void setall(const KeyFunc& f)
+  {
+    for (auto& func : Keymap) {
+      func = f;
+    }
+  }
+
+  KeyFunc& operator[](size_t index) { return Keymap[index]; }
+
+  void overrideKeymap(const SparseKeymapBody* keymap)
+  {
+    for (; keymap->function; ++keymap) {
+      int c = (unsigned char)keymap->key;
+      if (c < 128) {
+        Keymap[c] = keymap->function;
+      }
+    }
+  }
+};
+using KeymapPtr = Keymap*;
+
+extern const char* KanaKey;
+extern SparseKeymapBody _ViEscKeymap[];
+extern SparseKeymapBody _EmacsEscKeymap[];
+
 extern SparseKeymap NormalKeymap;
 extern SparseKeymap SelectionKeymap;
 extern SparseKeymap CodeInputKeymap;
@@ -54,10 +80,7 @@ void
 toggleEscape(EscapeBehavior b);
 
 KeymapPtr
-convertKeymap(SparseKeymap* skm);
-
-void
-overrideKeymap(KeymapPtr km, SparseKeymap* skm);
+convertKeymap(const SparseKeymap& skm);
 
 int
 changeKey(SparseKeymap* skm, void (*func)(char), char newkey);
@@ -67,6 +90,3 @@ setKeymap(KeymapPtr* current, KeymapPtr _new);
 
 void
 restoreKeymap(KeymapPtr* current);
-
-KeymapPtr
-convertKeymap();

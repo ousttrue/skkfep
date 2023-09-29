@@ -84,7 +84,7 @@ bufferedInput(const char* s)
 void
 kkBeg(char)
 {
-  setKeymap(&CurrentKeymap, KanjiInputKeymap);
+  setKeymap(&CurrentKeymap, &KanjiInputKeymap);
   showmode(KINPUT_MODE);
   kanjiInputEffect(1);
   WordBufLen = 0;
@@ -107,7 +107,7 @@ void
 kkBegA(char c)
 {
   romkan::flushKana();
-  setKeymap(&CurrentKeymap, KAlphaInputKeymap);
+  setKeymap(&CurrentKeymap, &KAlphaInputKeymap);
   showmode(KINPUT_MODE);
   kanjiInputEffect(1);
   WordBufLen = 0;
@@ -211,7 +211,7 @@ fxthru(char c)
 {
   /* fix and through */
   fixIt({});
-  (*CurrentKeymap[c])(c);
+  (*CurrentKeymap)[c](c);
 }
 
 void
@@ -276,7 +276,7 @@ void
 okfFix(char c)
 {
   cancelOkuri({});
-  if (CurrentKeymap == OkuriInputKeymap)
+  if (CurrentKeymap == &OkuriInputKeymap)
     cancelOkuri({});
   kfFix(0);
 }
@@ -392,7 +392,7 @@ kkconv(char c)
   if (OkuriInput)
     l += strlen(OkuriBuf) - 1;
   rubout(l);
-  setKeymap(&CurrentKeymap, convertKeymap(&SelectionKeymap));
+  setKeymap(&CurrentKeymap, convertKeymap(SelectionKeymap));
 
   if (Current.IsEnabled()) {
     showCand();
@@ -414,7 +414,7 @@ toOkuri()
   OkuriInput = 1;
   *OkuriBuf = '\0';
   OkuriBufLen = 0;
-  setKeymap(&CurrentKeymap, OkuriInputKeymap);
+  setKeymap(&CurrentKeymap, &OkuriInputKeymap);
 }
 
 void
@@ -435,7 +435,7 @@ kOkuri(char c)
   }
   toOkuri();
   write1('*');
-  (*CurrentKeymap[okuri])(okuri /*, 1*/);
+  (*CurrentKeymap)[okuri](okuri /*, 1*/);
 }
 
 void
@@ -537,7 +537,7 @@ cancelOkuri(char)
   if (Nconso == 0) {
     rubout(1);
     OkuriInput = 0;
-    setKeymap(&CurrentKeymap, KanjiInputKeymap);
+    setKeymap(&CurrentKeymap, &KanjiInputKeymap);
   } else {
     romkan::cancelConso();
     clearOkuri();
