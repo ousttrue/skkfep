@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 #define DEFAULT_KANAKEY "^j"
-char* KanaKey = DEFAULT_KANAKEY;
+const char* KanaKey = DEFAULT_KANAKEY;
 static KeymapPtr lastKeymap;
 EscapeBehavior CurrentEscapeBehavior = NoEsc;
 EscapeBehavior LastEscapeBehavior = SimpleEsc;

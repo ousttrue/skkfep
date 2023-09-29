@@ -1,10 +1,11 @@
 #pragma once
+#include <stdint.h>
 
-extern char* KanaKey;
+extern const char* KanaKey;
 
 enum EscapeBehavior
 {
-  NoEsc = 0,
+  NoEsc,
   SimpleEsc,
   ViEsc,
   EmacsEsc,
@@ -15,23 +16,27 @@ using KeymapPtr = void (**)(char);
 typedef void (*Keymap[128])(char);
 struct SparseKeymapBody
 {
-  int key;
-  void (*function)(char);
+  uint8_t key = 0;
+  void (*function)(char) = nullptr;
 };
+extern SparseKeymapBody _ViEscKeymap[];
+extern SparseKeymapBody _EmacsEscKeymap[];
 
 struct SparseKeymap
 {
   void (*defaultfunc)(char);
   SparseKeymapBody* keymap;
 };
-
-extern SparseKeymap NormalKeymap, SelectionKeymap, CodeInputKeymap;
-
+extern SparseKeymap NormalKeymap;
+extern SparseKeymap SelectionKeymap;
+extern SparseKeymap CodeInputKeymap;
 extern SparseKeymap EscapedKeymap;
-extern SparseKeymapBody _ViEscKeymap[], _EmacsEscKeymap[];
 
-extern Keymap KanaKeymap, ZenkakuKeymap, KanjiInputKeymap, OkuriInputKeymap,
-  KAlphaInputKeymap;
+extern Keymap KanaKeymap;
+extern Keymap ZenkakuKeymap;
+extern Keymap KanjiInputKeymap;
+extern Keymap OkuriInputKeymap;
+extern Keymap KAlphaInputKeymap;
 
 extern const char* modeString[];
 

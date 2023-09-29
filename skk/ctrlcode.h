@@ -1,3 +1,4 @@
+#pragma once
 #define CTRL_A 1
 #define CTRL_B 2
 #define CTRL_C 3
@@ -24,7 +25,7 @@
 #define CTRL_X 24
 #define CTRL_Y 25
 #define CTRL_Z 26
-#define	ESC_CODE	27
-#define	DEL_CODE	127
+#define ESC_CODE 27
+#define DEL_CODE 127
 
-#define EXTRA_CODE	128
+#define EXTRA_CODE 128
