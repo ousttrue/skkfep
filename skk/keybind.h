@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include <span>
 #include <stddef.h>
 #include <stdint.h>
@@ -13,17 +14,18 @@ enum EscapeBehavior
   ToggleEsc
 };
 
+// using KeyFunc = std::function<void(char)>;
 using KeyFunc = void (*)(char);
 
 struct SparseKeymapBody
 {
   uint8_t key = 0;
-  KeyFunc function = nullptr;
+  KeyFunc function = {};
 };
 
 struct SparseKeymap
 {
-  KeyFunc defaultfunc;
+  KeyFunc defaultfunc = {};
   std::vector<SparseKeymapBody> keymap;
 };
 struct Keymap
@@ -52,8 +54,6 @@ struct Keymap
 using KeymapPtr = Keymap*;
 
 extern const char* KanaKey;
-extern std::vector<SparseKeymapBody> _ViEscKeymap;
-extern std::vector<SparseKeymapBody> _EmacsEscKeymap;
 
 extern SparseKeymap NormalKeymap;
 extern SparseKeymap SelectionKeymap;
@@ -66,17 +66,11 @@ extern Keymap KanjiInputKeymap;
 extern Keymap OkuriInputKeymap;
 extern Keymap KAlphaInputKeymap;
 
-extern const char* modeString[];
-
-extern KeymapPtr CurrentKeymap;
-
-extern EscapeBehavior CurrentEscapeBehavior, LastEscapeBehavior;
-
 void
 setKanaKey();
 
 void
-setEscape(EscapeBehavior b);
+setEscape(EscapeBehavior b, bool init = false);
 
 void
 toggleEscape(EscapeBehavior b);
@@ -84,11 +78,17 @@ toggleEscape(EscapeBehavior b);
 KeymapPtr
 convertKeymap(const SparseKeymap& skm);
 
-int
-changeKey(SparseKeymap* skm, void (*func)(char), char newkey);
+void
+changeKey(SparseKeymap* skm, KeyFunc func, char newkey);
 
 void
-setKeymap(KeymapPtr* current, KeymapPtr _new);
+setKeymap(KeymapPtr _new);
 
 void
-restoreKeymap(KeymapPtr* current);
+restoreKeymap();
+
+void
+keyinput(char c, char o = 0);
+
+bool
+is_okuri_input();

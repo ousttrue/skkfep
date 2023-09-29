@@ -6,6 +6,11 @@
 #include "romkan.h"
 #include <stdio.h>
 
+extern std::vector<SparseKeymapBody> _ViEscKeymap;
+extern std::vector<SparseKeymapBody> _EmacsEscKeymap;
+
+KeymapPtr CurrentKeymap;
+
 #define DEFAULT_KANAKEY "^j"
 const char* KanaKey = DEFAULT_KANAKEY;
 static KeymapPtr lastKeymap;
@@ -72,8 +77,12 @@ setKanaKey()
 }
 
 void
-setEscape(EscapeBehavior b)
+setEscape(EscapeBehavior b, bool init)
 {
+  if (init) {
+    LastEscapeBehavior = NoEsc;
+  }
+
   if (b == ToggleEsc)
     return;
   if (b == NoEsc) {
@@ -146,28 +155,38 @@ convertKeymap(const SparseKeymap& skm)
   return &keymap_body;
 }
 
-int
-changeKey(SparseKeymap* skm, void (*func)(char), char newkey)
+void
+changeKey(SparseKeymap* skm, KeyFunc func, char newkey)
 {
-  int i;
-
-  for (i = 0; skm->keymap[i].function != NULL; i++)
-    if (skm->keymap[i].function == func) {
-      skm->keymap[i].key = newkey;
-      return 0;
+  for (auto& keymap : skm->keymap) {
+    if (keymap.function == func) {
+      keymap.key = newkey;
+      return;
     }
-  return -1;
+  }
 }
 
 void
-setKeymap(KeymapPtr* current, KeymapPtr _new)
+setKeymap(KeymapPtr _new)
 {
-  lastKeymap = *current;
-  *current = _new;
+  lastKeymap = CurrentKeymap;
+  CurrentKeymap = _new;
 }
 
 void
-restoreKeymap(KeymapPtr* current)
+restoreKeymap()
 {
-  *current = lastKeymap;
+  CurrentKeymap = lastKeymap;
+}
+
+void
+keyinput(char c, char o)
+{
+  (*CurrentKeymap)[c](c /*, o*/);
+}
+
+bool
+is_okuri_input()
+{
+  return CurrentKeymap == &OkuriInputKeymap;
 }

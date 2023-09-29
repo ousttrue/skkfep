@@ -480,7 +480,7 @@ flushLastConso(char c, const OutFunc& output, void (*flush)(int))
 void
 toKana(char c)
 {
-  setKeymap(&CurrentKeymap, &KanaKeymap);
+  setKeymap(&KanaKeymap);
   if (CurrentTab == HiraTab)
     showmode(KANA_MODE);
   else
@@ -568,14 +568,14 @@ inputCode(char)
   if (status::type() == StatusType::NoStatusLine)
     return;
   codeinMsg();
-  setKeymap(&CurrentKeymap, convertKeymap(CodeInputKeymap));
+  setKeymap(convertKeymap(CodeInputKeymap));
   codecol = 0;
 }
 
 void
 cancelCode(char)
 {
-  setKeymap(&CurrentKeymap, &KanaKeymap);
+  setKeymap(&KanaKeymap);
   showmode(KANA_MODE);
 }
 

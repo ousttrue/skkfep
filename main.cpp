@@ -32,14 +32,11 @@ ParseArgs(int argc, char** argv)
     } else if (!strcmp(argv[i], "-P")) {
       PreserveOnFailure ^= 1;
     } else if (!strcmp(argv[i], "-esc")) {
-      setEscape(SimpleEsc);
-      LastEscapeBehavior = NoEsc;
+      setEscape(SimpleEsc, true);
     } else if (!strcmp(argv[i], "-viesc")) {
-      setEscape(ViEsc);
-      LastEscapeBehavior = NoEsc;
+      setEscape(ViEsc, true);
     } else if (!strcmp(argv[i], "-emacsesc")) {
-      setEscape(EmacsEsc);
-      LastEscapeBehavior = NoEsc;
+      setEscape(EmacsEsc, true);
     } else if (!strcmp(argv[i], "-rs")) {
       ReverseStatus = 1;
     }

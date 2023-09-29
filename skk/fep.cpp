@@ -21,8 +21,6 @@
 
 #define FLUSH_TIMEOUT 300000 /* timeout ( micro-sec ) */
 
-KeymapPtr CurrentKeymap;
-
 extern char* version;
 extern char ShellName[];
 extern char** ShellArg;
@@ -177,7 +175,7 @@ void
 toAsc(char c)
 {
   romkan::flushKana();
-  setKeymap(&CurrentKeymap, convertKeymap(NormalKeymap));
+  setKeymap(convertKeymap(NormalKeymap));
   showmode(SKK_MODE);
 }
 
@@ -185,7 +183,7 @@ void
 toZenA(char c)
 {
   romkan::flushKana();
-  setKeymap(&CurrentKeymap, &ZenkakuKeymap);
+  setKeymap(&ZenkakuKeymap);
   showmode(ZENEI_MODE);
 }
 
@@ -200,7 +198,7 @@ void
 toEsc(char c)
 {
   romkan::flushKana();
-  setKeymap(&CurrentKeymap, convertKeymap(EscapedKeymap));
+  setKeymap(convertKeymap(EscapedKeymap));
   showmode(SKK_MODE);
 }
 
@@ -222,6 +220,6 @@ void
 thru1(char c)
 {
   thru(c);
-  restoreKeymap(&CurrentKeymap);
+  restoreKeymap();
   showlastmode();
 }
