@@ -1,12 +1,5 @@
 #pragma once
 
-enum StatusType
-{
-  NoStatusLine = 0,
-  HaveStatusLine,
-  UseBottomLine
-};
-
 void
 set_winsize(int tty);
 

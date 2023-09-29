@@ -5,6 +5,7 @@ termpty_lib = static_library('termpty', [
   'stty.cpp',
   'terms.cpp',
   'connsh.cpp',
+  'statusline.cpp',
   ])
 
 termpty_dep = declare_dependency(

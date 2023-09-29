@@ -3,6 +3,7 @@
 #include "etc.h"
 #include "fep.h"
 #include "keybind.h"
+#include "statusline.h"
 #include "stty.h"
 #include "terms.h"
 #include <ctype.h>
@@ -303,7 +304,7 @@ flushKana()
 }
 
 void
-inputKanaVowel(char c, const OutFunc &output)
+inputKanaVowel(char c, const OutFunc& output)
 {
   int vowelnum;
 
@@ -339,7 +340,7 @@ inputKanaVowel(char c, const OutFunc &output)
 }
 
 void
-inputKanaConso(char c, const OutFunc &output, void (*flush)(int))
+inputKanaConso(char c, const OutFunc& output, void (*flush)(int))
 
 {
   char notOverwrite = 0;
@@ -453,7 +454,7 @@ inputKanaConso(char c, const OutFunc &output, void (*flush)(int))
 }
 
 void
-flushLastConso(char c, const OutFunc &output, void (*flush)(int))
+flushLastConso(char c, const OutFunc& output, void (*flush)(int))
 {
   if (Nconso == 0)
     return;
@@ -527,14 +528,14 @@ kanaBS(char c)
 }
 
 void
-inputZenkakuAlpha(char c, const OutFunc &output)
+inputZenkakuAlpha(char c, const OutFunc& output)
 
 {
   output(ZenkakuAlpha[c - ' ']);
 }
 
 void
-inputZenkakuEx(char c, const OutFunc &output)
+inputZenkakuEx(char c, const OutFunc& output)
 {
   switch (c) {
     case '-':
@@ -564,7 +565,7 @@ void
 inputCode(char)
 {
   flushKana();
-  if (!msgLine())
+  if (status::type() == StatusType::NoStatusLine)
     return;
   codeinMsg();
   setKeymap(&CurrentKeymap, convertKeymap(&CodeInputKeymap));

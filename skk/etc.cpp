@@ -1,4 +1,5 @@
 #include "etc.h"
+#include "statusline.h"
 #include "stty.h"
 #include "terms.h"
 #include <sys/time.h>
@@ -37,7 +38,7 @@ showlastmode()
 void
 showmessage(const char* s)
 {
-  if (msgLine()) {
+  if (status::type() != StatusType::NoStatusLine) {
     toMsg();
     writes(s);
     clearToEnd();

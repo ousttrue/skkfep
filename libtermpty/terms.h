@@ -10,9 +10,6 @@ setEnvirons();
 void
 adjstr(char** buf, char** ptr);
 
-int
-msgLine();
-
 void
 toMsg();
 

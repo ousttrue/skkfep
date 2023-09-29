@@ -1,4 +1,5 @@
 #include "stty.h"
+#include "statusline.h"
 
 #define LINUX
 #define SYSV
@@ -197,14 +198,11 @@ void
 set_winsize(int tty)
 {
 #ifdef TIOCSWINSZ
-  int er;
-  struct winsize s_winsize;
-
-  s_winsize = d_winsize;
-  if (msgLine() == (int)UseBottomLine) {
+  auto s_winsize = d_winsize;
+  if (status::type() == StatusType::UseBottomLine) {
     s_winsize.ws_row--;
   }
-  er = ioctl(tty, TIOCSWINSZ, &s_winsize);
+  int er = ioctl(tty, TIOCSWINSZ, &s_winsize);
   if (er == -1) {
     printf("Error occured\n");
   }

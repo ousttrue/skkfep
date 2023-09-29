@@ -1,4 +1,5 @@
 #include "terms.h"
+#include "statusline.h"
 #include "stty.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,7 +19,6 @@ char PC, *BC, *UP, *T_ce, *T_kr, *T_kl, *T_cr, *T_bt, *T_ta, *T_sc, *T_rc,
 
 char *T_TS, *T_FS, *T_SS, *T_HS, *T_ES;
 int columns, lines;
-StatusType status;
 
 char ReverseStatus = 0;
 
@@ -93,12 +93,12 @@ getTCstr()
     T_ES = NULL;
 
   if ((T_TS != NULL) && (T_FS != NULL)) {
-    status = HaveStatusLine;
+    status::type(StatusType::HaveStatusLine);
   } else if ((T_cs != NULL) && (T_cm != NULL) && (T_sc != NULL) &&
              (T_rc != NULL)) {
-    status = UseBottomLine;
+    status::type(StatusType::UseBottomLine);
   } else {
-    status = NoStatusLine;
+    status::type(StatusType::NoStatusLine);
   }
 
   lines = tgetnum("li");
@@ -125,7 +125,7 @@ setEnvirons()
   sprintf(buf, "%s", version);
   setenv("SKKFEP_VERSION", buf, 1);
 
-  if (msgLine() != (int)UseBottomLine) {
+  if (status::type() != StatusType::UseBottomLine) {
     return;
   }
   li = lines - 1;
@@ -200,18 +200,12 @@ adjstr(char** buf, char** ptr)
   *((*ptr)++) = '\0';
 }
 
-int
-msgLine()
-{
-  return (int)status;
-}
-
 void
 toMsg()
 {
   if (ReverseStatus)
     standout(1);
-  if (status == HaveStatusLine) {
+  if (status::type() == StatusType::HaveStatusLine) {
     writes(tgoto(T_TS, 0, 0));
   } else {
     writes(T_sc);
@@ -222,7 +216,7 @@ toMsg()
 void
 fromMsg()
 {
-  if (status == HaveStatusLine) {
+  if (status::type() == StatusType::HaveStatusLine) {
     writes(T_FS);
   } else {
     writes(T_rc);
@@ -234,11 +228,11 @@ fromMsg()
 void
 initFep()
 {
-  if (status == HaveStatusLine) {
+  if (status::type() == StatusType::HaveStatusLine) {
     if (T_SS != NULL) {
       writes(T_SS);
     }
-  } else if (status == UseBottomLine) {
+  } else if (status::type() == StatusType::UseBottomLine) {
     writes("\r\n");
     writes(tgoto(T_cs, lines - 2, 0));
     writes(tgoto(T_cm, 0, lines - 2));
@@ -248,11 +242,11 @@ initFep()
 void
 termFep()
 {
-  if (status == HaveStatusLine) {
+  if (status::type() == StatusType::HaveStatusLine) {
     if (T_HS != NULL) {
       writes(T_HS);
     }
-  } else if (status == UseBottomLine) {
+  } else if (status::type() == StatusType::UseBottomLine) {
     writes(tgoto(T_cs, lines - 1, 0));
     writes(tgoto(T_cm, 0, lines - 1));
   }
