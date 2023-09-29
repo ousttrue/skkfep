@@ -1,10 +1,9 @@
 #include "app.h"
 #include "connsh.h"
+#include "dictinary.h"
 #include "fep.h"
 #include "keybind.h"
 #include "kkconv.h"
-// #include "skklib.h"
-#include "dictinary.h"
 #include "stty.h"
 #include "terms.h"
 #include <signal.h>
@@ -116,45 +115,54 @@ App::Initialize(std::string_view UserDicName, const char* cmd, char** args)
 int
 App::Run()
 {
-  // char c;
-  // int i;
   fd_set selfds;
-  // guess_system_kanji_code();
-  //
-
   FD_ZERO(&selfds);
   int fdnum = Shellfd + 1;
 
-  char shellBuf[SH_BUF_SIZ];
-
-  /* Loop */
   for (;;) {
     FD_SET(0, &selfds);
     FD_SET(Shellfd, &selfds);
     int i = select(fdnum, &selfds, NULL, NULL, NULL);
-    if (i == -1 && errno == EINTR)
-      continue;
-    if (FD_ISSET(Shellfd, &selfds) && !BlockTty) {
-      /* Shell input is ready */
-      if ((i = read(Shellfd, shellBuf, SH_BUF_SIZ)) > 0)
-        writeShTty(shellBuf, i);
-      if (i == SH_BUF_SIZ)
-        continue;
-    }
-    if (!FD_ISSET(0, &selfds)) { /* Key input not ready */
+    if (i == -1 && errno == EINTR) {
       continue;
     }
-    if (ioctl(0, FIONREAD, &i) == 0) {
-      while (i) {
-        char o = OkuriFirst;
-        OkuriFirst = 0;
-        int c = getchar();
-        if (c & 0x80)
-          thru(c);
-        else
-          (*CurrentKeymap[c])(c /*, o*/);
-        i--;
+
+    // read pty out
+    if (FD_ISSET(Shellfd, &selfds)) {
+      if (!BlockTty) {
+        char shellBuf[SH_BUF_SIZ];
+        auto i = read(Shellfd, shellBuf, SH_BUF_SIZ);
+        if (i > 0) {
+          writeShTty(shellBuf, i);
+        }
+      }
+      continue;
+    }
+
+    // read stdin
+    if (FD_ISSET(0, &selfds)) {
+      int i;
+      if (ioctl(0, FIONREAD, &i) == 0) {
+        for (; i; --i) {
+          int c = getchar();
+          Input(c);
+        }
       }
     }
+  }
+}
+
+void
+App::Input(uint8_t c)
+{
+  char o = OkuriFirst;
+  OkuriFirst = 0;
+  if (c & 0x80) {
+    // not ascii
+    // thru(c);
+    write(fileno(Shellout), &c, 1);
+  } else {
+    // ascii
+    (*CurrentKeymap[c])(c /*, o*/);
   }
 }

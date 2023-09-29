@@ -1,5 +1,7 @@
 #pragma once
 #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 extern int Shellfd;
 extern int ShellPID;
@@ -14,16 +16,28 @@ getDevice(int* master, int* slave);
 void
 freeDevice();
 
-void
-writeShell1(char c);
+inline void
+writeShell1(char c)
+{
+  write(fileno(Shellout), &c, 1);
+}
 
-void
-writeShells(const char* s);
+inline void
+writeShells(const char* s)
+{
+  int l = strlen(s);
+  write(fileno(Shellout), s, l);
+}
 
-void
-writeTtyShell1(char c);
+inline void
+writeTtyShell1(char c)
+{
+  write(fileno(Shellout), &c, 1);
+}
 
-
-void
-writeTtyShells(const char* s);
-
+inline void
+writeTtyShells(const char* s)
+{
+  int l = strlen(s);
+  write(fileno(Shellout), s, l);
+}
