@@ -1,10 +1,6 @@
 #pragma once
 
-void
-set_winsize(int tty);
-
-void
-get_winsize();
+extern int g_term_tty;
 
 bool
 set_tty();

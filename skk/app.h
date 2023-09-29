@@ -19,7 +19,10 @@ public:
     return s_instance;
   }
 
-  bool Initialize(std::string_view UserDicName, const char* cmd, char** args);
+  bool Initialize(std::string_view UserDicName,
+                  const char* cmd,
+                  char** args,
+                  const char* version);
   int Run();
 
   void Abort();

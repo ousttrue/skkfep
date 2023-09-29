@@ -1,11 +1,7 @@
 #pragma once
-extern char ReverseStatus;
 
 bool
 getTCstr();
-
-void
-setEnvirons();
 
 void
 adjstr(char** buf, char** ptr);

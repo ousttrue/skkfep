@@ -1,4 +1,6 @@
 #pragma once
+#include "termsize.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -8,10 +10,11 @@ extern int ShellPID;
 extern FILE* Shellout;
 
 bool
-establishShell(const char* ShellName, char** ShellArg, void (*onSigChild)(int));
-
-void
-getDevice(int* master, int* slave);
+establishShell(const TermSize& size,
+               const char* ShellName,
+               char** ShellArg,
+               void (*onSigChild)(int),
+               const char* version);
 
 void
 freeDevice();
@@ -41,3 +44,8 @@ writeTtyShells(const char* s)
   int l = strlen(s);
   write(fileno(Shellout), s, l);
 }
+
+void
+set_termsize(int tty, const TermSize &size);
+
+

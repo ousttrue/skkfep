@@ -194,50 +194,11 @@ TERMPARAM* ioval;
 }
 #endif /* not TERMIOS */
 
-void
-set_winsize(int tty)
-{
-#ifdef TIOCSWINSZ
-  auto s_winsize = d_winsize;
-  if (status::type() == StatusType::UseBottomLine) {
-    s_winsize.ws_row--;
-  }
-  int er = ioctl(tty, TIOCSWINSZ, &s_winsize);
-  if (er == -1) {
-    printf("Error occured\n");
-  }
-#endif /* TIOCSWINSZ */
-}
-
-void
-get_winsize()
-{
-#ifdef TIOCSWINSZ
-  extern int lines, columns;
-
-  ioctl(g_term_tty, TIOCGWINSZ, &d_winsize);
-  if (d_winsize.ws_col == 0) {
-    d_winsize.ws_col = columns;
-  } else {
-    columns = d_winsize.ws_col;
-  }
-  if (d_winsize.ws_row == 0) {
-    d_winsize.ws_row = lines;
-  } else {
-    lines = d_winsize.ws_row;
-  }
-  ioctl(g_term_tty, TIOCSWINSZ, &d_winsize);
-#endif /* TIOCSWINSZ */
-}
-
 bool
 set_tty()
 {
-  int er;
-  TERMPARAM ioval;
-
   GET_TTY(g_term_tty, &d_ioval);
-  ioval = d_ioval;
+  auto ioval = d_ioval;
 
 #if defined TERMIOS || defined TERMIO
   ioval.c_iflag &= ~(INLCR | IGNCR | ICRNL | IXON | IXOFF);
@@ -270,14 +231,11 @@ set_tty()
   ioval.m_ttyb.sg_flags = RAW;
 #endif
 
-  er = SET_TTY(g_term_tty, &ioval);
-
-  initFep();
-
+  int er = SET_TTY(g_term_tty, &ioval);
   if (er == -1) {
-    return false;
     printf("Error occured\n");
     reset_tty();
+    return false;
   }
   return true;
 }

@@ -1,6 +1,7 @@
 #include "app.h"
 #include "keybind.h"
 #include "kkconv.h"
+#include "statusline.h"
 #include "terms.h"
 #include "version.h"
 #include <pwd.h>
@@ -90,7 +91,7 @@ main(int argc, char* argv[], char* envp[])
 
   printf("SKKFEP version %s\n", version);
 
-  if (!App::Instance().Initialize(UserDicName, ShellName, ShellArg)) {
+  if (!App::Instance().Initialize(UserDicName, ShellName, ShellArg, version)) {
     return 1;
   }
 

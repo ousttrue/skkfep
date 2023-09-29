@@ -4,8 +4,10 @@
 #include "fep.h"
 #include "keybind.h"
 #include "kkconv.h"
+#include "statusline.h"
 #include "stty.h"
 #include "terms.h"
+#include "termsize.h"
 #include <signal.h>
 #include <sstream>
 #include <sys/ioctl.h>
@@ -76,25 +78,26 @@ App::SaveJisyo()
 }
 
 bool
-App::Initialize(std::string_view UserDicName, const char* cmd, char** args)
+App::Initialize(std::string_view UserDicName,
+                const char* cmd,
+                char** args,
+                const char* version)
 {
-  /* Initialize */
-  setKanaKey();
   if (!getTCstr()) {
     App::Instance().Exit(-1);
   }
   tty_ready();
-  get_winsize();
   if (!set_tty()) {
     App::Instance().Exit(-1);
   }
+  auto win_size = get_termsize();
+  if (status::type() == StatusType::UseBottomLine) {
+    --win_size.Rows;
+  }
+
+  // fork
   init_signals();
-
-  OpenDictionary(UserDicName);
-
-  toAsc({});
-
-  auto ok = establishShell(cmd, args, [](int) {
+  auto callback = [](int) {
     int cpid;
     int statusp;
 
@@ -106,8 +109,17 @@ App::Initialize(std::string_view UserDicName, const char* cmd, char** args)
     } else
 #endif /* NO_SUSPEND */
       App::Instance().Exit(0);
-  });
-  return ok;
+  };
+  if (!establishShell(win_size, cmd, args, callback, version)) {
+    return false;
+  }
+
+  setKanaKey();
+  OpenDictionary(UserDicName);
+  toAsc({});
+  initFep();
+
+  return true;
 }
 
 #define SH_BUF_SIZ 256

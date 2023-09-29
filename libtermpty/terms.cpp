@@ -1,6 +1,7 @@
 #include "terms.h"
 #include "statusline.h"
 #include "stty.h"
+#include "termsize.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,9 +19,7 @@ char PC, *BC, *UP, *T_ce, *T_kr, *T_kl, *T_cr, *T_bt, *T_ta, *T_sc, *T_rc,
   *T_so, *T_se, *T_us, *T_ue, *T_cl, *T_cs, *T_cm;
 
 char *T_TS, *T_FS, *T_SS, *T_HS, *T_ES;
-int columns, lines;
 
-char ReverseStatus = 0;
 
 #define GETSTR(v, s)                                                           \
   {                                                                            \
@@ -101,85 +100,7 @@ getTCstr()
     status::type(StatusType::NoStatusLine);
   }
 
-  lines = tgetnum("li");
-  if ((env = getenv("LINES")) != NULL) {
-    lines = atoi(env);
-  }
-  columns = tgetnum("co");
-  if ((env = getenv("COLUMNS")) != NULL) {
-    columns = atoi(env);
-  }
-
   return true;
-}
-
-void
-setEnvirons()
-{
-  extern char* version;
-  char buf[1024], *p, *q, *e, c1, c2;
-  int li, ignore;
-
-  sprintf(buf, "%d", getpid());
-  setenv("SKKFEP_PID", buf, 1);
-  sprintf(buf, "%s", version);
-  setenv("SKKFEP_VERSION", buf, 1);
-
-  if (status::type() != StatusType::UseBottomLine) {
-    return;
-  }
-  li = lines - 1;
-
-  sprintf(buf, "%d", columns);
-  setenv("COLUMNS", buf, 1);
-  sprintf(buf, "%d", li);
-  setenv("LINES", buf, 1);
-
-  ignore = 0;
-#ifdef TERMINFO
-  if (getenv("TERMCAP") != NULL) {
-#endif
-    for (p = bp, q = buf; *p != '\0'; p++) {
-      if (*p == ':') {
-        if (!ignore)
-          *q++ = *p;
-        c1 = *(p + 1);
-        c2 = *(p + 2);
-        switch ((c1 << 8) + c2) {
-          case ('c' << 8) + 'o': /* columns */
-          case ('l' << 8) + 'i': /* lines */
-          case ('s' << 8) + 'c': /* save cursor */
-          case ('r' << 8) + 'c': /* restore cursor */
-          case ('c' << 8) + 's': /* change scroll region */
-          case ('t' << 8) + 's': /* to status line */
-          case ('f' << 8) + 's': /* from status line */
-            ignore = 1;
-            break;
-          default:
-            ignore = 0;
-            break;
-        }
-      } else {
-        if (!ignore)
-          *q++ = *p;
-        if ((*p == '\\') && (*(p + 1) != '\0')) {
-          p++;
-          if (!ignore)
-            *q++ = *p;
-        }
-      }
-    }
-    if (*(q - 1) != ':') {
-      *q++ = ':';
-    }
-    sprintf(q, "li#%d:", li);
-    q += strlen(q);
-    sprintf(q, "co#%d:", columns);
-    q += strlen(q);
-    setenv("TERMCAP", buf, 1);
-#ifdef TERMINFO
-  }
-#endif
 }
 
 void
@@ -209,7 +130,7 @@ toMsg()
     writes(tgoto(T_TS, 0, 0));
   } else {
     writes(T_sc);
-    writes(tgoto(T_cm, 0, lines - 1));
+    writes(tgoto(T_cm, 0, current_termsize().Rows - 1));
   }
 }
 
@@ -234,8 +155,8 @@ initFep()
     }
   } else if (status::type() == StatusType::UseBottomLine) {
     writes("\r\n");
-    writes(tgoto(T_cs, lines - 2, 0));
-    writes(tgoto(T_cm, 0, lines - 2));
+    writes(tgoto(T_cs, current_termsize().Rows - 2, 0));
+    writes(tgoto(T_cm, 0, current_termsize().Rows - 2));
   }
 }
 
@@ -247,8 +168,8 @@ termFep()
       writes(T_HS);
     }
   } else if (status::type() == StatusType::UseBottomLine) {
-    writes(tgoto(T_cs, lines - 1, 0));
-    writes(tgoto(T_cm, 0, lines - 1));
+    writes(tgoto(T_cs, current_termsize().Rows - 1, 0));
+    writes(tgoto(T_cm, 0, current_termsize().Rows - 1));
   }
 }
 

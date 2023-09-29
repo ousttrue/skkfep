@@ -4,8 +4,10 @@
 #include "etc.h"
 #include "keybind.h"
 #include "romkan.h"
+#include "statusline.h"
 #include "stty.h"
 #include "terms.h"
+#include "termsize.h"
 #include <errno.h>
 #include <locale.h>
 #include <signal.h>
@@ -50,13 +52,17 @@ void
 winchange(int)
 {
   signal(SIGWINCH, SIG_IGN);
+  auto size = get_termsize();
+  if (status::type() == StatusType::UseBottomLine) {
+    --size.Rows;
+  }
+
   int tty;
   if (Shellout != NULL)
     tty = fileno(Shellout);
   else
     tty = 1; /* stdout */
-  get_winsize();
-  set_winsize(tty);
+  set_termsize(tty, size);
   initFep();
   showcurmode();
   signal(SIGWINCH, winchange);

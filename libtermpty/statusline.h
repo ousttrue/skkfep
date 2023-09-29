@@ -1,5 +1,7 @@
 #pragma once
 
+extern char ReverseStatus;
+
 enum class StatusType
 {
   NoStatusLine = 0,
