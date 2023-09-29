@@ -87,97 +87,103 @@ makeCand(std::string_view line, bool okuri)
   return list;
 }
 
-Dictionary::Dictionary(std::string_view path)
-  : m_path(path)
+bool
+Dictionary::load(std::string_view path)
 {
-  if (auto f = fopen(m_path.c_str(), "r")) {
-
-    struct stat st;
-    fstat(fileno(f), &st);
-    this->mtime = st.st_mtime;
-
-    // DicList* lastItem = NULL;
-    bool okuriAri = true;
-    char buf[4096];
-    while (auto l = fgets(buf, std::size(buf), f)) {
-      // skip white space
-      std::string_view line(l);
-      assert(line.back() == '\n');
-      while (line.size() &&
-             (line[0] == ' ' || line[0] == '\t' || line[0] == '\n')) {
-        line = line.substr(1);
-      }
-      if (line.empty()) {
-        continue;
-      }
-
-      // comment
-      if (line[0] == ';') {
-        if (line.starts_with("; okuri-ari entries.")) {
-          okuriAri = true;
-        } else if (line.starts_with("; okuri-nasi entries.")) {
-          okuriAri = 0;
-        }
-        continue;
-      }
-
-      // 見出し語
-      auto space = line.find(' ');
-      if (space == std::string::npos) {
-        // ?
-        continue;
-      }
-      auto _word = line.substr(0, space);
-      std::string word{ _word.begin(), _word.end() };
-      line = line.substr(space + 1);
-
-      // new entry
-      auto list = makeCand(line, okuriAri);
-      assert(list.size());
-      if (okuriAri) {
-        m_okuriAri.insert({ word, list });
-      } else {
-        m_okuriNasi.insert({ word, list });
-      }
-    }
-    fclose(f);
+  m_path = path;
+  auto f = fopen(m_path.c_str(), "r");
+  if (!f) {
+    return false;
   }
+
+  struct stat st;
+  fstat(fileno(f), &st);
+  this->mtime = st.st_mtime;
+
+  // DicList* lastItem = NULL;
+  bool okuriAri = true;
+  char buf[4096];
+  while (auto l = fgets(buf, std::size(buf), f)) {
+    // skip white space
+    std::string_view line(l);
+    assert(line.back() == '\n');
+    while (line.size() &&
+           (line[0] == ' ' || line[0] == '\t' || line[0] == '\n')) {
+      line = line.substr(1);
+    }
+    if (line.empty()) {
+      continue;
+    }
+
+    // comment
+    if (line[0] == ';') {
+      if (line.find("; okuri-ari entries.") != std::string_view::npos) {
+        okuriAri = true;
+      } else if (line.find("; okuri-nasi entries.") != std::string_view::npos) {
+        okuriAri = 0;
+      }
+      continue;
+    }
+
+    // 見出し語
+    auto space = line.find(' ');
+    if (space == std::string::npos) {
+      // ?
+      continue;
+    }
+    auto _word = line.substr(0, space);
+    std::string word{ _word.begin(), _word.end() };
+    line = line.substr(space + 1);
+
+    // new entry
+    auto list = makeCand(line, okuriAri);
+    assert(list.size());
+    if (okuriAri) {
+      auto ret = m_okuriAri.insert({ word, list });
+      assert(ret.second);
+    } else {
+      auto ret = m_okuriNasi.insert({ word, list });
+      assert(ret.second);
+    }
+  }
+  fclose(f);
+  return true;
 }
 
-Dictionary::~Dictionary()
-{
-  int old = 0;
-  std::string buf;
-  /* backup skk-jisyo if jisyo is not empty. */
-  buf += m_path;
-  buf += ".BAK";
-  struct stat sbuf;
-  if ((stat(m_path.c_str(), &sbuf) == 0) && (sbuf.st_size != 0)) {
-    if (this->mtime < sbuf.st_mtime) {
-      printf("The dictionary is changed. merging...\n");
-      mergeDictionary(m_path.c_str());
-    }
-    rename(m_path.c_str(), buf.c_str());
-    old = 1;
-  }
-  // if (auto f = fopen(m_path.c_str(), "w")) {
-  //   fprintf(f, ";; okuri-ari entries.\n");
-  //   int okuri = 1;
-  //   for (dlist = globaldic; dlist != NULL;
-  //        dlist2 = dlist, dlist = dlist->nextitem, delete dlist2) {
-  //     auto wd = dlist->kanaword;
-  //     if (okuri && (!isConjugate(wd))) {
-  //       fprintf(f, ";; okuri-nasi entries.\n");
-  //       okuri = 0;
-  //     }
-  //     fprintf(f, "%s ", dlist->kanaword.c_str());
-  //     dlist->cand->print(f, PrintCandTypes::FREE_CAND);
-  //   }
-  //   fclose(f);
-  //   if (old)
-  //     chmod(m_path.c_str(), sbuf.st_mode);
-  // }
-}
+// Dictionary::~Dictionary()
+// {
+//   int old = 0;
+//   std::string buf;
+//   /* backup skk-jisyo if jisyo is not empty. */
+//   buf += m_path;
+//   buf += ".BAK";
+//   struct stat sbuf;
+//   if ((stat(m_path.c_str(), &sbuf) == 0) && (sbuf.st_size != 0)) {
+//     if (this->mtime < sbuf.st_mtime) {
+//       printf("The dictionary is changed. merging...\n");
+//       mergeDictionary(m_path.c_str());
+//     }
+//     rename(m_path.c_str(), buf.c_str());
+//     old = 1;
+//   }
+//   // if (auto f = fopen(m_path.c_str(), "w")) {
+//   //   fprintf(f, ";; okuri-ari entries.\n");
+//   //   int okuri = 1;
+//   //   for (dlist = globaldic; dlist != NULL;
+//   //        dlist2 = dlist, dlist = dlist->nextitem, delete dlist2) {
+//   //     auto wd = dlist->kanaword;
+//   //     if (okuri && (!isConjugate(wd))) {
+//   //       fprintf(f, ";; okuri-nasi entries.\n");
+//   //       okuri = 0;
+//   //     }
+//   //     fprintf(f, "%s ", dlist->kanaword.c_str());
+//   //     dlist->cand->print(f, PrintCandTypes::FREE_CAND);
+//   //   }
+//   //   fclose(f);
+//   //   if (old)
+//   //     chmod(m_path.c_str(), sbuf.st_mode);
+//   // }
+// }
 
 const CandList*
 Dictionary::getCand(std::string_view s) const
@@ -230,7 +236,7 @@ Dictionary::mergeDictionary(const std::string& dicname)
 
       ;
       auto okuriAri = isConjugate(word);
-      if (auto list = this->getCand({ word.begin(), word.end() })) {
+      if (auto list = this->getCand(word)) {
         // merge
         assert(false);
         // auto cand =

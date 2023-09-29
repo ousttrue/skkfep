@@ -61,7 +61,10 @@ App::OpenDictionary(std::string_view path)
     ss << getenv("HOME") << "/" << USER_DIC_NAME;
     UserDicName = ss.str();
   }
-  UserDic = new Dictionary(UserDicName.c_str());
+  auto d = new Dictionary;
+  if (d->load(UserDicName)) {
+    UserDic = d;
+  }
 }
 
 void

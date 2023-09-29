@@ -17,11 +17,12 @@ private:
   time_t mtime;
 
 public:
-  Dictionary(std::string_view path);
-  ~Dictionary();
+  Dictionary(){}
+  ~Dictionary(){}
   Dictionary(const Dictionary&) = delete;
   Dictionary& operator=(const Dictionary&) = delete;
 
+  bool load(std::string_view path);
   const CandList* getCand(std::string_view s) const;
 
 private:
