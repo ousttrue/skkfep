@@ -1,6 +1,8 @@
 #pragma once
+#include <span>
 #include <stddef.h>
 #include <stdint.h>
+#include <vector>
 
 enum EscapeBehavior
 {
@@ -22,7 +24,7 @@ struct SparseKeymapBody
 struct SparseKeymap
 {
   KeyFunc defaultfunc;
-  SparseKeymapBody* keymap;
+  std::vector<SparseKeymapBody> keymap;
 };
 struct Keymap
 {
@@ -37,12 +39,12 @@ struct Keymap
 
   KeyFunc& operator[](size_t index) { return Keymap[index]; }
 
-  void overrideKeymap(const SparseKeymapBody* keymap)
+  void overrideKeymap(std::span<const SparseKeymapBody> body)
   {
-    for (; keymap->function; ++keymap) {
-      int c = (unsigned char)keymap->key;
+    for (auto keymap : body) {
+      int c = (unsigned char)keymap.key;
       if (c < 128) {
-        Keymap[c] = keymap->function;
+        Keymap[c] = keymap.function;
       }
     }
   }
@@ -50,8 +52,8 @@ struct Keymap
 using KeymapPtr = Keymap*;
 
 extern const char* KanaKey;
-extern SparseKeymapBody _ViEscKeymap[];
-extern SparseKeymapBody _EmacsEscKeymap[];
+extern std::vector<SparseKeymapBody> _ViEscKeymap;
+extern std::vector<SparseKeymapBody> _EmacsEscKeymap;
 
 extern SparseKeymap NormalKeymap;
 extern SparseKeymap SelectionKeymap;
