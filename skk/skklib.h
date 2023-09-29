@@ -50,8 +50,5 @@ public:
   void print(FILE* f, PrintCandTypes fre);
 };
 
-std::tuple<CandList**, CandList*>
-searchOkuri(CandList* cl, const char* okuri);
-
 CandList*
 deleteCand(CandList* frlist, CandList* itlist);

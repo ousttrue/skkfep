@@ -160,21 +160,3 @@ firstCand(CandList* l)
   return l;
 }
 
-std::tuple<CandList**, CandList*>
-searchOkuri(CandList* cl, const char* okuri)
-{
-  CandList** newfirst = nullptr;
-  for (auto ll = cl; ll != NULL; ll = ll->nextcand) {
-    if (ll->okuri && ll->candword == okuri) {
-      newfirst = &ll->okuri;
-      return { newfirst, ll->okuri };
-    }
-  }
-  if (newfirst && cl->dicitem) {
-    if (cl->dicitem->cand->okuri) {
-      return {};
-    }
-    newfirst = &(cl->dicitem->cand);
-  }
-  return { newfirst, cl };
-}

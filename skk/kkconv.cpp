@@ -343,22 +343,10 @@ kkconv(char c)
   CurrentCand = App::Instance().UserDic->getCand(WordBuf);
   if (CurrentCand) {
     originalDicItem = CurrentCand->dicitem;
-    if (OkuriInput) {
-      auto [f, c] = searchOkuri(CurrentCand, OkuriBuf);
-      FirstCandEntry = f;
-      CurrentCand = c;
-    } else
-      FirstCandEntry = &(CurrentCand->dicitem->cand);
+    FirstCandEntry = &(CurrentCand->dicitem->cand);
   } else {
     FirstCandEntry = NULL;
   }
-#ifdef SYSTEM_DIC_NAME
-  if (CurrentCand == NULL) {
-    CurrentCand = getCand(SystemDic, WordBuf);
-    if (CurrentCand && OkuriInput)
-      CurrentCand = searchOkuri(CurrentCand, OkuriBuf, &FirstCandEntry);
-  }
-#endif
 
   l = WordBufLen;
   if (OkuriInput)
