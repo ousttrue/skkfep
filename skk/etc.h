@@ -1,5 +1,5 @@
 #pragma once
-#include "romkan.h"
+#include "skk.h"
 
 void
 sleep_ms(int n);
