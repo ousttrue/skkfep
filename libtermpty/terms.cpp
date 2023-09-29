@@ -1,6 +1,7 @@
 #include "terms.h"
 #include "statusline.h"
 #include "stty.h"
+#include "terminal.h"
 #include "termsize.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,117 +9,12 @@
 #include <termcap.h>
 #include <unistd.h>
 
-#define DEF_TS "\033[?T"
-#define DEF_FS "\033[?F"
-#define DEF_SS "\033[?S"
-#define DEF_HS "\033[?H"
-
-char bp[1024];
-char funcstr[256];
-char PC, *BC, *UP, *T_ce, *T_kr, *T_kl, *T_cr, *T_bt, *T_ta, *T_sc, *T_rc,
-  *T_so, *T_se, *T_us, *T_ue, *T_cl, *T_cs, *T_cm;
-
-char *T_TS, *T_FS, *T_SS, *T_HS, *T_ES;
-
-
-#define GETSTR(v, s)                                                           \
-  {                                                                            \
-    v = pt;                                                                    \
-    suc = (int64_t)tgetstr(s, &pt);                                            \
-    adjstr(&v, &pt);                                                           \
-  }
+Terminal g_term;
 
 bool
 getTCstr()
 {
-  int suc;
-  char *pt = funcstr, *env;
-
-  tgetent(bp, getenv("TERM"));
-
-  GETSTR(T_ce, "ce"); /* clear to the end of line */
-  GETSTR(T_kr, "nd"); /* cursor right */
-  if (suc == -1)
-    GETSTR(T_kr, "kr");
-  if (tgetflag("bs"))
-    T_kl = "\b"; /* cursor left */
-  else {
-    GETSTR(T_kl, "le");
-    if (suc == -1)
-      GETSTR(T_kl, "kb");
-    if (suc == -1)
-      GETSTR(T_kl, "kl");
-  }
-  adjstr(&T_kl, &pt);
-  GETSTR(T_cr, "cr"); /* carrige return */
-  GETSTR(T_ta, "ta"); /* tab */
-  GETSTR(T_bt, "bt"); /* backtab */
-  GETSTR(T_sc, "sc"); /* save cursor */
-  if (suc == NULL)
-    T_sc = NULL;
-  GETSTR(T_rc, "rc"); /* restore cursor */
-  if (suc == NULL)
-    T_rc = NULL;
-  if ((T_sc == NULL) || (T_rc == NULL)) {
-    fprintf(stderr, "Your terminal cannot save/restore cursor.\n");
-    return false;
-  }
-  GETSTR(T_so, "so"); /* standout mode */
-  GETSTR(T_se, "se"); /* standout mode end */
-  GETSTR(T_us, "us"); /* underline mode */
-  GETSTR(T_ue, "ue"); /* underline mode end */
-  GETSTR(T_cl, "cl"); /* clear screen */
-  GETSTR(T_cm, "cm"); /* cursor motion */
-  GETSTR(T_cs, "cs"); /* change scroll region */
-  if (suc == NULL)
-    T_cs = NULL;
-  GETSTR(T_TS, "ts"); /* to status line */
-  if (suc == NULL)
-    T_TS = NULL;
-  GETSTR(T_FS, "fs"); /* from status line */
-  if (suc == NULL)
-    T_FS = NULL;
-  GETSTR(T_SS, "ss"); /* show status line */
-  if (suc == NULL)
-    T_SS = DEF_SS;
-  GETSTR(T_HS, "hs"); /* hide status line */
-  if (suc == NULL) {
-    GETSTR(T_HS, "ds"); /* disable status line */
-    if (suc == NULL)
-      T_HS = DEF_HS;
-  }
-  GETSTR(T_ES, "es"); /* erase status line */
-  if (suc == NULL)
-    T_ES = NULL;
-
-  if ((T_TS != NULL) && (T_FS != NULL)) {
-    status::type(StatusType::HaveStatusLine);
-  } else if ((T_cs != NULL) && (T_cm != NULL) && (T_sc != NULL) &&
-             (T_rc != NULL)) {
-    status::type(StatusType::UseBottomLine);
-  } else {
-    status::type(StatusType::NoStatusLine);
-  }
-
-  return true;
-}
-
-void
-adjstr(char** buf, char** ptr)
-{
-#if defined TERMINFO && !defined _AIX
-  char* p = (*ptr) - 2;
-  if (*(p--) == '>') {
-    while ('0' <= *p && *p <= '9')
-      p--;
-    if (*(p--) == '<' && *p == '$')
-      *p = '\0';
-  }
-#else  /* TERMCAP */
-  while ('0' <= **buf && **buf <= '9')
-    (*buf)++;
-#endif /* TERMCAP */
-  *((*ptr)++) = '\0';
+  return g_term.load(getenv("TERM"));
 }
 
 void
@@ -127,10 +23,10 @@ toMsg()
   if (ReverseStatus)
     standout(1);
   if (status::type() == StatusType::HaveStatusLine) {
-    writes(tgoto(T_TS, 0, 0));
+    writes(g_term.ts.xy(0, 0));
   } else {
-    writes(T_sc);
-    writes(tgoto(T_cm, 0, current_termsize().Rows - 1));
+    writes(g_term.sc.seq);
+    writes(g_term.cm.xy(0, current_termsize().Rows - 1));
   }
 }
 
@@ -138,9 +34,9 @@ void
 fromMsg()
 {
   if (status::type() == StatusType::HaveStatusLine) {
-    writes(T_FS);
+    writes(g_term.fs.seq);
   } else {
-    writes(T_rc);
+    writes(g_term.rc.seq);
   }
   if (ReverseStatus)
     standout(0);
@@ -150,13 +46,13 @@ void
 initFep()
 {
   if (status::type() == StatusType::HaveStatusLine) {
-    if (T_SS != NULL) {
-      writes(T_SS);
+    if (g_term.ss) {
+      writes(g_term.ss.seq);
     }
   } else if (status::type() == StatusType::UseBottomLine) {
     writes("\r\n");
-    writes(tgoto(T_cs, current_termsize().Rows - 2, 0));
-    writes(tgoto(T_cm, 0, current_termsize().Rows - 2));
+    writes(g_term.cs.xy(current_termsize().Rows - 2, 0));
+    writes(g_term.cm.xy(0, current_termsize().Rows - 2));
   }
 }
 
@@ -164,12 +60,12 @@ void
 termFep()
 {
   if (status::type() == StatusType::HaveStatusLine) {
-    if (T_HS != NULL) {
-      writes(T_HS);
+    if (g_term.hs) {
+      writes(g_term.hs.seq);
     }
   } else if (status::type() == StatusType::UseBottomLine) {
-    writes(tgoto(T_cs, current_termsize().Rows - 1, 0));
-    writes(tgoto(T_cm, 0, current_termsize().Rows - 1));
+    writes(g_term.cs.xy(current_termsize().Rows - 1, 0));
+    writes(g_term.cm.xy(0, current_termsize().Rows - 1));
   }
 }
 
@@ -177,43 +73,43 @@ void
 underline(int ctl)
 {
   if (ctl)
-    writes(T_us);
+    writes(g_term.us.seq);
   else
-    writes(T_ue);
+    writes(g_term.ue.seq);
 }
 
 void
 standout(int ctl)
 {
   if (ctl)
-    writes(T_so);
+    writes(g_term.so.seq);
   else
-    writes(T_se);
+    writes(g_term.se.seq);
 }
 
 void
 saveCsr()
 {
-  writes(T_sc);
+  writes(g_term.sc.seq);
 }
 
 void
 restoreCsr()
 {
-  writes(T_rc);
+  writes(g_term.rc.seq);
 }
 
 void
 clearToEnd()
 {
-  writes(T_ce);
+  writes(g_term.ce.seq);
 }
 
 void
 csrLeft(int n)
 {
   while (n) {
-    writes(T_kl);
+    writes(g_term.kl.seq);
     n--;
   }
 }
@@ -222,7 +118,7 @@ void
 csrRight(int n)
 {
   while (n) {
-    writes(T_kr);
+    writes(g_term.kr.seq);
     n--;
   }
 }
@@ -230,7 +126,7 @@ csrRight(int n)
 void
 cls()
 {
-  writes(T_cl);
+  writes(g_term.cl.seq);
 }
 
 void

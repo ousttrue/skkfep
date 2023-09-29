@@ -302,11 +302,9 @@ tty_ready()
 }
 
 void
-writes(const char* s)
+writes(std::string_view s)
 {
-  int l = strlen(s);
-
-  write(g_term_tty, s, l);
+  write(g_term_tty, s.data(), s.size());
 }
 
 void

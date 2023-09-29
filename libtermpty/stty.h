@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 extern int g_term_tty;
 
@@ -21,7 +22,7 @@ void
 init_signals();
 
 void
-writes(const char* s);
+writes(std::string_view s);
 
 void
 write1(char c);
