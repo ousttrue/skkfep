@@ -50,3 +50,12 @@ rubout(int n);
 
 void
 bell();
+
+void
+showmessage(const char* s);
+
+void
+kanjiInputEffect(int on);
+
+void
+kanjiSelectionEffect(int on);

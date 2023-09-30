@@ -9,7 +9,6 @@ class App
   App();
 
 public:
-  struct Dictionary* UserDic = nullptr;
   ~App();
   App(const App&) = delete;
   App& operator=(const App&) = delete;

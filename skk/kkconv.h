@@ -3,6 +3,7 @@
 extern short BlockTty;
 extern char PreserveOnFailure;
 extern char OkuriFirst;
+extern struct Dictionary* UserDic;
 
 void
 kkBeg(char);

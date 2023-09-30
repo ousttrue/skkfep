@@ -29,6 +29,9 @@ enum class KeymapTypes
 
 class Skk
 {
+  SkkModes lastmode = {};
+  SkkModes curmode = {};
+
   Keymap KeymapList[9];
   Keymap& NormalKeymap() { return KeymapList[(int)KeymapTypes::Normal]; }
   Keymap& SelectionKeymap() { return KeymapList[(int)KeymapTypes::Selection]; }
@@ -63,6 +66,10 @@ public:
   ~Skk();
   Skk(const Skk&) = delete;
   Skk& operator=(const Skk&) = delete;
+
+  void showmode(SkkModes s);
+  void showcurmode();
+  void showlastmode();
 
   void setKanaKey();
   void setKeymap(KeymapPtr _new);

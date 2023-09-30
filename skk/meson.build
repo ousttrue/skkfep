@@ -1,6 +1,4 @@
 skk_lib = static_library('skk', [
-  'app.cpp',
-  'etc.cpp',
   'skk.cpp',
   'skk_keymap.cpp',
 

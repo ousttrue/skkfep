@@ -1,8 +1,6 @@
 #include "kkconv.h"
-#include "app.h"
 #include "connsh.h"
 #include "dictinary.h"
-#include "etc.h"
 #include "romkan.h"
 #include "skk.h"
 #include "stty.h"
@@ -19,6 +17,7 @@
 char PreserveOnFailure = PRESERVE_ON_FAILURE;
 short BlockTty;
 char OkuriFirst;
+struct Dictionary* UserDic = nullptr;
 
 #define VOWEL(c)                                                               \
   ((c) == 'a' || (c) == 'i' || (c) == 'u' || (c) == 'e' || (c) == 'o')
@@ -85,7 +84,7 @@ void
 kkBeg(char)
 {
   g_skk.setKeymap(SkkModes::KINPUT_MODE);
-  showmode(KINPUT_MODE);
+  g_skk.showmode(KINPUT_MODE);
   kanjiInputEffect(1);
   WordBufLen = 0;
 }
@@ -109,7 +108,7 @@ kkBegA(char c)
 {
   romkan::flushKana();
   g_skk.setKeymap(KeymapTypes::KAlphaInput);
-  showmode(KINPUT_MODE);
+  g_skk.showmode(KINPUT_MODE);
   kanjiInputEffect(1);
   WordBufLen = 0;
 }
@@ -379,10 +378,10 @@ kkconv(char c)
   if (WordBufLen == 0 || (OkuriInput && WordBufLen == 1)) {
     endKanjiInput();
   }
-  showmode(KSELECT_MODE);
+  g_skk.showmode(KSELECT_MODE);
 
   WordBuf[WordBufLen] = '\0';
-  Current.List = App::Instance().UserDic->getCand(WordBuf);
+  Current.List = UserDic->getCand(WordBuf);
   if (Current.List) {
     Current.Cand = Current.List->begin();
   } else {
@@ -520,7 +519,7 @@ void
 backToKanjiInput()
 {
   g_skk.restoreKeymap();
-  showmode(KINPUT_MODE);
+  g_skk.showmode(KINPUT_MODE);
   kanjiInputEffect(1);
   if (OkuriInput) {
     clearOkuri();

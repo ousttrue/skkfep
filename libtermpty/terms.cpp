@@ -151,3 +151,26 @@ bell()
 {
   write1('\007');
 }
+
+void
+showmessage(const char* s)
+{
+  if (status::type() != StatusType::NoStatusLine) {
+    toMsg();
+    writes(s);
+    clearToEnd();
+    fromMsg();
+  }
+}
+
+void
+kanjiInputEffect(int on)
+{
+  underline(on);
+}
+
+void
+kanjiSelectionEffect(int on)
+{
+  standout(on);
+}

@@ -1,9 +1,9 @@
 #include "skk.h"
 #include "connsh.h"
 #include "ctrlcode.h"
-#include "etc.h"
 #include "kkconv.h"
 #include "romkan.h"
+#include "terms.h"
 #include <assert.h>
 #include <stdio.h>
 
@@ -25,6 +25,27 @@ Skk::Skk()
 }
 
 Skk::~Skk() {}
+
+void
+Skk::showmode(SkkModes s)
+{
+  lastmode = curmode;
+  showmessage(mode_string(s));
+  curmode = s;
+}
+
+void
+Skk::showcurmode()
+{
+  showmessage(mode_string(curmode));
+}
+
+void
+Skk::showlastmode()
+{
+  showmessage(mode_string(lastmode));
+  curmode = lastmode;
+}
 
 void
 Skk::setKeymap(KeymapPtr _new)
@@ -243,5 +264,5 @@ thru1(char c)
 {
   thru(c);
   g_skk.restoreKeymap();
-  showlastmode();
+  g_skk.showlastmode();
 }

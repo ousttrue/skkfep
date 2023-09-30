@@ -1,6 +1,5 @@
 #include "romkan.h"
 #include "connsh.h"
-#include "etc.h"
 #include "skk.h"
 #include "statusline.h"
 #include "stty.h"
@@ -358,10 +357,10 @@ tglK(char c)
   flushKana();
   if (CurrentTab == HiraTab) {
     CurrentTab = KataTab;
-    showmode(KKANA_MODE);
+    g_skk.showmode(KKANA_MODE);
   } else {
     CurrentTab = HiraTab;
-    showmode(KANA_MODE);
+    g_skk.showmode(KANA_MODE);
   }
 }
 
@@ -418,9 +417,9 @@ void
 toggleKana()
 {
   if (CurrentTab == HiraTab)
-    showmode(KANA_MODE);
+    g_skk.showmode(KANA_MODE);
   else
-    showmode(KKANA_MODE);
+    g_skk.showmode(KKANA_MODE);
 }
 
 } // namespace
