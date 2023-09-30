@@ -1,6 +1,9 @@
 #pragma once
+#include "skk.h"
 #include <string>
 #include <string_view>
+
+extern Skk g_skk;
 
 class App
 {

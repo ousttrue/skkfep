@@ -82,47 +82,44 @@ bufferedInput(std::string_view s)
 }
 
 void
-kkBeg(char)
+kkClearBuf()
 {
-  g_skk.setKeymap(SkkModes::KINPUT_MODE);
-  g_skk.showmode(KINPUT_MODE);
-  kanjiInputEffect(1);
   WordBufLen = 0;
 }
 
 void
-kkBegV(char c)
+kkBegV(Skk* skk, char c)
 {
-  kkBeg({});
+  skk->kkBeg();
   bufferedInput(romkan::inputKanaVowel(tolower(c)));
 }
 
 void
-kkBegC(char c)
+kkBegC(Skk* skk, char c)
 {
-  kkBeg({});
+  skk->kkBeg();
   bufferedInput(romkan::inputKanaConso(tolower(c), NULL));
 }
 
 void
-kkBegA(char c)
+kkBegA(Skk* skk, char c)
 {
   romkan::flushKana();
-  g_skk.setKeymap(KeymapTypes::KAlphaInput);
-  g_skk.showmode(KINPUT_MODE);
+  skk->setKeymap(KeymapTypes::KAlphaInput);
+  skk->showmode(KINPUT_MODE);
   kanjiInputEffect(1);
   WordBufLen = 0;
 }
 
 void
-kalpha(char c)
+kalpha(char c, bool)
 {
   terminal::write1(c);
   WordBuf[WordBufLen++] = c;
 }
 
 void
-kaBS(char c)
+kaBS(char c, bool)
 {
   if (WordBufLen > 0) {
     kanjiInputEffect(0);
@@ -133,7 +130,7 @@ kaBS(char c)
 }
 
 void
-kKanaV(char c)
+kKanaV(char c, bool)
 {
   bufferedInput(romkan::inputKanaVowel(c));
 }
@@ -155,28 +152,27 @@ putOkuri(std::string_view s)
   }
   OkuriBuf[OkuriBufLen] = '\0';
 }
+
 void
-okKanaV(char c /*, char first*/)
+okKanaV(Skk* skk, char c, bool first)
 {
-  char first = false;
   if (first) {
     WordBuf[WordBufLen++] = c;
   }
   rubout(1);
   putOkuri(romkan::inputKanaVowel(tolower(c)));
-  kkconv({});
+  kkconv(skk, c);
 }
 
 void
-kKanaC(char c)
+kKanaC(char c, bool)
 {
   bufferedInput(romkan::inputKanaConso(c, NULL));
 }
 
 void
-okKanaC(char c /*, char first*/)
+okKanaC(char c, bool first)
 {
-  char first = false;
   if (Nconso == 0) {
     WordBuf[WordBufLen++] = c;
   } else if (first) {
@@ -187,19 +183,19 @@ okKanaC(char c /*, char first*/)
 }
 
 void
-kZenAl(char c)
+kZenAl(char c, bool)
 {
   bufferedInput(zenkakualpha::inputZenkakuAlpha(c));
 }
 
 void
-kZenEx(char c)
+kZenEx(char c, bool)
 {
   bufferedInput(zenkakualpha::inputZenkakuEx(c));
 }
 
 void
-kfthru(char c)
+kfthru(char c, bool)
 {
   static char buf[2];
   buf[0] = c;
@@ -208,103 +204,103 @@ kfthru(char c)
 }
 
 void
-fxthru(char c)
+fxthru(Skk* skk, char c)
 {
   /* fix and through */
-  fixIt({});
-  g_skk.input(c);
+  fixIt(skk);
+  skk->input(c);
 }
 
 void
-kfCancel(char c)
+kfCancel(Skk* skk, char c)
 {
   kanjiInputEffect(0);
   romkan::cancelConso();
   rubout(WordBufLen);
   WordBuf[WordBufLen] = '\0';
-  endKanjiInput();
+  endKanjiInput(skk);
 }
 
 void
-kfFix(char c)
+kfFix(Skk* skk, char c)
 {
   csrLeft(WordBufLen);
   WordBuf[WordBufLen] = '\0';
   kanjiInputEffect(0);
   child::writeShells(WordBuf);
   flushOut(WordBufLen);
-  endKanjiInput();
+  endKanjiInput(skk);
 }
 
 void
-kfFixToAsc(char c)
+kfFixToAsc(Skk* skk, char c)
 {
-  kfFix(c);
-  g_skk.toAsc();
+  kfFix(skk, c);
+  skk->toAsc();
 }
 
 void
-kfFixToZenA(char c)
+kfFixToZenA(Skk* skk, char c)
 {
-  kfFix(c);
-  g_skk.toZenA();
+  kfFix(skk, c);
+  skk->toZenA();
 }
 
 void
-kfFixThru(char c)
+kfFixThru(Skk* skk, char c)
 {
-  kfFix(c);
+  kfFix(skk, c);
   child::thru(c);
 }
 
 void
-thruKfFixToAsc(char c)
+thruKfFixToAsc(Skk* skk, char c)
 {
-  kfFix(c);
-  g_skk.toAsc();
+  kfFix(skk, c);
+  skk->toAsc();
   child::thru(c);
 }
 
 void
-okfFix(char c)
+okfFix(Skk* skk, char c)
 {
-  cancelOkuri({});
-  if (g_skk.is_okuri_input())
-    cancelOkuri({});
-  kfFix(0);
+  cancelOkuri(skk);
+  if (skk->is_okuri_input())
+    cancelOkuri(skk);
+  kfFix(skk, 0);
 }
 
 void
-okfFixToAsc(char c)
+okfFixToAsc(Skk* skk, char c)
 {
-  okfFix(c);
-  g_skk.toAsc();
+  okfFix(skk, c);
+  skk->toAsc();
 }
 
 void
-okfFixToZenA(char c)
+okfFixToZenA(Skk* skk, char c)
 {
-  okfFix(c);
-  g_skk.toZenA();
+  okfFix(skk, c);
+  skk->toZenA();
 }
 
 void
-okfFixThru(char c)
+okfFixThru(Skk* skk, char c)
 {
-  okfFix(c);
-  child::thru(c);
+  okfFix(skk, c);
+  skk->thru(c);
 }
 
 void
-thruOkfFixToAsc(char c)
+thruOkfFixToAsc(Skk* skk, char c)
 {
-  okfFix(c);
-  g_skk.toAsc();
-  child::thru(c);
+  okfFix(skk, c);
+  skk->toAsc();
+  skk->thru(c);
 }
 
 void
-kfBS(char c)
+kfBS(char c, bool)
 {
   kanjiInputEffect(0);
   if (Nconso) {
@@ -331,7 +327,7 @@ kfBS(char c)
 }
 
 void
-okuriBS(char c)
+okuriBS(Skk* skk, char c)
 {
   int i, n;
   char con[MAX_CONSO];
@@ -341,17 +337,17 @@ okuriBS(char c)
   for (i = 0; i < n; i++)
     con[i] = LastConso[i];
   if (n <= 1) {
-    cancelOkuri({});
+    cancelOkuri(skk);
   } else {
     romkan::cancelConso();
     for (i = 0; i < n; i++)
-      okKanaC(con[i] /*, 0*/);
+      okKanaC(con[i], 0);
   }
   kanjiInputEffect(1);
 }
 
 void
-kkconv(char c)
+kkconv(Skk* skk, char c)
 {
   int l;
 
@@ -359,9 +355,9 @@ kkconv(char c)
   romkan::flushLastConso('\0', bufferedInput, NULL);
   romkan::cancelConso();
   if (WordBufLen == 0 || (OkuriInput && WordBufLen == 1)) {
-    endKanjiInput();
+    endKanjiInput(skk);
   }
-  g_skk.showmode(KSELECT_MODE);
+  skk->showmode(KSELECT_MODE);
 
   WordBuf[WordBufLen] = '\0';
   Current.List = UserDic->getCand(WordBuf);
@@ -375,7 +371,7 @@ kkconv(char c)
   if (OkuriInput)
     l += strlen(OkuriBuf) - 1;
   rubout(l);
-  g_skk.setKeymap(KeymapTypes::Selection);
+  skk->setKeymap(KeymapTypes::Selection);
 
   if (Current.IsEnabled()) {
     showCand();
@@ -384,24 +380,24 @@ kkconv(char c)
     /* Really, enter register mode */
     if (PreserveOnFailure) {
       bell();
-      backToKanjiInput();
+      backToKanjiInput(skk);
     } else {
-      endKanjiInput();
+      endKanjiInput(skk);
     }
   }
 }
 
 void
-toOkuri()
+toOkuri(Skk* skk)
 {
   OkuriInput = 1;
   *OkuriBuf = '\0';
   OkuriBufLen = 0;
-  g_skk.setKeymap(KeymapTypes::OkuriInput);
+  skk->setKeymap(KeymapTypes::OkuriInput);
 }
 
 void
-kOkuri(char c)
+kOkuri(Skk* skk, char c)
 {
   char okuri = tolower(c);
 
@@ -412,31 +408,31 @@ kOkuri(char c)
       return;
     }
     romkan::cancelConso();
-    endKanjiInput();
+    endKanjiInput(skk);
     kanjiInputEffect(0);
     return;
   }
-  toOkuri();
+  toOkuri(skk);
   terminal::write1('*');
-  g_skk.input(okuri, 1);
+  skk->input(okuri, 1);
 }
 
 void
-stSuffix(char c)
+stSuffix(Skk* skk, char c)
 {
-  fixIt({});
-  kkBeg({});
+  fixIt(skk);
+  skk->kkBeg();
   kfthru(c);
 }
 
 void
-stPrefixCv(char c)
+stPrefixCv(Skk* skk, char c)
 {
   if (WordBufLen == 0) {
     kfthru(c);
   } else {
     kfthru(c);
-    kkconv(' ');
+    kkconv(skk, ' ');
   }
 }
 
@@ -464,7 +460,7 @@ clearCurrent()
 }
 
 void
-nxCand(char)
+nxCand()
 {
   auto l = clearCurrent();
 
@@ -480,7 +476,7 @@ nxCand(char)
 }
 
 void
-pvCand(char)
+pvCand(Skk* skk)
 {
   auto l = clearCurrent();
 
@@ -493,19 +489,19 @@ pvCand(char)
       terminal::writes(OkuriBuf);
 
   } else {
-    backToKanjiInput();
+    backToKanjiInput(skk);
   }
 }
 
 /* back to kanji input mode */
 void
-backToKanjiInput()
+backToKanjiInput(Skk* skk)
 {
-  g_skk.restoreKeymap();
-  g_skk.showmode(KINPUT_MODE);
+  skk->restoreKeymap();
+  skk->showmode(KINPUT_MODE);
   kanjiInputEffect(1);
   if (OkuriInput) {
-    clearOkuri();
+    clearOkuri(skk);
     terminal::writes(WordBuf);
     terminal::write1('*');
     OkuriFirst = 1;
@@ -514,31 +510,31 @@ backToKanjiInput()
 }
 
 void
-cancelOkuri(char)
+cancelOkuri(Skk* skk)
 {
   kanjiInputEffect(0);
   if (Nconso == 0) {
     rubout(1);
     OkuriInput = 0;
-    g_skk.setKeymap(KeymapTypes::KanjiInput);
+    skk->setKeymap(KeymapTypes::KanjiInput);
   } else {
     romkan::cancelConso();
-    clearOkuri();
+    clearOkuri(skk);
     OkuriFirst = 1;
   }
   kanjiInputEffect(1);
 }
 
 void
-clearOkuri()
+clearOkuri(Skk* skk)
 {
   WordBufLen--;
   WordBuf[WordBufLen] = '\0';
-  toOkuri();
+  toOkuri(skk);
 }
 
 void
-fixIt(char c)
+fixIt(Skk* skk)
 {
   kanjiSelectionEffect(0);
   if (Current.IsEnabled()) {
@@ -552,19 +548,19 @@ fixIt(char c)
     }
     flushOut(l);
   }
-  endKanjiInput();
+  endKanjiInput(skk);
 }
 
 void
-thruFixItToAsc(char c)
+thruFixItToAsc(Skk* skk, char c)
 {
-  fixIt(c);
-  g_skk.toAsc();
-  child::thru(c);
+  fixIt(skk);
+  skk->toAsc();
+  skk->thru(c);
 }
 
 void
-cancelSel(char c)
+cancelSel(Skk* skk, char c)
 {
   kanjiSelectionEffect(0);
   if (Current.IsEnabled()) {
@@ -573,21 +569,21 @@ cancelSel(char c)
       l += strlen(OkuriBuf);
     rubout(l);
   }
-  backToKanjiInput();
+  backToKanjiInput(skk);
 }
 
 void
-endKanjiInput()
+endKanjiInput(Skk* skk)
 {
   *OkuriBuf = '\0';
   OkuriBufLen = 0;
   OkuriInput = 0;
-  g_skk.toKana();
+  skk->toKana();
   BlockTty = 0;
 }
 
 void
-h2kkana(char c)
+h2kkana(Skk* skk, char c)
 {
   int l;
 
@@ -595,7 +591,7 @@ h2kkana(char c)
   romkan::flushLastConso('\0', bufferedInput, NULL);
   romkan::cancelConso();
   if (WordBufLen == 0 || (OkuriInput && WordBufLen == 1)) {
-    endKanjiInput();
+    endKanjiInput(skk);
   }
   WordBuf[WordBufLen] = '\0';
 
@@ -605,5 +601,5 @@ h2kkana(char c)
   rubout(l);
   romkan::hira2kata(WordBuf);
   child::writeShells(WordBuf);
-  endKanjiInput();
+  endKanjiInput(skk);
 }

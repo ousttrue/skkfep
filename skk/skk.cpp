@@ -1,5 +1,5 @@
 #include "skk.h"
-#include "connsh.h"
+// #include "connsh.h"
 #include "ctrlcode.h"
 #include "kkconv.h"
 #include "romkan.h"
@@ -7,10 +7,8 @@
 #include <assert.h>
 #include <stdio.h>
 
-Skk g_skk;
-
 void
-nulcmd(char c)
+nulcmd(char, bool)
 {
 }
 
@@ -19,7 +17,7 @@ nulcmd(char c)
 Skk::Skk()
 {
   KanaKey = DEFAULT_KANAKEY;
-  initializeKeymap();
+  initialize([self = this](auto s) { self->m_buffer += s; });
   setKanaKey();
   toAsc();
 }
@@ -63,7 +61,10 @@ Skk::restoreKeymap()
 SkkResult
 Skk::input(uint8_t c, bool okuri)
 {
-  return CurrentKeymap->input(c, okuri);
+  auto res = CurrentKeymap->input(c, okuri);
+  res.Output = m_buffer;
+  m_buffer.clear();
+  return res;
 }
 
 static int
@@ -114,14 +115,20 @@ Skk::setKanaKey()
 {
   auto k = code(KanaKey.c_str());
   printf("KanaKey=^%c\n", k ^ 0x40);
-  NormalKeymap().Keymap[k] = [](auto) { g_skk.toKana(); };
-  SelectionKeymap().Keymap[k] = fixIt;
-  CodeInputKeymap().Keymap[k] = [](auto) { g_skk.toKana(); };
+  NormalKeymap().Keymap[k] = [self = this](auto, auto) { self->toKana(); };
+  SelectionKeymap().Keymap[k] = [self = this](auto, auto) { fixIt(self); };
+  CodeInputKeymap().Keymap[k] = [self = this](auto, auto) { self->toKana(); };
   KanaKeymap().Keymap[k] = nulcmd;
-  ZenkakuKeymap().Keymap[k] = [](auto) { g_skk.toKana(); };
-  KanjiInputKeymap().Keymap[k] = kfFix;
-  OkuriInputKeymap().Keymap[k] = okfFix;
-  KAlphaInputKeymap().Keymap[k] = kfFix;
+  ZenkakuKeymap().Keymap[k] = [self = this](auto, auto) { self->toKana(); };
+  KanjiInputKeymap().Keymap[k] = [self = this](auto c, auto) {
+    kfFix(self, c);
+  };
+  OkuriInputKeymap().Keymap[k] = [self = this](auto c, auto) {
+    okfFix(self, c);
+  };
+  KAlphaInputKeymap().Keymap[k] = [self = this](auto c, auto) {
+    kfFix(self, c);
+  };
 }
 
 bool
@@ -134,7 +141,7 @@ void
 Skk::toKana()
 {
   setKeymap(KeymapTypes::Kana);
-  romkan::toggleKana();
+  toggleKana();
 }
 
 void
@@ -161,23 +168,41 @@ Skk::toZenA()
 }
 
 void
-thruToAsc(char c)
+Skk::thruToAsc(char c)
 {
-  g_skk.toAsc();
-  child::thru(c);
+  toAsc();
+  thru(c);
 }
 
 void
-thruBack(char c)
+Skk::thruBack(char c)
 {
-  child::thru(c);
-  g_skk.toKana();
+  thru(c);
+  toKana();
 }
 
 void
-thru1(char c)
+Skk::thru1(char c)
 {
-  child::thru(c);
-  g_skk.restoreKeymap();
-  g_skk.showlastmode();
+  thru(c);
+  restoreKeymap();
+  showlastmode();
+}
+
+void
+Skk::kkBeg()
+{
+  setKeymap(SkkModes::KINPUT_MODE);
+  showmode(KINPUT_MODE);
+  kanjiInputEffect(1);
+  kkClearBuf();
+}
+
+void
+Skk::toggleKana()
+{
+  if (romkan::isHiragana())
+    showmode(KANA_MODE);
+  else
+    showmode(KKANA_MODE);
 }

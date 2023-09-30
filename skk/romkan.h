@@ -3,6 +3,8 @@
 #include <functional>
 #include <string>
 
+class Skk;
+
 // 母音
 enum class Vowel
 {
@@ -75,8 +77,6 @@ enum class CON
   NN,
 };
 
-using OutFunc = std::function<void(std::string_view s)>;
-
 #define MAX_CONSO 5
 extern char LastConso[MAX_CONSO]; /* LastConso[0] is always '\0' */
 extern short Nconso;
@@ -84,6 +84,9 @@ extern bool SmallTU;
 extern CON Kindex;
 
 namespace romkan {
+
+bool
+isHiragana();
 
 // 母音
 std::string
@@ -94,7 +97,7 @@ std::string
 iKanaC(char c);
 
 std::string
-flthru(char c);
+flthru(char c, bool);
 
 std::string
 flushKana();
@@ -108,10 +111,12 @@ std::string
 inputKanaConso(char c, void (*flush)(int));
 
 void
-flushLastConso(char c, const OutFunc& output, void (*flush)(int));
+flushLastConso(char c,
+               const std::function<void(std::string_view)>& output,
+               void (*flush)(int));
 
 std::string
-tglK();
+tglK(Skk* skk);
 
 void
 cancelConso();
@@ -121,8 +126,5 @@ kanaBS(char c);
 
 void
 hira2kata(char* buf);
-
-void
-toggleKana();
 
 } // namespace

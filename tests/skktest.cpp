@@ -5,13 +5,16 @@
 TEST(SkkTest, zenkaku)
 {
   Skk skk;
+  EXPECT_EQ(skk.currentKeymap().Type, KeymapTypes::Normal);
 
   {
     auto res = skk.input(CTRL_J);
+    EXPECT_EQ(skk.currentKeymap().Type, KeymapTypes::Kana);
   }
 
   {
     auto res = skk.input('L');
+    EXPECT_EQ(skk.currentKeymap().Type, KeymapTypes::Zenkaku);
   }
 
   {
@@ -26,7 +29,7 @@ TEST(SkkTest, romkan)
 
   {
     auto res = skk.input(CTRL_J);
-    // EXPECT_EQ(res.Mode, SkkModes::KANA_MODE);
+    EXPECT_EQ(skk.currentKeymap().Type, KeymapTypes::Kana);
   }
 
   {

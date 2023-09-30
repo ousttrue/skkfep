@@ -1,56 +1,59 @@
 #pragma once
 #include "keymap.h"
 #include <assert.h>
+#include <unordered_map>
 
 void
-nulcmd(char c);
-
-enum class KeymapTypes
-{
-  Normal,
-  Selection,
-  CodeInput,
-  Kana,
-  Zenkaku,
-  KanjiInput,
-  OkuriInput,
-  KAlphaInput,
-};
+nulcmd(char, bool);
 
 class Skk
 {
+  std::function<void(std::string_view)> m_output;
+
   SkkModes lastmode = {};
   SkkModes curmode = {};
 
-  Keymap KeymapList[9];
-  Keymap& NormalKeymap() { return KeymapList[(int)KeymapTypes::Normal]; }
-  Keymap& SelectionKeymap() { return KeymapList[(int)KeymapTypes::Selection]; }
-  Keymap& CodeInputKeymap() { return KeymapList[(int)KeymapTypes::CodeInput]; }
-  Keymap& KanaKeymap() { return KeymapList[(int)KeymapTypes::Kana]; }
-  Keymap& ZenkakuKeymap() { return KeymapList[(int)KeymapTypes::Zenkaku]; }
-  Keymap& KanjiInputKeymap()
-  {
-    return KeymapList[(int)KeymapTypes::KanjiInput];
-  }
-  Keymap& OkuriInputKeymap()
-  {
-    return KeymapList[(int)KeymapTypes::OkuriInput];
-  }
-  Keymap& KAlphaInputKeymap()
-  {
-    return KeymapList[(int)KeymapTypes::KAlphaInput];
-  }
+  std::unordered_map<KeymapTypes, Keymap> m_keymaps{
+    { KeymapTypes::Normal, Keymap{ KeymapTypes::Normal } },
+    { KeymapTypes::Selection, Keymap{ KeymapTypes::Selection } },
+    { KeymapTypes::CodeInput, Keymap{ KeymapTypes::CodeInput } },
+    { KeymapTypes::Kana, Keymap{ KeymapTypes::Kana } },
+    { KeymapTypes::Zenkaku, Keymap{ KeymapTypes::Zenkaku } },
+    { KeymapTypes::KanjiInput, Keymap{ KeymapTypes::KanjiInput } },
+    { KeymapTypes::OkuriInput, Keymap{ KeymapTypes::OkuriInput } },
+    { KeymapTypes::KAlphaInput, Keymap{ KeymapTypes::KAlphaInput } },
+  };
+  Keymap& NormalKeymap() { return m_keymaps[KeymapTypes::Normal]; }
+  Keymap& SelectionKeymap() { return m_keymaps[KeymapTypes::Selection]; }
+  Keymap& CodeInputKeymap() { return m_keymaps[KeymapTypes::CodeInput]; }
+  Keymap& KanaKeymap() { return m_keymaps[KeymapTypes::Kana]; }
+  Keymap& ZenkakuKeymap() { return m_keymaps[KeymapTypes::Zenkaku]; }
+  Keymap& KanjiInputKeymap() { return m_keymaps[KeymapTypes::KanjiInput]; }
+  Keymap& OkuriInputKeymap() { return m_keymaps[KeymapTypes::OkuriInput]; }
+  Keymap& KAlphaInputKeymap() { return m_keymaps[KeymapTypes::KAlphaInput]; }
 
-  KeymapPtr CurrentKeymap;
-  KeymapPtr lastKeymap;
+  KeymapPtr CurrentKeymap = nullptr;
+  KeymapPtr lastKeymap = nullptr;
 
 public:
   std::string KanaKey;
+
+  std::string m_buffer;
+
+  void thru(char c)
+  {
+    char str[]{ c, 0 };
+    m_output(str);
+  }
 
   Skk();
   ~Skk();
   Skk(const Skk&) = delete;
   Skk& operator=(const Skk&) = delete;
+
+  void initialize(const std::function<void(std::string_view)>& output);
+
+  Keymap& currentKeymap() { return *CurrentKeymap; }
 
   void showmode(SkkModes s);
   void showcurmode();
@@ -58,7 +61,7 @@ public:
 
   void setKanaKey();
   void setKeymap(KeymapPtr _new);
-  void setKeymap(KeymapTypes t) { setKeymap(&KeymapList[(int)t]); }
+  void setKeymap(KeymapTypes t) { setKeymap(&m_keymaps[t]); }
   void setKeymap(SkkModes m)
   {
     switch (m) {
@@ -92,23 +95,15 @@ public:
   void cancelCode();
   void toAsc();
   void toZenA();
+  void toggleKana();
+
+  void thruToAsc(char c);
+  void thruToEsc(char c);
+  void thruBack(char c);
+  void thru1(char c);
+
+  void kkBeg();
 
   SkkResult input(uint8_t c, bool okuri = false);
   void putc(char c);
-
-private:
-  void initializeKeymap();
 };
-extern Skk g_skk;
-
-void
-thruToAsc(char c);
-
-void
-thruToEsc(char c);
-
-void
-thruBack(char c);
-
-void
-thru1(char c);

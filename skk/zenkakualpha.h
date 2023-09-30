@@ -4,13 +4,13 @@
 namespace zenkakualpha {
 
 void
-iZenAl(char c);
+iZenAl(char c, bool);
 
 std::string
 inputZenkakuAlpha(char c);
 
 void
-iZenEx(char c);
+iZenEx(char c, bool);
 
 std::string
 inputZenkakuEx(char c);

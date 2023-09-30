@@ -24,6 +24,12 @@ static const char* (*CurrentTab)[5] = HiraTab;
 
 namespace romkan {
 
+bool
+isHiragana()
+{
+  return CurrentTab == HiraTab;
+}
+
 std::string
 iKanaV(char c)
 {
@@ -37,7 +43,7 @@ iKanaC(char c)
 }
 
 std::string
-flthru(char c)
+flthru(char c, bool)
 {
   std::stringstream ss;
   ss << flushKana();
@@ -196,7 +202,9 @@ inputKanaConso(char c, void (*flush)(int))
 }
 
 void
-flushLastConso(char c, const OutFunc& output, void (*flush)(int))
+flushLastConso(char c,
+               const std::function<void(std::string_view)>& output,
+               void (*flush)(int))
 {
   if (Nconso == 0) {
     return;
@@ -223,15 +231,15 @@ flushLastConso(char c, const OutFunc& output, void (*flush)(int))
 }
 
 std::string
-tglK()
+tglK(Skk* skk)
 {
   auto out = flushKana();
   if (CurrentTab == HiraTab) {
     CurrentTab = KataTab;
-    g_skk.showmode(KKANA_MODE);
+    skk->showmode(KKANA_MODE);
   } else {
     CurrentTab = HiraTab;
-    g_skk.showmode(KANA_MODE);
+    skk->showmode(KANA_MODE);
   }
   return out;
 }
@@ -284,15 +292,6 @@ hira2kata(char* buf)
     } else
       i++;
   }
-}
-
-void
-toggleKana()
-{
-  if (CurrentTab == HiraTab)
-    g_skk.showmode(KANA_MODE);
-  else
-    g_skk.showmode(KKANA_MODE);
 }
 
 } // namespace

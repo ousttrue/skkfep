@@ -118,7 +118,7 @@ const char* ExChars[] = { "ー", "「", "」" };
 namespace zenkakualpha {
 
 void
-iZenAl(char c)
+iZenAl(char c, bool)
 {
   romkan::flushKana();
   child::writeShells(inputZenkakuAlpha(c));
@@ -132,7 +132,7 @@ inputZenkakuAlpha(char c)
 }
 
 void
-iZenEx(char c)
+iZenEx(char c, bool)
 {
   romkan::flushKana();
   child::writeShells(inputZenkakuEx(c));

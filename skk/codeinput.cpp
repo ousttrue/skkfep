@@ -14,13 +14,13 @@ KanjiCodeInput::codeinMsg()
 }
 
 void
-KanjiCodeInput::inputCode()
+KanjiCodeInput::inputCode(Skk* skk)
 {
   romkan::flushKana();
   if (status::type() == StatusType::NoStatusLine)
     return;
   codeinMsg();
-  g_skk.setKeymap(KeymapTypes::CodeInput);
+  skk->setKeymap(KeymapTypes::CodeInput);
   codecol = 0;
 }
 
@@ -40,7 +40,7 @@ KanjiCodeInput::codein(char c)
 #define HEX2INT(a, b) ((HEX1(a) << 4) + HEX1(b))
 
 void
-KanjiCodeInput::enterCode()
+KanjiCodeInput::enterCode(Skk* skk)
 {
   fromMsg();
   if (codecol == 4) {
@@ -50,7 +50,7 @@ KanjiCodeInput::enterCode()
     kbuf[2] = '\0';
     child::writeShells(kbuf);
   }
-  g_skk.cancelCode();
+  skk->cancelCode();
 }
 
 KanjiCodeInput g_codeinput;

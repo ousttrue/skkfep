@@ -39,7 +39,22 @@ struct PreEdit
   std::string Display;
 };
 
-using KeyFunc = std::function<void(uint8_t)>;
+//
+// キーボード入力に対する副作用をあらわす
+// 内部ステートの変更と、child process, std out(preedit), statusline の
+// 3系統の出力がありえる。
+// test しづらい。
+//
+// * nullcmd: 何もしない
+//
+// [to child process]
+// * thru 素通し
+// * romaji 変換
+//
+// [to preedit]
+// * 見出し語 romaji
+//
+using KeyFunc = std::function<void(uint8_t, bool)>;
 
 struct SkkResult
 {
@@ -50,8 +65,21 @@ struct SkkResult
   SkkModes Mode;
 };
 
+enum class KeymapTypes
+{
+  Normal,
+  Selection,
+  CodeInput,
+  Kana,
+  Zenkaku,
+  KanjiInput,
+  OkuriInput,
+  KAlphaInput,
+};
+
 struct Keymap
 {
+  KeymapTypes Type;
   KeyFunc DefaultFunc = {};
   std::unordered_map<uint8_t, KeyFunc> Keymap;
 
@@ -59,12 +87,12 @@ struct Keymap
   {
     auto found = Keymap.find(c);
 
-    auto f = &DefaultFunc;
+    auto f = DefaultFunc;
     if (found != Keymap.end()) {
-      f = &found->second;
+      f = found->second;
     }
 
-    (*f)(c);
+    f(c, okuri);
     return {
 
     };

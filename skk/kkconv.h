@@ -5,131 +5,134 @@ extern char PreserveOnFailure;
 extern char OkuriFirst;
 extern struct Dictionary* UserDic;
 
-void
-kkBeg(char);
-void
-kkBegV(char c);
+class Skk;
 
 void
-kkBegC(char c);
+kkClearBuf();
 
 void
-kkBegA(char c);
+kkBegV(Skk* skk, char c);
 
 void
-kalpha(char c);
+kkBegC(Skk* skk, char c);
 
 void
-kaBS(char c);
+kkBegA(Skk* skk, char c);
 
 void
-kKanaV(char c);
+kalpha(char c, bool o = {});
 
 void
-okKanaV(char c /*, char first*/);
+kaBS(char c, bool o = {});
 
 void
-kKanaC(char c);
+kKanaV(char c, bool o = {});
 
 void
-okKanaC(char c /*, char first*/);
+okKanaV(Skk* skk, char c, bool first);
 
 void
-kZenAl(char c);
+kKanaC(char c, bool o = {});
 
 void
-kZenEx(char c);
+okKanaC(char c, bool first);
 
 void
-kfthru(char c);
+kZenAl(char c, bool o = {});
 
 void
-fxthru(char c);
+kZenEx(char c, bool o = {});
 
 void
-kfCancel(char c);
+kfthru(char c, bool o = {});
 
 void
-kfFix(char c);
+fxthru(Skk* skk, char c);
 
 void
-kfFixToAsc(char c);
+kfCancel(Skk* skk, char c);
 
 void
-kfFixToZenA(char c);
+kfFix(Skk* skk, char c);
 
 void
-kfFixThru(char c);
+kfFixToAsc(Skk* skk, char c);
 
 void
-thruKfFixToAsc(char c);
+kfFixToZenA(Skk* skk, char c);
 
 void
-okfFix(char c);
+kfFixThru(Skk* skk, char c);
 
 void
-okfFixToAsc(char c);
+thruKfFixToAsc(Skk* skk, char c);
 
 void
-okfFixToZenA(char c);
+okfFix(Skk* skk, char c);
 
 void
-okfFixThru(char c);
+okfFixToAsc(Skk* skk, char c);
 
 void
-thruOkfFixToAsc(char c);
+okfFixToZenA(Skk* skk, char c);
 
 void
-kfBS(char c);
+okfFixThru(Skk* skk, char c);
 
 void
-okuriBS(char c);
+thruOkfFixToAsc(Skk* skk, char c);
 
 void
-kkconv(char c);
+kfBS(char c, bool o = {});
 
 void
-toOkuri();
+okuriBS(Skk* skk, char c);
 
 void
-kOkuri(char c);
+kkconv(Skk* skk, char c);
 
 void
-stSuffix(char c);
+toOkuri(Skk* skk);
 
 void
-stPrefixCv(char c);
+kOkuri(Skk* skk, char c);
+
+void
+stSuffix(Skk* skk, char c);
+
+void
+stPrefixCv(Skk* skk, char c);
 
 void
 showCand();
 
 void
-nxCand(char);
+nxCand();
 
 void
-pvCand(char);
+pvCand(Skk* skk);
 
 /* back to kanji input mode */
 void
-backToKanjiInput();
+backToKanjiInput(Skk* skk);
 
 void
-cancelOkuri(char);
+cancelOkuri(Skk* skk);
 
 void
-clearOkuri();
+clearOkuri(Skk* skk);
 
 void
-fixIt(char c);
+fixIt(Skk* skk);
 
 void
-thruFixItToAsc(char c);
+thruFixItToAsc(Skk* skk, char c);
 
 void
-cancelSel(char c);
+cancelSel(Skk* skk, char c);
 
 void
-endKanjiInput();
+endKanjiInput(Skk* skk);
 
 void
-h2kkana(char c);
+h2kkana(Skk* skk, char c);

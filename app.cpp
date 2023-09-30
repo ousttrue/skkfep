@@ -18,6 +18,8 @@
 
 #define IF_STOPPED(x) WIFSTOPPED(x)
 
+Skk g_skk;
+
 App::App() {}
 
 App::~App() {}
@@ -116,6 +118,7 @@ App::Initialize(std::string_view UserDicName,
 
   OpenDictionary(UserDicName);
   initFep();
+  g_skk.initialize(child::writeShells);
 
   return true;
 }
