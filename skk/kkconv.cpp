@@ -265,14 +265,6 @@ thruKfFixToAsc(char c)
 }
 
 void
-thruKfFixToEsc(char c)
-{
-  kfFix(c);
-  g_skk.toEsc();
-  child::thru(c);
-}
-
-void
 okfFix(char c)
 {
   cancelOkuri({});
@@ -307,14 +299,6 @@ thruOkfFixToAsc(char c)
 {
   okfFix(c);
   g_skk.toAsc();
-  child::thru(c);
-}
-
-void
-thruOkfFixToEsc(char c)
-{
-  okfFix(c);
-  g_skk.toEsc();
   child::thru(c);
 }
 
@@ -575,14 +559,6 @@ thruFixItToAsc(char c)
 {
   fixIt(c);
   g_skk.toAsc();
-  child::thru(c);
-}
-
-void
-thruFixItToEsc(char c)
-{
-  fixIt(c);
-  g_skk.toEsc();
   child::thru(c);
 }
 

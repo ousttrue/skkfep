@@ -124,76 +124,6 @@ Skk::setKanaKey()
   KAlphaInputKeymap().Keymap[k] = kfFix;
 }
 
-void
-Skk::setEscape(EscapeBehavior b, bool init)
-{
-  if (init) {
-    LastEscapeBehavior = NoEsc;
-  }
-
-  if (b == ToggleEsc)
-    return;
-  if (b == NoEsc) {
-    SelectionKeymap().Keymap[EXTRA_CODE] = thruFixItToAsc;
-    KanaKeymap().Keymap[ESC_CODE] = romkan::flthru;
-    ZenkakuKeymap().Keymap[ESC_CODE] = child::thru;
-    KanjiInputKeymap().Keymap[ESC_CODE] = nulcmd;
-    KAlphaInputKeymap().Keymap[ESC_CODE] = nulcmd;
-    OkuriInputKeymap().Keymap[ESC_CODE] = nulcmd;
-  } else if (b == SimpleEsc) {
-    SelectionKeymap().Keymap[ESC_CODE] = thruFixItToAsc;
-    KanaKeymap().Keymap[ESC_CODE] = thruToAsc;
-    ZenkakuKeymap().Keymap[ESC_CODE] = thruToAsc;
-    KanjiInputKeymap().Keymap[ESC_CODE] = thruKfFixToAsc;
-    KAlphaInputKeymap().Keymap[ESC_CODE] = thruKfFixToAsc;
-    OkuriInputKeymap().Keymap[ESC_CODE] = thruOkfFixToAsc;
-  } else {
-    SelectionKeymap().Keymap[ESC_CODE] = thruFixItToEsc;
-    KanaKeymap().Keymap[ESC_CODE] = thruToEsc;
-    ZenkakuKeymap().Keymap[ESC_CODE] = thruToEsc;
-    KanjiInputKeymap().Keymap[ESC_CODE] = thruKfFixToEsc;
-    KAlphaInputKeymap().Keymap[ESC_CODE] = thruKfFixToEsc;
-    OkuriInputKeymap().Keymap[ESC_CODE] = thruOkfFixToEsc;
-    if (b == ViEsc) {
-      EscapedKeymap().DefaultFunc = child::thru;
-      EscapedKeymap().Keymap = _ViEscKeymap;
-    } else {
-      EscapedKeymap().DefaultFunc = thru1;
-      EscapedKeymap().Keymap = _EmacsEscKeymap;
-    }
-  }
-  CurrentEscapeBehavior = b;
-}
-
-void
-Skk::toggleEscape(EscapeBehavior b)
-{
-  EscapeBehavior t = CurrentEscapeBehavior;
-  if (b == ToggleEsc || (b == NoEsc && LastEscapeBehavior == NoEsc)) {
-    setEscape(LastEscapeBehavior);
-    LastEscapeBehavior = t;
-  } else {
-    setEscape(b);
-    if (t == NoEsc)
-      LastEscapeBehavior = t;
-  }
-
-  switch (CurrentEscapeBehavior) {
-    case NoEsc:
-      showmessage("Escape mode off");
-      break;
-    case SimpleEsc:
-      showmessage("Simple escape mode");
-      break;
-    case ViEsc:
-      showmessage("Vi escape mode");
-      break;
-    case EmacsEsc:
-      showmessage("Emacs escape mode");
-      break;
-  }
-}
-
 bool
 Skk::is_okuri_input()
 {
@@ -231,24 +161,9 @@ Skk::toZenA()
 }
 
 void
-Skk::toEsc()
-{
-  romkan::flushKana();
-  setKeymap(KeymapTypes::Escaped);
-  showmode(SKK_MODE);
-}
-
-void
 thruToAsc(char c)
 {
   g_skk.toAsc();
-  child::thru(c);
-}
-
-void
-thruToEsc(char c)
-{
-  g_skk.toEsc();
   child::thru(c);
 }
 

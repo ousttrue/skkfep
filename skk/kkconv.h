@@ -65,9 +65,6 @@ void
 thruKfFixToAsc(char c);
 
 void
-thruKfFixToEsc(char c);
-
-void
 okfFix(char c);
 
 void
@@ -81,9 +78,6 @@ okfFixThru(char c);
 
 void
 thruOkfFixToAsc(char c);
-
-void
-thruOkfFixToEsc(char c);
 
 void
 kfBS(char c);
@@ -130,9 +124,6 @@ fixIt(char c);
 
 void
 thruFixItToAsc(char c);
-
-void
-thruFixItToEsc(char c);
 
 void
 cancelSel(char c);

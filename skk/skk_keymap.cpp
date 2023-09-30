@@ -276,7 +276,6 @@ Skk::initializeKeymap()
                         { '?', stSuffix },
                         { '<', stSuffix },
                         { EXTRA_CODE, thruFixItToAsc },
-                        { EXTRA_CODE, thruFixItToEsc },
                       } };
 
   auto& CodeInputKeymap = KeymapList[(int)KeymapTypes::CodeInput];
@@ -310,14 +309,4 @@ Skk::initializeKeymap()
                         { 'e', [](auto c) { g_codeinput.codein(c); } },
                         { 'f', [](auto c) { g_codeinput.codein(c); } },
                       } };
-
-  _ViEscKeymap = {
-    { 'i', thruBack }, { 'I', thruBack }, { 'a', thruBack }, { 'A', thruBack },
-    { 'o', thruBack }, { 'O', thruBack }, { 'S', thruBack }, { 's', thruBack },
-    { 'R', thruBack }, { 'r', thruBack }, { 'C', thruBack }, { 'c', thruBack },
-  };
-
-  _EmacsEscKeymap = {
-    { EXTRA_CODE, nulcmd },
-  };
 }

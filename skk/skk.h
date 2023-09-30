@@ -2,15 +2,6 @@
 #include "keymap.h"
 #include <assert.h>
 
-enum EscapeBehavior
-{
-  NoEsc,
-  SimpleEsc,
-  ViEsc,
-  EmacsEsc,
-  ToggleEsc
-};
-
 void
 nulcmd(char c);
 
@@ -19,7 +10,6 @@ enum class KeymapTypes
   Normal,
   Selection,
   CodeInput,
-  Escaped,
   Kana,
   Zenkaku,
   KanjiInput,
@@ -36,7 +26,6 @@ class Skk
   Keymap& NormalKeymap() { return KeymapList[(int)KeymapTypes::Normal]; }
   Keymap& SelectionKeymap() { return KeymapList[(int)KeymapTypes::Selection]; }
   Keymap& CodeInputKeymap() { return KeymapList[(int)KeymapTypes::CodeInput]; }
-  Keymap& EscapedKeymap() { return KeymapList[(int)KeymapTypes::Escaped]; }
   Keymap& KanaKeymap() { return KeymapList[(int)KeymapTypes::Kana]; }
   Keymap& ZenkakuKeymap() { return KeymapList[(int)KeymapTypes::Zenkaku]; }
   Keymap& KanjiInputKeymap()
@@ -52,12 +41,8 @@ class Skk
     return KeymapList[(int)KeymapTypes::KAlphaInput];
   }
 
-  EscapeBehavior CurrentEscapeBehavior = NoEsc;
-  EscapeBehavior LastEscapeBehavior = SimpleEsc;
   KeymapPtr CurrentKeymap;
   KeymapPtr lastKeymap;
-  std::unordered_map<uint8_t, KeyFunc> _ViEscKeymap;
-  std::unordered_map<uint8_t, KeyFunc> _EmacsEscKeymap;
 
 public:
   std::string KanaKey;
@@ -101,15 +86,12 @@ public:
   }
   void restoreKeymap();
 
-  void setEscape(EscapeBehavior b, bool init = false);
-  void toggleEscape(EscapeBehavior b);
   bool is_okuri_input();
 
   void toKana();
   void cancelCode();
   void toAsc();
   void toZenA();
-  void toEsc();
 
   SkkResult input(uint8_t c, bool okuri = false);
   void putc(char c);

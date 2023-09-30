@@ -31,12 +31,6 @@ ParseArgs(int argc, char** argv)
       break;
     } else if (!strcmp(argv[i], "-P")) {
       PreserveOnFailure ^= 1;
-    } else if (!strcmp(argv[i], "-esc")) {
-      g_skk.setEscape(SimpleEsc, true);
-    } else if (!strcmp(argv[i], "-viesc")) {
-      g_skk.setEscape(ViEsc, true);
-    } else if (!strcmp(argv[i], "-emacsesc")) {
-      g_skk.setEscape(EmacsEsc, true);
     } else if (!strcmp(argv[i], "-rs")) {
       ReverseStatus = 1;
     }
