@@ -43,7 +43,7 @@ App::Abort()
 void
 App::Reset(const char* msg)
 {
-  reset_tty();
+  terminal::reset_tty();
   fprintf(stderr, "%s\n", msg);
   Exit(-1);
 }
@@ -51,7 +51,7 @@ App::Reset(const char* msg)
 void
 App::PtyFree()
 {
-  freeDevice();
+  child::freeDevice();
 }
 
 void
@@ -86,8 +86,8 @@ App::Initialize(std::string_view UserDicName,
   if (!getTCstr()) {
     App::Instance().Exit(-1);
   }
-  tty_ready();
-  if (!set_tty()) {
+  terminal::tty_ready();
+  if (!terminal::set_tty()) {
     App::Instance().Exit(-1);
   }
   auto win_size = get_termsize();
@@ -101,7 +101,7 @@ App::Initialize(std::string_view UserDicName,
     int cpid;
     int statusp;
 
-    reset_tty_without_close();
+    terminal::reset_tty_without_close();
 #ifndef NO_SUSPEND
     cpid = wait((int*)&statusp);
     if (cpid != -1 && IF_STOPPED(statusp)) { /* suspend */
@@ -110,7 +110,7 @@ App::Initialize(std::string_view UserDicName,
 #endif /* NO_SUSPEND */
       App::Instance().Exit(0);
   };
-  if (!establishShell(win_size, cmd, args, callback, version)) {
+  if (!child::establishShell(win_size, cmd, args, callback, version)) {
     return false;
   }
 
@@ -127,23 +127,23 @@ App::Run()
 {
   fd_set selfds;
   FD_ZERO(&selfds);
-  int fdnum = Shellfd + 1;
+  int fdnum = child::Shellfd + 1;
 
   for (;;) {
     FD_SET(0, &selfds);
-    FD_SET(Shellfd, &selfds);
+    FD_SET(child::Shellfd, &selfds);
     int i = select(fdnum, &selfds, NULL, NULL, NULL);
     if (i == -1 && errno == EINTR) {
       continue;
     }
 
     // read pty out
-    if (FD_ISSET(Shellfd, &selfds)) {
+    if (FD_ISSET(child::Shellfd, &selfds)) {
       if (!BlockTty) {
         char shellBuf[SH_BUF_SIZ];
-        auto i = read(Shellfd, shellBuf, SH_BUF_SIZ);
+        auto i = read(child::Shellfd, shellBuf, SH_BUF_SIZ);
         if (i > 0) {
-          writeShTty(shellBuf, i);
+          terminal::writeShTty(shellBuf, i);
         }
       }
       continue;
@@ -170,7 +170,7 @@ App::Input(uint8_t c)
   if (c & 0x80) {
     // not ascii
     // thru(c);
-    write(fileno(Shellout), &c, 1);
+    write(fileno(child::Shellout), &c, 1);
   } else {
     // ascii
     g_skk.input(c, o);

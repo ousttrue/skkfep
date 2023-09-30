@@ -5,6 +5,8 @@
 #include <string>
 #include <unistd.h>
 
+namespace child {
+
 extern int Shellfd;
 extern int ShellPID;
 extern FILE* Shellout;
@@ -52,3 +54,5 @@ flushOut(int minchar);
 
 void
 thru(char c);
+
+} // namespace

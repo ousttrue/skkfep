@@ -10,7 +10,7 @@
 void
 suspend(int)
 {
-  reset_tty_without_close();
+  terminal::reset_tty_without_close();
   signal(SIGTSTP, SIG_DFL);
   kill(0, SIGTSTP);
 }
@@ -19,12 +19,12 @@ void
 susp_cont(int)
 {
   signal(SIGTSTP, suspend);
-  reset_tty_without_close();
-  if (!set_tty()) {
+  terminal::reset_tty_without_close();
+  if (!terminal::set_tty()) {
     // App::Instance().Exit(-1);
     exit(-1);
   }
-  kill(ShellPID, SIGCONT);
+  kill(child::ShellPID, SIGCONT);
 }
 #endif
 
@@ -38,11 +38,11 @@ winchange(int)
   }
 
   int tty;
-  if (Shellout != NULL)
-    tty = fileno(Shellout);
+  if (child::Shellout != NULL)
+    tty = fileno(child::Shellout);
   else
     tty = 1; /* stdout */
-  set_termsize(tty, size);
+  child::set_termsize(tty, size);
   initFep();
   // showcurmode();
   signal(SIGWINCH, winchange);
@@ -86,25 +86,25 @@ init_signals(const std::function<void(const char*)>& reset)
   signal(SIGINT, sig_int);
   /*	signal(SIGQUIT,iot_exit); */
   signal(SIGILL, [](int) {
-    reset_tty();
+      terminal::reset_tty();
     signal(SIGCHLD, SIG_DFL);
     // App::Instance().Exit(-1);
     exit(-1);
   });
   signal(SIGIOT, [](int) {
-    reset_tty();
+      terminal::reset_tty();
     fprintf(stderr, "Abort.\n");
     // App::Instance().Abort();
     abort();
   });
   signal(SIGFPE, [](int) {
-    reset_tty();
+      terminal::reset_tty();
     signal(SIGCHLD, SIG_DFL);
     // App::Instance().Exit(-1);
     exit(-1);
   });
   signal(SIGSEGV, [](int) {
-    reset_tty();
+      terminal::reset_tty();
     fprintf(stderr, "SEGMENTATION VIOLATION\n");
     // App::Instance().Abort();
     abort();

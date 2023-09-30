@@ -10,7 +10,7 @@ void
 KanjiCodeInput::codeinMsg()
 {
   toMsg();
-  writes("JIS or EUC code: ");
+  terminal::writes("JIS or EUC code: ");
 }
 
 void
@@ -31,7 +31,7 @@ KanjiCodeInput::codein(char c)
     codecol = 0;
     codeinMsg();
   }
-  write1(c);
+  terminal::write1(c);
   codebuf[codecol] = tolower(c);
   codecol++;
 }
@@ -48,7 +48,7 @@ KanjiCodeInput::enterCode()
     kbuf[0] = (HEX2INT(codebuf[0], codebuf[1]) | 0x80);
     kbuf[1] = (HEX2INT(codebuf[2], codebuf[3]) | 0x80);
     kbuf[2] = '\0';
-    writeShells(kbuf);
+    child::writeShells(kbuf);
   }
   g_skk.cancelCode();
 }

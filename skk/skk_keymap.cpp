@@ -11,7 +11,7 @@ void
 Skk::initializeKeymap()
 {
   auto& NormalKeymap = KeymapList[(int)KeymapTypes::Normal];
-  NormalKeymap.DefaultFunc = thru;
+  NormalKeymap.DefaultFunc = child::thru;
   NormalKeymap.Keymap[CTRL_T] = [](auto) { g_skk.toKana(); };
 
   auto& KanaKeymap = KeymapList[(int)KeymapTypes::Kana];
@@ -84,7 +84,7 @@ Skk::initializeKeymap()
   };
 
   auto& ZenkakuKeymap = KeymapList[(int)KeymapTypes::Zenkaku];
-  ZenkakuKeymap.DefaultFunc = thru;
+  ZenkakuKeymap.DefaultFunc = child::thru;
   ZenkakuKeymap.Keymap = {
     { ' ', zenkakualpha::iZenAl },  { '!', zenkakualpha::iZenAl },
     { '"', zenkakualpha::iZenAl },  { '#', zenkakualpha::iZenAl },

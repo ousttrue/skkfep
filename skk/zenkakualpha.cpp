@@ -121,7 +121,7 @@ void
 iZenAl(char c)
 {
   romkan::flushKana();
-  writeShells(inputZenkakuAlpha(c));
+  child::writeShells(inputZenkakuAlpha(c));
 }
 
 std::string
@@ -135,7 +135,7 @@ void
 iZenEx(char c)
 {
   romkan::flushKana();
-  writeShells(inputZenkakuEx(c));
+  child::writeShells(inputZenkakuEx(c));
 }
 
 std::string

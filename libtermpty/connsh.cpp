@@ -19,6 +19,8 @@
 
 #define DEVICELEN 16
 
+namespace child {
+
 FILE* Shellout;
 FILE* Shellin;
 int Shellfd;
@@ -107,7 +109,7 @@ establishShell(const TermSize& size,
     //     }
     //     close(master);
     // #endif
-    set_tty_sane(slave);
+    terminal::set_tty_sane(slave);
     dup2(slave, 0);
     dup2(slave, 1);
     dup2(slave, 2);
@@ -183,7 +185,7 @@ flushOut(int minchar)
       continue;
     if (i > 0) {
       i = read(Shellfd, shellBuf, std::size(shellBuf));
-      writeShTty(shellBuf, i);
+      terminal::writeShTty(shellBuf, i);
       nchar += i;
       if (nchar >= minchar)
         break;
@@ -197,3 +199,5 @@ thru(char c)
 {
   writeTtyShell1(c);
 }
+
+} // namespace

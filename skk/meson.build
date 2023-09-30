@@ -3,6 +3,8 @@ skk_lib = static_library('skk', [
   'skk_keymap.cpp',
 
   'romkan.cpp',
+  'romkan_hira.cpp',
+  'romkan_kata.cpp',
   'codeinput.cpp',
   'zenkakualpha.cpp',
 

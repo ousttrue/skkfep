@@ -23,10 +23,10 @@ toMsg()
   if (ReverseStatus)
     standout(1);
   if (status::type() == StatusType::HaveStatusLine) {
-    writes(g_term.ts.xy(0, 0));
+    terminal::writes(g_term.ts.xy(0, 0));
   } else {
-    writes(g_term.sc.seq);
-    writes(g_term.cm.xy(0, current_termsize().Rows - 1));
+    terminal::writes(g_term.sc.seq);
+    terminal::writes(g_term.cm.xy(0, current_termsize().Rows - 1));
   }
 }
 
@@ -34,9 +34,9 @@ void
 fromMsg()
 {
   if (status::type() == StatusType::HaveStatusLine) {
-    writes(g_term.fs.seq);
+    terminal::writes(g_term.fs.seq);
   } else {
-    writes(g_term.rc.seq);
+    terminal::writes(g_term.rc.seq);
   }
   if (ReverseStatus)
     standout(0);
@@ -47,12 +47,12 @@ initFep()
 {
   if (status::type() == StatusType::HaveStatusLine) {
     if (g_term.ss) {
-      writes(g_term.ss.seq);
+      terminal::writes(g_term.ss.seq);
     }
   } else if (status::type() == StatusType::UseBottomLine) {
-    writes("\r\n");
-    writes(g_term.cs.xy(current_termsize().Rows - 2, 0));
-    writes(g_term.cm.xy(0, current_termsize().Rows - 2));
+    terminal::writes("\r\n");
+    terminal::writes(g_term.cs.xy(current_termsize().Rows - 2, 0));
+    terminal::writes(g_term.cm.xy(0, current_termsize().Rows - 2));
   }
 }
 
@@ -61,11 +61,11 @@ termFep()
 {
   if (status::type() == StatusType::HaveStatusLine) {
     if (g_term.hs) {
-      writes(g_term.hs.seq);
+      terminal::writes(g_term.hs.seq);
     }
   } else if (status::type() == StatusType::UseBottomLine) {
-    writes(g_term.cs.xy(current_termsize().Rows - 1, 0));
-    writes(g_term.cm.xy(0, current_termsize().Rows - 1));
+    terminal::writes(g_term.cs.xy(current_termsize().Rows - 1, 0));
+    terminal::writes(g_term.cm.xy(0, current_termsize().Rows - 1));
   }
 }
 
@@ -73,43 +73,43 @@ void
 underline(int ctl)
 {
   if (ctl)
-    writes(g_term.us.seq);
+    terminal::writes(g_term.us.seq);
   else
-    writes(g_term.ue.seq);
+    terminal::writes(g_term.ue.seq);
 }
 
 void
 standout(int ctl)
 {
   if (ctl)
-    writes(g_term.so.seq);
+    terminal::writes(g_term.so.seq);
   else
-    writes(g_term.se.seq);
+    terminal::writes(g_term.se.seq);
 }
 
 void
 saveCsr()
 {
-  writes(g_term.sc.seq);
+  terminal::writes(g_term.sc.seq);
 }
 
 void
 restoreCsr()
 {
-  writes(g_term.rc.seq);
+  terminal::writes(g_term.rc.seq);
 }
 
 void
 clearToEnd()
 {
-  writes(g_term.ce.seq);
+  terminal::writes(g_term.ce.seq);
 }
 
 void
 csrLeft(int n)
 {
   while (n) {
-    writes(g_term.kl.seq);
+    terminal::writes(g_term.kl.seq);
     n--;
   }
 }
@@ -118,7 +118,7 @@ void
 csrRight(int n)
 {
   while (n) {
-    writes(g_term.kr.seq);
+    terminal::writes(g_term.kr.seq);
     n--;
   }
 }
@@ -126,14 +126,14 @@ csrRight(int n)
 void
 cls()
 {
-  writes(g_term.cl.seq);
+  terminal::writes(g_term.cl.seq);
 }
 
 void
 erase(int n)
 {
   while (n) {
-    write1(' ');
+    terminal::write1(' ');
     n--;
   }
 }
@@ -149,7 +149,7 @@ rubout(int n)
 void
 bell()
 {
-  write1('\007');
+  terminal::write1('\007');
 }
 
 void
@@ -157,7 +157,7 @@ showmessage(const char* s)
 {
   if (status::type() != StatusType::NoStatusLine) {
     toMsg();
-    writes(s);
+    terminal::writes(s);
     clearToEnd();
     fromMsg();
   }

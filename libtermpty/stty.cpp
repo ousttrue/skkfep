@@ -194,6 +194,8 @@ TERMPARAM* ioval;
 }
 #endif /* not TERMIOS */
 
+namespace terminal {
+
 bool
 set_tty()
 {
@@ -324,3 +326,5 @@ writeTty(const char* s, int l)
 {
   write(g_term_tty, s, l);
 }
+
+} // namespace

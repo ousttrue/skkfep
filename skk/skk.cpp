@@ -136,7 +136,7 @@ Skk::setEscape(EscapeBehavior b, bool init)
   if (b == NoEsc) {
     SelectionKeymap().Keymap[EXTRA_CODE] = thruFixItToAsc;
     KanaKeymap().Keymap[ESC_CODE] = romkan::flthru;
-    ZenkakuKeymap().Keymap[ESC_CODE] = thru;
+    ZenkakuKeymap().Keymap[ESC_CODE] = child::thru;
     KanjiInputKeymap().Keymap[ESC_CODE] = nulcmd;
     KAlphaInputKeymap().Keymap[ESC_CODE] = nulcmd;
     OkuriInputKeymap().Keymap[ESC_CODE] = nulcmd;
@@ -155,7 +155,7 @@ Skk::setEscape(EscapeBehavior b, bool init)
     KAlphaInputKeymap().Keymap[ESC_CODE] = thruKfFixToEsc;
     OkuriInputKeymap().Keymap[ESC_CODE] = thruOkfFixToEsc;
     if (b == ViEsc) {
-      EscapedKeymap().DefaultFunc = thru;
+      EscapedKeymap().DefaultFunc = child::thru;
       EscapedKeymap().Keymap = _ViEscKeymap;
     } else {
       EscapedKeymap().DefaultFunc = thru1;
@@ -242,27 +242,27 @@ void
 thruToAsc(char c)
 {
   g_skk.toAsc();
-  thru(c);
+  child::thru(c);
 }
 
 void
 thruToEsc(char c)
 {
   g_skk.toEsc();
-  thru(c);
+  child::thru(c);
 }
 
 void
 thruBack(char c)
 {
-  thru(c);
+  child::thru(c);
   g_skk.toKana();
 }
 
 void
 thru1(char c)
 {
-  thru(c);
+  child::thru(c);
   g_skk.restoreKeymap();
   g_skk.showlastmode();
 }

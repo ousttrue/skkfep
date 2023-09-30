@@ -3,6 +3,8 @@
 
 extern int g_term_tty;
 
+namespace terminal {
+
 bool
 set_tty();
 
@@ -29,3 +31,5 @@ writeShTty(const char* s, int l);
 
 void
 writeTty(const char* s, int l);
+
+} // namespace
