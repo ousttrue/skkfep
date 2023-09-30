@@ -1,5 +1,4 @@
 #include "zenkakualpha.h"
-#include "connsh.h"
 #include "romkan.h"
 
 const char* ZenkakuAlpha[] = {
@@ -117,11 +116,11 @@ const char* ExChars[] = { "ー", "「", "」" };
 
 namespace zenkakualpha {
 
-void
-iZenAl(char c, bool)
+std::string
+iZenAl(char c)
 {
   romkan::flushKana();
-  child::writeShells(inputZenkakuAlpha(c));
+  return inputZenkakuAlpha(c);
 }
 
 std::string
@@ -131,11 +130,11 @@ inputZenkakuAlpha(char c)
   return ZenkakuAlpha[c - ' '];
 }
 
-void
-iZenEx(char c, bool)
+std::string
+iZenEx(char c)
 {
   romkan::flushKana();
-  child::writeShells(inputZenkakuEx(c));
+  return inputZenkakuEx(c);
 }
 
 std::string
