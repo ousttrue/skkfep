@@ -19,7 +19,7 @@ TEST(SkkTest, zenkaku)
 
   {
     auto res = skk.input('a');
-    EXPECT_EQ(res.Output, "ａ");
+    EXPECT_EQ(res.Through, "ａ");
   }
 }
 
@@ -34,6 +34,6 @@ TEST(SkkTest, romkan)
 
   {
     auto res = skk.input('a');
-    EXPECT_EQ(res.Output, "あ");
+    EXPECT_EQ(res.Through, "あ");
   }
 }

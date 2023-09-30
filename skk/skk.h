@@ -3,13 +3,11 @@
 #include <assert.h>
 #include <unordered_map>
 
-void
+SkkOutput
 nulcmd(char, bool);
 
 class Skk
 {
-  std::function<void(std::string_view)> m_output;
-
   SkkModes lastmode = {};
   SkkModes curmode = {};
 
@@ -38,20 +36,12 @@ class Skk
 public:
   std::string KanaKey;
 
-  std::string m_buffer;
-
-  void thru(char c)
-  {
-    char str[]{ c, 0 };
-    m_output(str);
-  }
-
   Skk();
   ~Skk();
   Skk(const Skk&) = delete;
   Skk& operator=(const Skk&) = delete;
 
-  void initialize(const std::function<void(std::string_view)>& output);
+  void initialize();
 
   Keymap& currentKeymap() { return *CurrentKeymap; }
 
@@ -96,14 +86,7 @@ public:
   void toAsc();
   void toZenA();
   void toggleKana();
-
-  void thruToAsc(char c);
-  void thruToEsc(char c);
-  void thruBack(char c);
-  void thru1(char c);
-
   void kkBeg();
-
-  SkkResult input(uint8_t c, bool okuri = false);
+  SkkOutput input(uint8_t c, bool okuri = false);
   void putc(char c);
 };

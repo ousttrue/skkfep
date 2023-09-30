@@ -1,16 +1,17 @@
 #pragma once
+#include "keymap.h"
 #include <string>
 
 namespace zenkakualpha {
 
-std::string
-iZenAl(char c);
+SkkOutput
+iZenAl(char c, bool o = {});
 
 std::string
 inputZenkakuAlpha(char c);
 
-std::string
-iZenEx(char c);
+SkkOutput
+iZenEx(char c, bool o = {});
 
 std::string
 inputZenkakuEx(char c);

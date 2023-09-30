@@ -7,158 +7,277 @@
 #include <stdio.h>
 
 void
-Skk::initialize(const std::function<void(std::string_view)>& output)
+Skk::initialize()
 {
-  m_output = output;
-
-  auto thru = [self = this](char c, bool) { self->thru(c); };
-
   auto& NormalKeymap = m_keymaps[KeymapTypes::Normal];
-  NormalKeymap.DefaultFunc = thru;
-  NormalKeymap.Keymap[CTRL_T] = [self = this](auto, auto) { self->toKana(); };
+  NormalKeymap.DefaultFunc = [](auto c, auto) {
+    SkkOutput output;
+    output.Through += c;
+    return output;
+  };
+  NormalKeymap.Keymap[CTRL_T] = [self = this](auto, auto) {
+    self->toKana();
+    return SkkOutput{};
+  };
 
   auto& KanaKeymap = m_keymaps[KeymapTypes::Kana];
   KanaKeymap.DefaultFunc = romkan::flthru;
   KanaKeymap.Keymap = {
-    { CTRL_H,
-      [self = this](auto s, auto) { self->m_output(romkan::kanaBS(s)); } },
-    { '!',
+    { CTRL_H, romkan::kanaBS },
+    { '!', zenkakualpha::iZenAl },
+    { ',', zenkakualpha::iZenAl },
+    { '-', zenkakualpha::iZenEx },
+    { '.', zenkakualpha::iZenAl },
+    { '/',
       [self = this](auto c, auto) {
-        self->m_output(zenkakualpha::iZenAl(c));
+        kkBegA(self, c);
+        return SkkOutput{};
       } },
-    { ',',
+    { ':', zenkakualpha::iZenAl },
+    { ';', zenkakualpha::iZenAl },
+    { '?', zenkakualpha::iZenAl },
+    { 'A',
       [self = this](auto c, auto) {
-        self->m_output(zenkakualpha::iZenAl(c));
+        kkBegV(self, c);
+        return SkkOutput{};
       } },
-    { '-',
+    { 'B',
       [self = this](auto c, auto) {
-        self->m_output(zenkakualpha::iZenEx(c));
+        kkBegC(self, c);
+        return SkkOutput{};
       } },
-    { '.',
+    { 'C',
       [self = this](auto c, auto) {
-        self->m_output(zenkakualpha::iZenAl(c));
+        kkBegC(self, c);
+        return SkkOutput{};
       } },
-    { '/', [self = this](auto c, auto) { kkBegA(self, c); } },
-    { ':',
+    { 'D',
       [self = this](auto c, auto) {
-        self->m_output(zenkakualpha::iZenAl(c));
+        kkBegC(self, c);
+        return SkkOutput{};
       } },
-    { ';',
+    { 'E',
       [self = this](auto c, auto) {
-        self->m_output(zenkakualpha::iZenAl(c));
+        kkBegV(self, c);
+        return SkkOutput{};
       } },
-    { '?',
+    { 'F',
       [self = this](auto c, auto) {
-        self->m_output(zenkakualpha::iZenAl(c));
+        kkBegC(self, c);
+        return SkkOutput{};
       } },
-    { 'A', [self = this](auto c, auto) { kkBegV(self, c); } },
-    { 'B', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'C', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'D', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'E', [self = this](auto c, auto) { kkBegV(self, c); } },
-    { 'F', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'G', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'H', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'I', [self = this](auto c, auto) { kkBegV(self, c); } },
-    { 'J', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'K', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'L', [self = this](auto, auto) { self->toZenA(); } },
-    { 'M', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'N', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'O', [self = this](auto c, auto) { kkBegV(self, c); } },
-    { 'P', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'Q', [self = this](auto, auto) { self->kkBeg(); } },
-    { 'R', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'S', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'T', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'U', [self = this](auto c, auto) { kkBegV(self, c); } },
-    { 'V', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'W', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'X', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'Y', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { 'Z', [self = this](auto c, auto) { kkBegC(self, c); } },
-    { '[',
+    { 'G',
       [self = this](auto c, auto) {
-        self->m_output(zenkakualpha::iZenEx(c));
+        kkBegC(self, c);
+        return SkkOutput{};
       } },
-    { '\\', [self = this](auto, auto) { g_codeinput.inputCode(self); } },
-    { ']',
+    { 'H',
       [self = this](auto c, auto) {
-        self->m_output(zenkakualpha::iZenEx(c));
+        kkBegC(self, c);
+        return SkkOutput{};
       } },
-    { 'a', [self = this](auto s, bool) { self->m_output(romkan::iKanaV(s)); } },
-    { 'b', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 'c', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 'd', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 'e', [self = this](auto s, bool) { self->m_output(romkan::iKanaV(s)); } },
-    { 'f', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 'g', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 'h', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 'i', [self = this](auto s, bool) { self->m_output(romkan::iKanaV(s)); } },
-    { 'j', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 'k', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 'l', [self = this](auto, auto) { self->toAsc(); } },
-    { 'm', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 'n', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 'o', [self = this](auto s, bool) { self->m_output(romkan::iKanaV(s)); } },
-    { 'p', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
+    { 'I',
+      [self = this](auto c, auto) {
+        kkBegV(self, c);
+        return SkkOutput{};
+      } },
+    { 'J',
+      [self = this](auto c, auto) {
+        kkBegC(self, c);
+        return SkkOutput{};
+      } },
+    { 'K',
+      [self = this](auto c, auto) {
+        kkBegC(self, c);
+        return SkkOutput{};
+      } },
+    { 'L',
+      [self = this](auto, auto) {
+        self->toZenA();
+        return SkkOutput{};
+      } },
+    { 'M',
+      [self = this](auto c, auto) {
+        kkBegC(self, c);
+        return SkkOutput{};
+      } },
+    { 'N',
+      [self = this](auto c, auto) {
+        kkBegC(self, c);
+        return SkkOutput{};
+      } },
+    { 'O',
+      [self = this](auto c, auto) {
+        kkBegV(self, c);
+        return SkkOutput{};
+      } },
+    { 'P',
+      [self = this](auto c, auto) {
+        kkBegC(self, c);
+        return SkkOutput{};
+      } },
+    { 'Q',
+      [self = this](auto, auto) {
+        self->kkBeg();
+        return SkkOutput{};
+      } },
+    { 'R',
+      [self = this](auto c, auto) {
+        kkBegC(self, c);
+        return SkkOutput{};
+      } },
+    { 'S',
+      [self = this](auto c, auto) {
+        kkBegC(self, c);
+        return SkkOutput{};
+      } },
+    { 'T',
+      [self = this](auto c, auto) {
+        kkBegC(self, c);
+        return SkkOutput{};
+      } },
+    { 'U',
+      [self = this](auto c, auto) {
+        kkBegV(self, c);
+        return SkkOutput{};
+      } },
+    { 'V',
+      [self = this](auto c, auto) {
+        kkBegC(self, c);
+        return SkkOutput{};
+      } },
+    { 'W',
+      [self = this](auto c, auto) {
+        kkBegC(self, c);
+        return SkkOutput{};
+      } },
+    { 'X',
+      [self = this](auto c, auto) {
+        kkBegC(self, c);
+        return SkkOutput{};
+      } },
+    { 'Y',
+      [self = this](auto c, auto) {
+        kkBegC(self, c);
+        return SkkOutput{};
+      } },
+    { 'Z',
+      [self = this](auto c, auto) {
+        kkBegC(self, c);
+        return SkkOutput{};
+      } },
+    { '[', zenkakualpha::iZenEx },
+    { '\\', [self = this](auto, auto) { return g_codeinput.inputCode(self); } },
+    { ']', zenkakualpha::iZenEx },
+    { 'a', romkan::iKanaV },
+    { 'b', romkan::iKanaC },
+    { 'c', romkan::iKanaC },
+    { 'd', romkan::iKanaC },
+    { 'e', romkan::iKanaV },
+    { 'f', romkan::iKanaC },
+    { 'g', romkan::iKanaC },
+    { 'h', romkan::iKanaC },
+    { 'i', romkan::iKanaV },
+    { 'j', romkan::iKanaC },
+    { 'k', romkan::iKanaC },
+    { 'l',
+      [self = this](auto, auto) {
+        self->toAsc();
+        return SkkOutput{};
+      } },
+    { 'm', romkan::iKanaC },
+    { 'n', romkan::iKanaC },
+    { 'o', romkan::iKanaV },
+    { 'p', romkan::iKanaC },
     { 'q',
       [self = this](auto, auto) {
         romkan::tglK(self);
-        ;
+        return SkkOutput{};
       } },
-    { 'r', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 's', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 't', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 'u', [self = this](auto s, bool) { self->m_output(romkan::iKanaV(s)); } },
-    { 'v', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 'w', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 'x', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 'y', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
-    { 'z', [self = this](auto s, bool) { self->m_output(romkan::iKanaC(s)); } },
+    { 'r', romkan::iKanaC },
+    { 's', romkan::iKanaC },
+    { 't', romkan::iKanaC },
+    { 'u', romkan::iKanaV },
+    { 'v', romkan::iKanaC },
+    { 'w', romkan::iKanaC },
+    { 'x', romkan::iKanaC },
+    { 'y', romkan::iKanaC },
+    { 'z', romkan::iKanaC },
   };
 
   auto& ZenkakuKeymap = m_keymaps[KeymapTypes::Zenkaku];
-  ZenkakuKeymap.DefaultFunc = thru;
-
-  auto iZenAl = [self = this](uint8_t c, bool) {
-    self->m_output(zenkakualpha::iZenAl(c));
+  ZenkakuKeymap.DefaultFunc = [](auto c, auto) {
+    SkkOutput output;
+    output.Through += c;
+    return output;
   };
 
   ZenkakuKeymap.Keymap = {
-    { ' ', iZenAl },  { '!', iZenAl }, { '"', iZenAl }, { '#', iZenAl },
-    { '$', iZenAl },  { '%', iZenAl }, { '&', iZenAl }, { '\'', iZenAl },
-    { '(', iZenAl },  { ')', iZenAl }, { '*', iZenAl }, { '+', iZenAl },
-    { '}', iZenAl },  { '-', iZenAl }, { '.', iZenAl }, { '/', iZenAl },
-    { '0', iZenAl },  { '1', iZenAl }, { '2', iZenAl }, { '3', iZenAl },
-    { '4', iZenAl },  { '5', iZenAl }, { '6', iZenAl }, { '7', iZenAl },
-    { '8', iZenAl },  { '9', iZenAl }, { ':', iZenAl }, { ';', iZenAl },
-    { '<', iZenAl },  { '=', iZenAl }, { '>', iZenAl }, { '?', iZenAl },
-    { '@', iZenAl },  { 'A', iZenAl }, { 'B', iZenAl }, { 'C', iZenAl },
-    { 'D', iZenAl },  { 'E', iZenAl }, { 'F', iZenAl }, { 'G', iZenAl },
-    { 'H', iZenAl },  { 'I', iZenAl }, { 'J', iZenAl }, { 'K', iZenAl },
-    { 'L', iZenAl },  { 'M', iZenAl }, { 'N', iZenAl }, { 'O', iZenAl },
-    { 'P', iZenAl },  { 'Q', iZenAl }, { 'R', iZenAl }, { 'S', iZenAl },
-    { 'T', iZenAl },  { 'U', iZenAl }, { 'V', iZenAl }, { 'W', iZenAl },
-    { 'X', iZenAl },  { 'Y', iZenAl }, { 'Z', iZenAl }, { '[', iZenAl },
-    { '\\', iZenAl }, { ']', iZenAl }, { '^', iZenAl }, { '_', iZenAl },
-    { '`', iZenAl },  { 'a', iZenAl }, { 'b', iZenAl }, { 'c', iZenAl },
-    { 'd', iZenAl },  { 'e', iZenAl }, { 'f', iZenAl }, { 'g', iZenAl },
-    { 'h', iZenAl },  { 'i', iZenAl }, { 'j', iZenAl }, { 'k', iZenAl },
-    { 'l', iZenAl },  { 'm', iZenAl }, { 'n', iZenAl }, { 'o', iZenAl },
-    { 'p', iZenAl },  { 'q', iZenAl }, { 'r', iZenAl }, { 's', iZenAl },
-    { 't', iZenAl },  { 'u', iZenAl }, { 'v', iZenAl }, { 'w', iZenAl },
-    { 'x', iZenAl },  { 'y', iZenAl }, { 'z', iZenAl }, { '{', iZenAl },
-    { '|', iZenAl },  { '}', iZenAl }, { '~', iZenAl },
+    { ' ', zenkakualpha::iZenAl },  { '!', zenkakualpha::iZenAl },
+    { '"', zenkakualpha::iZenAl },  { '#', zenkakualpha::iZenAl },
+    { '$', zenkakualpha::iZenAl },  { '%', zenkakualpha::iZenAl },
+    { '&', zenkakualpha::iZenAl },  { '\'', zenkakualpha::iZenAl },
+    { '(', zenkakualpha::iZenAl },  { ')', zenkakualpha::iZenAl },
+    { '*', zenkakualpha::iZenAl },  { '+', zenkakualpha::iZenAl },
+    { '}', zenkakualpha::iZenAl },  { '-', zenkakualpha::iZenAl },
+    { '.', zenkakualpha::iZenAl },  { '/', zenkakualpha::iZenAl },
+    { '0', zenkakualpha::iZenAl },  { '1', zenkakualpha::iZenAl },
+    { '2', zenkakualpha::iZenAl },  { '3', zenkakualpha::iZenAl },
+    { '4', zenkakualpha::iZenAl },  { '5', zenkakualpha::iZenAl },
+    { '6', zenkakualpha::iZenAl },  { '7', zenkakualpha::iZenAl },
+    { '8', zenkakualpha::iZenAl },  { '9', zenkakualpha::iZenAl },
+    { ':', zenkakualpha::iZenAl },  { ';', zenkakualpha::iZenAl },
+    { '<', zenkakualpha::iZenAl },  { '=', zenkakualpha::iZenAl },
+    { '>', zenkakualpha::iZenAl },  { '?', zenkakualpha::iZenAl },
+    { '@', zenkakualpha::iZenAl },  { 'A', zenkakualpha::iZenAl },
+    { 'B', zenkakualpha::iZenAl },  { 'C', zenkakualpha::iZenAl },
+    { 'D', zenkakualpha::iZenAl },  { 'E', zenkakualpha::iZenAl },
+    { 'F', zenkakualpha::iZenAl },  { 'G', zenkakualpha::iZenAl },
+    { 'H', zenkakualpha::iZenAl },  { 'I', zenkakualpha::iZenAl },
+    { 'J', zenkakualpha::iZenAl },  { 'K', zenkakualpha::iZenAl },
+    { 'L', zenkakualpha::iZenAl },  { 'M', zenkakualpha::iZenAl },
+    { 'N', zenkakualpha::iZenAl },  { 'O', zenkakualpha::iZenAl },
+    { 'P', zenkakualpha::iZenAl },  { 'Q', zenkakualpha::iZenAl },
+    { 'R', zenkakualpha::iZenAl },  { 'S', zenkakualpha::iZenAl },
+    { 'T', zenkakualpha::iZenAl },  { 'U', zenkakualpha::iZenAl },
+    { 'V', zenkakualpha::iZenAl },  { 'W', zenkakualpha::iZenAl },
+    { 'X', zenkakualpha::iZenAl },  { 'Y', zenkakualpha::iZenAl },
+    { 'Z', zenkakualpha::iZenAl },  { '[', zenkakualpha::iZenAl },
+    { '\\', zenkakualpha::iZenAl }, { ']', zenkakualpha::iZenAl },
+    { '^', zenkakualpha::iZenAl },  { '_', zenkakualpha::iZenAl },
+    { '`', zenkakualpha::iZenAl },  { 'a', zenkakualpha::iZenAl },
+    { 'b', zenkakualpha::iZenAl },  { 'c', zenkakualpha::iZenAl },
+    { 'd', zenkakualpha::iZenAl },  { 'e', zenkakualpha::iZenAl },
+    { 'f', zenkakualpha::iZenAl },  { 'g', zenkakualpha::iZenAl },
+    { 'h', zenkakualpha::iZenAl },  { 'i', zenkakualpha::iZenAl },
+    { 'j', zenkakualpha::iZenAl },  { 'k', zenkakualpha::iZenAl },
+    { 'l', zenkakualpha::iZenAl },  { 'm', zenkakualpha::iZenAl },
+    { 'n', zenkakualpha::iZenAl },  { 'o', zenkakualpha::iZenAl },
+    { 'p', zenkakualpha::iZenAl },  { 'q', zenkakualpha::iZenAl },
+    { 'r', zenkakualpha::iZenAl },  { 's', zenkakualpha::iZenAl },
+    { 't', zenkakualpha::iZenAl },  { 'u', zenkakualpha::iZenAl },
+    { 'v', zenkakualpha::iZenAl },  { 'w', zenkakualpha::iZenAl },
+    { 'x', zenkakualpha::iZenAl },  { 'y', zenkakualpha::iZenAl },
+    { 'z', zenkakualpha::iZenAl },  { '{', zenkakualpha::iZenAl },
+    { '|', zenkakualpha::iZenAl },  { '}', zenkakualpha::iZenAl },
+    { '~', zenkakualpha::iZenAl },
   };
 
   auto& KanjiInputKeymap = m_keymaps[KeymapTypes::KanjiInput];
   KanjiInputKeymap.DefaultFunc = nulcmd;
   KanjiInputKeymap.Keymap = {
-    { CTRL_G, [self = this](auto c, auto) { kfCancel(self, c); } },
-    { CTRL_H, kfBS },
-    { CTRL_M, [self = this](auto c, auto) { kfFixThru(self, c); } },
-    { ' ', [self = this](auto c, auto) { kkconv(self, c); } },
+    { CTRL_G,
+      [self = this](auto c, auto) {
+        kfCancel(self, c);
+        return SkkOutput{};
+      } },
+    { CTRL_H,
+      [](auto c, auto) {
+        kfBS(c);
+        return SkkOutput{};
+      } },
+    { CTRL_M, [self = this](auto c, auto) { return kfFixThru(self, c); } },
+    { ' ', [self = this](auto c, auto) { return kkconv(self, c); } },
     { '!', kZenAl },
     { '"', kfthru },
     { '#', kfthru },
@@ -186,37 +305,37 @@ Skk::initialize(const std::function<void(std::string_view)>& output)
     { '9', kfthru },
     { ':', kZenAl },
     { ';', kZenAl },
-    { '<', [self = this](auto c, auto) { stPrefixCv(self, c); } },
+    { '<', [self = this](auto c, auto) { return stPrefixCv(self, c); } },
     { '=', kfthru },
-    { '>', [self = this](auto c, auto) { stPrefixCv(self, c); } },
-    { '?', [self = this](auto c, auto) { stPrefixCv(self, c); } },
+    { '>', [self = this](auto c, auto) { return stPrefixCv(self, c); } },
+    { '?', [self = this](auto c, auto) { return stPrefixCv(self, c); } },
     { '@', kfthru },
-    { 'A', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'B', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'C', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'D', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'E', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'F', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'G', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'H', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'I', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'J', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'K', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'L', [self = this](auto c, auto) { kfFixToZenA(self, c); } },
-    { 'M', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'N', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'O', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'P', [self = this](auto c, auto) { kOkuri(self, c); } },
+    { 'A', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'B', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'C', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'D', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'E', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'F', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'G', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'H', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'I', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'J', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'K', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'L', [self = this](auto c, auto) { return kfFixToZenA(self, c); } },
+    { 'M', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'N', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'O', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'P', [self = this](auto c, auto) { return kOkuri(self, c); } },
     //
-    { 'R', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'S', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'T', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'U', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'V', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'W', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'X', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'Y', [self = this](auto c, auto) { kOkuri(self, c); } },
-    { 'Z', [self = this](auto c, auto) { kOkuri(self, c); } },
+    { 'R', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'S', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'T', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'U', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'V', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'W', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'X', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'Y', [self = this](auto c, auto) { return kOkuri(self, c); } },
+    { 'Z', [self = this](auto c, auto) { return kOkuri(self, c); } },
     { '[', kZenEx },
     { '\\', kfthru },
     { ']', kZenEx },
@@ -234,12 +353,12 @@ Skk::initialize(const std::function<void(std::string_view)>& output)
     { 'i', kKanaV },
     { 'j', kKanaC },
     { 'k', kKanaC },
-    { 'l', [self = this](auto c, auto) { kfFixToAsc(self, c); } },
+    { 'l', [self = this](auto c, auto) { return kfFixToAsc(self, c); } },
     { 'm', kKanaC },
     { 'n', kKanaC },
     { 'o', kKanaV },
     { 'p', kKanaC },
-    { 'q', [self = this](auto c, auto) { h2kkana(self, c); } },
+    { 'q', [self = this](auto c, auto) { return h2kkana(self, c); } },
     { 'r', kKanaC },
     { 's', kKanaC },
     { 't', kKanaC },
@@ -258,70 +377,82 @@ Skk::initialize(const std::function<void(std::string_view)>& output)
   auto& OkuriInputKeymap = m_keymaps[KeymapTypes::OkuriInput];
   OkuriInputKeymap.DefaultFunc = nulcmd;
   OkuriInputKeymap.Keymap = {
-    { CTRL_G, [self = this](auto, auto) { cancelOkuri(self); } },
-    { CTRL_H, [self = this](auto c, auto) { okuriBS(self, c); } },
-    { CTRL_M, [self = this](auto c, auto) { okfFixThru(self, c); } },
-    { ' ', [self = this](auto c, auto) { okfFix(self, c); } },
-    { 'A', [self = this](auto c, auto o) { okKanaV(self, c, o); } },
-    { 'B', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'C', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'D', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'E', [self = this](auto c, auto o) { okKanaV(self, c, o); } },
-    { 'F', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'G', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'H', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'I', [self = this](auto c, auto o) { okKanaV(self, c, o); } },
-    { 'J', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'K', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'L', [self = this](auto c, auto o) { okfFixToZenA(self, c); } },
-    { 'M', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'N', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'O', [self = this](auto c, auto o) { okKanaV(self, c, o); } },
-    { 'P', [](auto c, auto o) { okKanaC(c, o); } },
+    { CTRL_G,
+      [self = this](auto, auto) {
+        cancelOkuri(self);
+        return SkkOutput{};
+      } },
+    { CTRL_H, [self = this](auto c, auto) { return okuriBS(self, c); } },
+    { CTRL_M, [self = this](auto c, auto) { return okfFixThru(self, c); } },
+    { ' ', [self = this](auto c, auto) { return okfFix(self, c); } },
+    { 'A', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'B', okKanaC },
+    { 'C', okKanaC },
+    { 'D', okKanaC },
+    { 'E', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'F', okKanaC },
+    { 'G', okKanaC },
+    { 'H', okKanaC },
+    { 'I', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'J', okKanaC },
+    { 'K', okKanaC },
+    { 'L', [self = this](auto c, auto o) { return okfFixToZenA(self, c); } },
+    { 'M', okKanaC },
+    { 'N', okKanaC },
+    { 'O', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'P', okKanaC },
     //
-    { 'R', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'S', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'T', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'U', [self = this](auto c, auto o) { okKanaV(self, c, o); } },
-    { 'V', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'W', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'X', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'Y', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'Z', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'a', [self = this](auto c, auto o) { okKanaV(self, c, o); } },
-    { 'b', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'c', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'd', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'e', [self = this](auto c, auto o) { okKanaV(self, c, o); } },
-    { 'f', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'g', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'h', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'i', [self = this](auto c, auto o) { okKanaV(self, c, o); } },
-    { 'j', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'k', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'l', [self = this](auto c, auto o) { okfFixToAsc(self, c); } },
-    { 'm', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'n', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'o', [self = this](auto c, auto o) { okKanaV(self, c, o); } },
-    { 'p', [](auto c, auto o) { okKanaC(c, o); } },
+    { 'R', okKanaC },
+    { 'S', okKanaC },
+    { 'T', okKanaC },
+    { 'U', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'V', okKanaC },
+    { 'W', okKanaC },
+    { 'X', okKanaC },
+    { 'Y', okKanaC },
+    { 'Z', okKanaC },
+    { 'a', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'b', okKanaC },
+    { 'c', okKanaC },
+    { 'd', okKanaC },
+    { 'e', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'f', okKanaC },
+    { 'g', okKanaC },
+    { 'h', okKanaC },
+    { 'i', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'j', okKanaC },
+    { 'k', okKanaC },
+    { 'l', [self = this](auto c, auto o) { return okfFixToAsc(self, c); } },
+    { 'm', okKanaC },
+    { 'n', okKanaC },
+    { 'o', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'p', okKanaC },
     //
-    { 'r', [](auto c, auto o) { okKanaC(c, o); } },
-    { 's', [](auto c, auto o) { okKanaC(c, o); } },
-    { 't', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'u', [self = this](auto c, auto o) { okKanaV(self, c, o); } },
-    { 'v', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'w', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'x', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'y', [](auto c, auto o) { okKanaC(c, o); } },
-    { 'z', [](auto c, auto o) { okKanaC(c, o); } },
+    { 'r', okKanaC },
+    { 's', okKanaC },
+    { 't', okKanaC },
+    { 'u', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'v', okKanaC },
+    { 'w', okKanaC },
+    { 'x', okKanaC },
+    { 'y', okKanaC },
+    { 'z', okKanaC },
   };
 
   auto& KAlphaInputKeymap = m_keymaps[KeymapTypes::KAlphaInput];
   KAlphaInputKeymap.DefaultFunc = nulcmd;
   KAlphaInputKeymap.Keymap = {
-    { CTRL_G, [self = this](auto c, auto) { kfCancel(self, c); } },
-    { CTRL_H, kaBS },
-    { ' ', [self = this](auto c, auto) { kkconv(self, c); } },
+    { CTRL_G,
+      [self = this](auto c, auto) {
+        kfCancel(self, c);
+        return SkkOutput{};
+      } },
+    { CTRL_H,
+      [](auto c, auto) {
+        kaBS(c);
+        return SkkOutput{};
+      } },
+    { ' ', [self = this](auto c, auto) { return kkconv(self, c); } },
     { '!', kalpha },
     { '"', kalpha },
     { '#', kalpha },
@@ -420,48 +551,77 @@ Skk::initialize(const std::function<void(std::string_view)>& output)
 
   auto& SelectionKeymap = m_keymaps[KeymapTypes::Selection];
   SelectionKeymap.DefaultFunc = [self = this](auto c, auto) {
-    fxthru(self, c);
+    return fxthru(self, c);
   };
   SelectionKeymap.Keymap = {
-    { CTRL_G, [self = this](auto c, auto) { cancelSel(self, c); } },
-    { CTRL_T, [self = this](auto, auto) { fixIt(self); } },
-    { ' ', [](auto, auto) { nxCand(); } },
-    { 'x', [self = this](auto, auto) { pvCand(self); } },
-    { '>', [self = this](auto c, auto) { stSuffix(self, c); } },
-    { '?', [self = this](auto c, auto) { stSuffix(self, c); } },
-    { '<', [self = this](auto c, auto) { stSuffix(self, c); } },
-    { EXTRA_CODE, [self = this](auto c, auto) { thruFixItToAsc(self, c); } },
+    { CTRL_G, [self = this](auto c, auto) { return cancelSel(self, c); } },
+    { CTRL_T, [self = this](auto, auto) { return fixIt(self); } },
+    { ' ',
+      [](auto, auto) {
+        nxCand();
+        return SkkOutput{};
+      } },
+    { 'x',
+      [self = this](auto, auto) {
+        pvCand(self);
+        return SkkOutput{};
+      } },
+    { '>', [self = this](auto c, auto) { return stSuffix(self, c); } },
+    { '?', [self = this](auto c, auto) { return stSuffix(self, c); } },
+    { '<', [self = this](auto c, auto) { return stSuffix(self, c); } },
+    { EXTRA_CODE,
+      [self = this](auto c, auto) { return thruFixItToAsc(self, c); } },
   };
 
   auto& CodeInputKeymap = m_keymaps[KeymapTypes::CodeInput];
   CodeInputKeymap.DefaultFunc = nulcmd;
   CodeInputKeymap.Keymap = {
-    { CTRL_C, [self = this](auto, auto) { self->cancelCode(); } },
-    { CTRL_G, [self = this](auto, auto) { self->cancelCode(); } },
-    { CTRL_J, [self = this](auto, auto) { g_codeinput.enterCode(self); } },
-    { CTRL_M, [self = this](auto, auto) { g_codeinput.enterCode(self); } },
-    { CTRL_T, [self = this](auto, auto) { self->toKana(); } },
-    { '0', [](auto c, auto) { g_codeinput.codein(c); } },
-    { '1', [](auto c, auto) { g_codeinput.codein(c); } },
-    { '2', [](auto c, auto) { g_codeinput.codein(c); } },
-    { '3', [](auto c, auto) { g_codeinput.codein(c); } },
-    { '4', [](auto c, auto) { g_codeinput.codein(c); } },
-    { '5', [](auto c, auto) { g_codeinput.codein(c); } },
-    { '6', [](auto c, auto) { g_codeinput.codein(c); } },
-    { '7', [](auto c, auto) { g_codeinput.codein(c); } },
-    { '8', [](auto c, auto) { g_codeinput.codein(c); } },
-    { '9', [](auto c, auto) { g_codeinput.codein(c); } },
-    { 'A', [](auto c, auto) { g_codeinput.codein(c); } },
-    { 'B', [](auto c, auto) { g_codeinput.codein(c); } },
-    { 'C', [](auto c, auto) { g_codeinput.codein(c); } },
-    { 'D', [](auto c, auto) { g_codeinput.codein(c); } },
-    { 'E', [](auto c, auto) { g_codeinput.codein(c); } },
-    { 'F', [](auto c, auto) { g_codeinput.codein(c); } },
-    { 'a', [](auto c, auto) { g_codeinput.codein(c); } },
-    { 'b', [](auto c, auto) { g_codeinput.codein(c); } },
-    { 'c', [](auto c, auto) { g_codeinput.codein(c); } },
-    { 'd', [](auto c, auto) { g_codeinput.codein(c); } },
-    { 'e', [](auto c, auto) { g_codeinput.codein(c); } },
-    { 'f', [](auto c, auto) { g_codeinput.codein(c); } },
+    { CTRL_C,
+      [self = this](auto, auto) {
+        self->cancelCode();
+        return SkkOutput{};
+      } },
+    { CTRL_G,
+      [self = this](auto, auto) {
+        self->cancelCode();
+        return SkkOutput{};
+      } },
+    { CTRL_J,
+      [self = this](auto, auto) {
+        g_codeinput.enterCode(self);
+        return SkkOutput{};
+      } },
+    { CTRL_M,
+      [self = this](auto, auto) {
+        g_codeinput.enterCode(self);
+        return SkkOutput{};
+      } },
+    { CTRL_T,
+      [self = this](auto, auto) {
+        self->toKana();
+        return SkkOutput{};
+      } },
+    { '0', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { '1', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { '2', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { '3', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { '4', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { '5', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { '6', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { '7', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { '8', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { '9', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { 'A', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { 'B', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { 'C', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { 'D', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { 'E', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { 'F', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { 'a', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { 'b', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { 'c', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { 'd', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { 'e', [](auto c, auto) { return g_codeinput.codein(c); } },
+    { 'f', [](auto c, auto) { return g_codeinput.codein(c); } },
   };
 }

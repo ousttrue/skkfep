@@ -1,5 +1,4 @@
 #include "skk.h"
-// #include "connsh.h"
 #include "ctrlcode.h"
 #include "kkconv.h"
 #include "romkan.h"
@@ -7,9 +6,10 @@
 #include <assert.h>
 #include <stdio.h>
 
-void
+SkkOutput
 nulcmd(char, bool)
 {
+  return {};
 }
 
 #define DEFAULT_KANAKEY "^j"
@@ -17,7 +17,7 @@ nulcmd(char, bool)
 Skk::Skk()
 {
   KanaKey = DEFAULT_KANAKEY;
-  initialize([self = this](auto s) { self->m_buffer += s; });
+  initialize();
   setKanaKey();
   toAsc();
 }
@@ -58,13 +58,10 @@ Skk::restoreKeymap()
   CurrentKeymap = lastKeymap;
 }
 
-SkkResult
+SkkOutput
 Skk::input(uint8_t c, bool okuri)
 {
-  auto res = CurrentKeymap->input(c, okuri);
-  res.Output = m_buffer;
-  m_buffer.clear();
-  return res;
+  return CurrentKeymap->input(c, okuri);
 }
 
 static int
@@ -115,19 +112,31 @@ Skk::setKanaKey()
 {
   auto k = code(KanaKey.c_str());
   printf("KanaKey=^%c\n", k ^ 0x40);
-  NormalKeymap().Keymap[k] = [self = this](auto, auto) { self->toKana(); };
-  SelectionKeymap().Keymap[k] = [self = this](auto, auto) { fixIt(self); };
-  CodeInputKeymap().Keymap[k] = [self = this](auto, auto) { self->toKana(); };
+  NormalKeymap().Keymap[k] = [self = this](auto, auto) {
+    self->toKana();
+    return SkkOutput{};
+  };
+  SelectionKeymap().Keymap[k] = [self = this](auto, auto) {
+    fixIt(self);
+    return SkkOutput{};
+  };
+  CodeInputKeymap().Keymap[k] = [self = this](auto, auto) {
+    self->toKana();
+    return SkkOutput{};
+  };
   KanaKeymap().Keymap[k] = nulcmd;
-  ZenkakuKeymap().Keymap[k] = [self = this](auto, auto) { self->toKana(); };
+  ZenkakuKeymap().Keymap[k] = [self = this](auto, auto) {
+    self->toKana();
+    return SkkOutput{};
+  };
   KanjiInputKeymap().Keymap[k] = [self = this](auto c, auto) {
-    kfFix(self, c);
+    return kfFix(self, c);
   };
   OkuriInputKeymap().Keymap[k] = [self = this](auto c, auto) {
-    okfFix(self, c);
+    return okfFix(self, c);
   };
   KAlphaInputKeymap().Keymap[k] = [self = this](auto c, auto) {
-    kfFix(self, c);
+    return kfFix(self, c);
   };
 }
 
@@ -165,28 +174,6 @@ Skk::toZenA()
   romkan::flushKana();
   setKeymap(KeymapTypes::Zenkaku);
   showmode(ZENEI_MODE);
-}
-
-void
-Skk::thruToAsc(char c)
-{
-  toAsc();
-  thru(c);
-}
-
-void
-Skk::thruBack(char c)
-{
-  thru(c);
-  toKana();
-}
-
-void
-Skk::thru1(char c)
-{
-  thru(c);
-  restoreKeymap();
-  showlastmode();
 }
 
 void

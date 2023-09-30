@@ -1,4 +1,5 @@
 #pragma once
+#include "keymap.h"
 #include <assert.h>
 #include <functional>
 #include <string>
@@ -89,14 +90,14 @@ bool
 isHiragana();
 
 // 母音
-std::string
-iKanaV(char c);
+SkkOutput
+iKanaV(char c, bool o = {});
 
 // 子音
-std::string
-iKanaC(char c);
+SkkOutput
+iKanaC(char c, bool o = {});
 
-std::string
+SkkOutput
 flthru(char c, bool);
 
 std::string
@@ -108,21 +109,19 @@ inputKanaVowel(char c);
 
 // 子音
 std::string
-inputKanaConso(char c, void (*flush)(int));
-
-void
-flushLastConso(char c,
-               const std::function<void(std::string_view)>& output,
-               void (*flush)(int));
+inputKanaConso(char c);
 
 std::string
+flushLastConso(char c);
+
+SkkOutput
 tglK(Skk* skk);
 
 void
 cancelConso();
 
-std::string
-kanaBS(char c);
+SkkOutput
+kanaBS(char c, bool o = {});
 
 void
 hira2kata(char* buf);

@@ -9,7 +9,6 @@ termpty_lib = static_library('termpty', [
   'termsize.cpp',
   'terminal.cpp',
   'signal_setup.cpp',
-  'flushout.cpp',
   ])
 
 termpty_dep = declare_dependency(

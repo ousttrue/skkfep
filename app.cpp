@@ -118,7 +118,7 @@ App::Initialize(std::string_view UserDicName,
 
   OpenDictionary(UserDicName);
   initFep();
-  g_skk.initialize(child::writeShells);
+  g_skk.initialize();
 
   return true;
 }
@@ -176,6 +176,12 @@ App::Input(uint8_t c)
     write(fileno(child::Shellout), &c, 1);
   } else {
     // ascii
-    g_skk.input(c, o);
+    auto output = g_skk.input(c, o);
+    if (output.Predit.size()) {
+      terminal::writes(output.Predit);
+    }
+    if (output.Through.size()) {
+      child::writeShells(output.Through);
+    }
   }
 }

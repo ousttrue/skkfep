@@ -1,4 +1,5 @@
 #pragma once
+#include "keymap.h"
 
 extern short BlockTty;
 extern char PreserveOnFailure;
@@ -10,101 +11,98 @@ class Skk;
 void
 kkClearBuf();
 
-void
+SkkOutput
 kkBegV(Skk* skk, char c);
 
-void
+SkkOutput
 kkBegC(Skk* skk, char c);
 
 void
 kkBegA(Skk* skk, char c);
 
-void
+SkkOutput
 kalpha(char c, bool o = {});
 
 void
 kaBS(char c, bool o = {});
 
-void
+SkkOutput
 kKanaV(char c, bool o = {});
 
-void
+SkkOutput
 okKanaV(Skk* skk, char c, bool first);
 
-void
+SkkOutput
 kKanaC(char c, bool o = {});
 
-void
+SkkOutput
 okKanaC(char c, bool first);
 
-void
+SkkOutput
 kZenAl(char c, bool o = {});
 
-void
+SkkOutput
 kZenEx(char c, bool o = {});
 
-void
+SkkOutput
 kfthru(char c, bool o = {});
 
-void
+SkkOutput
 fxthru(Skk* skk, char c);
 
 void
 kfCancel(Skk* skk, char c);
 
-void
+SkkOutput
 kfFix(Skk* skk, char c);
 
-void
+SkkOutput
 kfFixToAsc(Skk* skk, char c);
 
-void
+SkkOutput
 kfFixToZenA(Skk* skk, char c);
 
-void
+SkkOutput
 kfFixThru(Skk* skk, char c);
 
-void
+SkkOutput
 thruKfFixToAsc(Skk* skk, char c);
 
-void
+SkkOutput
 okfFix(Skk* skk, char c);
 
-void
+SkkOutput
 okfFixToAsc(Skk* skk, char c);
 
-void
+SkkOutput
 okfFixToZenA(Skk* skk, char c);
 
-void
+SkkOutput
 okfFixThru(Skk* skk, char c);
 
-void
+SkkOutput
 thruOkfFixToAsc(Skk* skk, char c);
 
 void
 kfBS(char c, bool o = {});
 
-void
+SkkOutput
 okuriBS(Skk* skk, char c);
 
-void
+SkkOutput
 kkconv(Skk* skk, char c);
 
 void
 toOkuri(Skk* skk);
 
-void
+SkkOutput
 kOkuri(Skk* skk, char c);
 
-void
+SkkOutput
 stSuffix(Skk* skk, char c);
 
-void
+SkkOutput
 stPrefixCv(Skk* skk, char c);
-
-void
-showCand();
 
 void
 nxCand();
@@ -113,7 +111,7 @@ void
 pvCand(Skk* skk);
 
 /* back to kanji input mode */
-void
+SkkOutput
 backToKanjiInput(Skk* skk);
 
 void
@@ -122,17 +120,14 @@ cancelOkuri(Skk* skk);
 void
 clearOkuri(Skk* skk);
 
-void
+SkkOutput
 fixIt(Skk* skk);
 
-void
+SkkOutput
 thruFixItToAsc(Skk* skk, char c);
 
-void
+SkkOutput
 cancelSel(Skk* skk, char c);
 
-void
-endKanjiInput(Skk* skk);
-
-void
+SkkOutput
 h2kkana(Skk* skk, char c);

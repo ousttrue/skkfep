@@ -31,12 +31,19 @@ mode_string(SkkModes m)
   }
 }
 
-struct PreEdit
+struct SkkOutput
 {
-  // internal raw input
-  std::string Input;
-  // show user interface
-  std::string Display;
+  // To child process
+  std::string Through;
+  // To term
+  std::string Predit;
+
+  SkkOutput& operator+=(const SkkOutput& rhs)
+  {
+    Through += rhs.Through;
+    Predit += rhs.Predit;
+    return *this;
+  }
 };
 
 //
@@ -54,16 +61,7 @@ struct PreEdit
 // [to preedit]
 // * 見出し語 romaji
 //
-using KeyFunc = std::function<void(uint8_t, bool)>;
-
-struct SkkResult
-{
-  // write child pty
-  std::string Output;
-  // write stdout
-  PreEdit Predit;
-  SkkModes Mode;
-};
+using KeyFunc = std::function<SkkOutput(uint8_t, bool)>;
 
 enum class KeymapTypes
 {
@@ -83,7 +81,7 @@ struct Keymap
   KeyFunc DefaultFunc = {};
   std::unordered_map<uint8_t, KeyFunc> Keymap;
 
-  SkkResult input(uint8_t c, bool okuri)
+  SkkOutput input(uint8_t c, bool okuri)
   {
     auto found = Keymap.find(c);
 
@@ -92,10 +90,7 @@ struct Keymap
       f = found->second;
     }
 
-    f(c, okuri);
-    return {
-
-    };
+    return f(c, okuri);
   }
 
   void setall(const KeyFunc& f)

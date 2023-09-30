@@ -13,27 +13,30 @@ KanjiCodeInput::codeinMsg()
   terminal::writes("JIS or EUC code: ");
 }
 
-void
+SkkOutput
 KanjiCodeInput::inputCode(Skk* skk)
 {
-  romkan::flushKana();
-  if (status::type() == StatusType::NoStatusLine)
-    return;
-  codeinMsg();
-  skk->setKeymap(KeymapTypes::CodeInput);
-  codecol = 0;
+  auto output = romkan::flushKana();
+  if (status::type() != StatusType::NoStatusLine) {
+    codeinMsg();
+    skk->setKeymap(KeymapTypes::CodeInput);
+    codecol = 0;
+  }
+  return { .Through = output };
 }
 
-void
+SkkOutput
 KanjiCodeInput::codein(char c)
 {
   if (codecol == 4) {
     codecol = 0;
     codeinMsg();
   }
-  terminal::write1(c);
+  SkkOutput output;
+  output.Predit += c;
   codebuf[codecol] = tolower(c);
   codecol++;
+  return output;
 }
 
 #define HEX1(x) ((x) > '9' ? ((x) - 'a' + 10) : ((x) - '0'))
