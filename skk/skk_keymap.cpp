@@ -8,9 +8,11 @@
 void
 Skk::initializeKeymap()
 {
+  auto& NormalKeymap = KeymapList[(int)KeymapTypes::Normal];
   NormalKeymap.DefaultFunc = thru;
   NormalKeymap.Keymap[CTRL_T] = [](auto) { g_skk.toKana(); };
 
+  auto& KanaKeymap = KeymapList[(int)KeymapTypes::Kana];
   KanaKeymap.DefaultFunc = romkan::flthru;
   KanaKeymap.Keymap = {
     { CTRL_H, romkan::kanaBS },
@@ -79,6 +81,7 @@ Skk::initializeKeymap()
     { 'z', romkan::iKanaC },
   };
 
+  auto& ZenkakuKeymap = KeymapList[(int)KeymapTypes::Zenkaku];
   ZenkakuKeymap.DefaultFunc = thru;
   ZenkakuKeymap.Keymap = {
     { ' ', romkan::iZenAl },  { '!', romkan::iZenAl },  { '"', romkan::iZenAl },
@@ -115,6 +118,7 @@ Skk::initializeKeymap()
     { '}', romkan::iZenAl },  { '~', romkan::iZenAl },
   };
 
+  auto& KanjiInputKeymap = KeymapList[(int)KeymapTypes::KanjiInput];
   KanjiInputKeymap.DefaultFunc = nulcmd;
   KanjiInputKeymap.Keymap = {
     { CTRL_G, kfCancel }, { CTRL_H, kfBS },    { CTRL_M, kfFixThru },
@@ -152,6 +156,7 @@ Skk::initializeKeymap()
     { '}', kfthru },      { '~', kfthru },
   };
 
+  auto& OkuriInputKeymap = KeymapList[(int)KeymapTypes::OkuriInput];
   OkuriInputKeymap.DefaultFunc = nulcmd;
   OkuriInputKeymap.Keymap = {
     { CTRL_G, cancelOkuri },
@@ -212,6 +217,7 @@ Skk::initializeKeymap()
     { 'z', okKanaC },
   };
 
+  auto& KAlphaInputKeymap = KeymapList[(int)KeymapTypes::KAlphaInput];
   KAlphaInputKeymap.DefaultFunc = nulcmd;
   KAlphaInputKeymap.Keymap = {
     { CTRL_G, kfCancel }, { CTRL_H, kaBS }, { ' ', kkconv },  { '!', kalpha },
@@ -241,6 +247,7 @@ Skk::initializeKeymap()
     { DEL_CODE, kalpha },
   };
 
+  auto& SelectionKeymap = KeymapList[(int)KeymapTypes::Selection];
   SelectionKeymap = { fxthru,
                       {
                         { CTRL_G, cancelSel },
@@ -254,6 +261,7 @@ Skk::initializeKeymap()
                         { EXTRA_CODE, thruFixItToEsc },
                       } };
 
+  auto& CodeInputKeymap = KeymapList[(int)KeymapTypes::CodeInput];
   CodeInputKeymap = { nulcmd,
                       {
                         { CTRL_C, [](auto) { g_skk.cancelCode(); } },

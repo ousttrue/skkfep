@@ -1,67 +1,6 @@
 #pragma once
+#include "keymap.h"
 #include <assert.h>
-#include <functional>
-#include <span>
-#include <stdint.h>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-enum SkkModes
-{
-  SKK_MODE,
-  KANA_MODE,
-  ZENEI_MODE,
-  KKANA_MODE,
-  KINPUT_MODE,
-  KSELECT_MODE,
-};
-inline const char*
-mode_string(SkkModes m)
-{
-  switch (m) {
-    case SKK_MODE:
-      return "SKK";
-    case KANA_MODE:
-      return "かな";
-    case ZENEI_MODE:
-      return "全英";
-    case KKANA_MODE:
-      return "カナ";
-    case KINPUT_MODE:
-      return "単語入力";
-    case KSELECT_MODE:
-      return "単語選択";
-  }
-}
-
-struct PreEdit
-{
-  // internal raw input
-  std::string Input;
-  // show user interface
-  std::string Display;
-};
-
-struct SkkResult
-{
-  // write child pty
-  std::string Output;
-  // write stdout
-  PreEdit Predit;
-  SkkModes Mode;
-};
-
-enum class KeymapTypes
-{
-  Normal,
-  Selection,
-  CodeInput,
-  Escaped,
-  KAlphaInput,
-  OkuriInput,
-  KanjiInput,
-};
 
 enum EscapeBehavior
 {
@@ -72,46 +11,46 @@ enum EscapeBehavior
   ToggleEsc
 };
 
-using KeyFunc = std::function<void(uint8_t)>;
-
-struct Keymap
-{
-  KeyFunc DefaultFunc = {};
-  std::unordered_map<uint8_t, KeyFunc> Keymap;
-
-  void setall(const KeyFunc& f)
-  {
-    DefaultFunc = f;
-    Keymap.clear();
-  }
-
-  KeyFunc& operator[](uint8_t key)
-  {
-    auto found = Keymap.find(key);
-    if (found != Keymap.end()) {
-      return found->second;
-    }
-    return DefaultFunc;
-  }
-};
-using KeymapPtr = Keymap*;
-
 void
 nulcmd(char c);
 
+enum class KeymapTypes
+{
+  Normal,
+  Selection,
+  CodeInput,
+  Escaped,
+  Kana,
+  Zenkaku,
+  KanjiInput,
+  OkuriInput,
+  KAlphaInput,
+};
+
 class Skk
 {
-  Keymap NormalKeymap;
-  Keymap SelectionKeymap;
-  Keymap CodeInputKeymap;
-  Keymap EscapedKeymap;
+  Keymap KeymapList[9];
+  Keymap& NormalKeymap() { return KeymapList[(int)KeymapTypes::Normal]; }
+  Keymap& SelectionKeymap() { return KeymapList[(int)KeymapTypes::Selection]; }
+  Keymap& CodeInputKeymap() { return KeymapList[(int)KeymapTypes::CodeInput]; }
+  Keymap& EscapedKeymap() { return KeymapList[(int)KeymapTypes::Escaped]; }
+  Keymap& KanaKeymap() { return KeymapList[(int)KeymapTypes::Kana]; }
+  Keymap& ZenkakuKeymap() { return KeymapList[(int)KeymapTypes::Zenkaku]; }
+  Keymap& KanjiInputKeymap()
+  {
+    return KeymapList[(int)KeymapTypes::KanjiInput];
+  }
+  Keymap& OkuriInputKeymap()
+  {
+    return KeymapList[(int)KeymapTypes::OkuriInput];
+  }
+  Keymap& KAlphaInputKeymap()
+  {
+    return KeymapList[(int)KeymapTypes::KAlphaInput];
+  }
+
   EscapeBehavior CurrentEscapeBehavior = NoEsc;
   EscapeBehavior LastEscapeBehavior = SimpleEsc;
-  Keymap KanaKeymap;
-  Keymap ZenkakuKeymap;
-  Keymap KanjiInputKeymap;
-  Keymap OkuriInputKeymap;
-  Keymap KAlphaInputKeymap;
   KeymapPtr CurrentKeymap;
   KeymapPtr lastKeymap;
   std::unordered_map<uint8_t, KeyFunc> _ViEscKeymap;
@@ -127,35 +66,28 @@ public:
 
   void setKanaKey();
   void setKeymap(KeymapPtr _new);
+  void setKeymap(KeymapTypes t) { setKeymap(&KeymapList[(int)t]); }
   void setKeymap(SkkModes m)
   {
     switch (m) {
+      case KANA_MODE:
+        setKeymap(KeymapTypes::Kana);
+        break;
+
       case KINPUT_MODE:
-        setKeymap(&KanjiInputKeymap);
+        setKeymap(KeymapTypes::KanjiInput);
+        break;
+
+      case ZENEI_MODE:
+        setKeymap(KeymapTypes::Zenkaku);
+        break;
+
+      case KSELECT_MODE:
+        setKeymap(KeymapTypes::Selection);
         break;
 
       case SKK_MODE:
-      case KANA_MODE:
-      case ZENEI_MODE:
       case KKANA_MODE:
-      case KSELECT_MODE:
-        assert(false);
-        break;
-    }
-  }
-  void setKeymap(KeymapTypes t)
-  {
-    switch (t) {
-      case KeymapTypes::Selection:
-        setKeymap(&SelectionKeymap);
-        break;
-
-      case KeymapTypes::Normal:
-      case KeymapTypes::CodeInput:
-      case KeymapTypes::Escaped:
-      case KeymapTypes::KAlphaInput:
-      case KeymapTypes::OkuriInput:
-      case KeymapTypes::KanjiInput:
         assert(false);
         break;
     }

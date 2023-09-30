@@ -1,6 +1,6 @@
 skk_lib = static_library('skk', [
   'app.cpp',
-  'fep.cpp',
+  'signal_setup.cpp',
   'kkconv.cpp',
   'etc.cpp',
   'romkan.cpp',

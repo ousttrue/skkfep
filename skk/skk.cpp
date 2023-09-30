@@ -20,6 +20,8 @@ Skk::Skk()
 {
   KanaKey = DEFAULT_KANAKEY;
   initializeKeymap();
+  setKanaKey();
+  toAsc();
 }
 
 Skk::~Skk() {}
@@ -40,9 +42,7 @@ Skk::restoreKeymap()
 SkkResult
 Skk::input(uint8_t c, bool okuri)
 {
-  auto keyFunc = (*CurrentKeymap)[c];
-  keyFunc(c /*, o*/);
-  return {};
+  return CurrentKeymap->input(c, okuri);
 }
 
 static int
@@ -93,14 +93,14 @@ Skk::setKanaKey()
 {
   auto k = code(KanaKey.c_str());
   printf("KanaKey=^%c\n", k ^ 0x40);
-  NormalKeymap.Keymap[k] = [](auto) { g_skk.toKana(); };
-  SelectionKeymap.Keymap[k] = fixIt;
-  CodeInputKeymap.Keymap[k] = [](auto) { g_skk.toKana(); };
-  KanaKeymap[k] = nulcmd;
-  ZenkakuKeymap[k] = [](auto) { g_skk.toKana(); };
-  KanjiInputKeymap[k] = kfFix;
-  OkuriInputKeymap[k] = okfFix;
-  KAlphaInputKeymap[k] = kfFix;
+  NormalKeymap().Keymap[k] = [](auto) { g_skk.toKana(); };
+  SelectionKeymap().Keymap[k] = fixIt;
+  CodeInputKeymap().Keymap[k] = [](auto) { g_skk.toKana(); };
+  KanaKeymap().Keymap[k] = nulcmd;
+  ZenkakuKeymap().Keymap[k] = [](auto) { g_skk.toKana(); };
+  KanjiInputKeymap().Keymap[k] = kfFix;
+  OkuriInputKeymap().Keymap[k] = okfFix;
+  KAlphaInputKeymap().Keymap[k] = kfFix;
 }
 
 void
@@ -113,32 +113,32 @@ Skk::setEscape(EscapeBehavior b, bool init)
   if (b == ToggleEsc)
     return;
   if (b == NoEsc) {
-    SelectionKeymap.Keymap[EXTRA_CODE] = thruFixItToAsc;
-    KanaKeymap[ESC_CODE] = romkan::flthru;
-    ZenkakuKeymap[ESC_CODE] = thru;
-    KanjiInputKeymap[ESC_CODE] = nulcmd;
-    KAlphaInputKeymap[ESC_CODE] = nulcmd;
-    OkuriInputKeymap[ESC_CODE] = nulcmd;
+    SelectionKeymap().Keymap[EXTRA_CODE] = thruFixItToAsc;
+    KanaKeymap().Keymap[ESC_CODE] = romkan::flthru;
+    ZenkakuKeymap().Keymap[ESC_CODE] = thru;
+    KanjiInputKeymap().Keymap[ESC_CODE] = nulcmd;
+    KAlphaInputKeymap().Keymap[ESC_CODE] = nulcmd;
+    OkuriInputKeymap().Keymap[ESC_CODE] = nulcmd;
   } else if (b == SimpleEsc) {
-    SelectionKeymap.Keymap[ESC_CODE] = thruFixItToAsc;
-    KanaKeymap[ESC_CODE] = thruToAsc;
-    ZenkakuKeymap[ESC_CODE] = thruToAsc;
-    KanjiInputKeymap[ESC_CODE] = thruKfFixToAsc;
-    KAlphaInputKeymap[ESC_CODE] = thruKfFixToAsc;
-    OkuriInputKeymap[ESC_CODE] = thruOkfFixToAsc;
+    SelectionKeymap().Keymap[ESC_CODE] = thruFixItToAsc;
+    KanaKeymap().Keymap[ESC_CODE] = thruToAsc;
+    ZenkakuKeymap().Keymap[ESC_CODE] = thruToAsc;
+    KanjiInputKeymap().Keymap[ESC_CODE] = thruKfFixToAsc;
+    KAlphaInputKeymap().Keymap[ESC_CODE] = thruKfFixToAsc;
+    OkuriInputKeymap().Keymap[ESC_CODE] = thruOkfFixToAsc;
   } else {
-    SelectionKeymap[ESC_CODE] = thruFixItToEsc;
-    KanaKeymap[ESC_CODE] = thruToEsc;
-    ZenkakuKeymap[ESC_CODE] = thruToEsc;
-    KanjiInputKeymap[ESC_CODE] = thruKfFixToEsc;
-    KAlphaInputKeymap[ESC_CODE] = thruKfFixToEsc;
-    OkuriInputKeymap[ESC_CODE] = thruOkfFixToEsc;
+    SelectionKeymap().Keymap[ESC_CODE] = thruFixItToEsc;
+    KanaKeymap().Keymap[ESC_CODE] = thruToEsc;
+    ZenkakuKeymap().Keymap[ESC_CODE] = thruToEsc;
+    KanjiInputKeymap().Keymap[ESC_CODE] = thruKfFixToEsc;
+    KAlphaInputKeymap().Keymap[ESC_CODE] = thruKfFixToEsc;
+    OkuriInputKeymap().Keymap[ESC_CODE] = thruOkfFixToEsc;
     if (b == ViEsc) {
-      EscapedKeymap.DefaultFunc = thru;
-      EscapedKeymap.Keymap = _ViEscKeymap;
+      EscapedKeymap().DefaultFunc = thru;
+      EscapedKeymap().Keymap = _ViEscKeymap;
     } else {
-      EscapedKeymap.DefaultFunc = thru1;
-      EscapedKeymap.Keymap = _EmacsEscKeymap;
+      EscapedKeymap().DefaultFunc = thru1;
+      EscapedKeymap().Keymap = _EmacsEscKeymap;
     }
   }
   CurrentEscapeBehavior = b;
@@ -176,20 +176,20 @@ Skk::toggleEscape(EscapeBehavior b)
 bool
 Skk::is_okuri_input()
 {
-  return CurrentKeymap == &OkuriInputKeymap;
+  return CurrentKeymap == &OkuriInputKeymap();
 }
 
 void
 Skk::toKana()
 {
-  setKeymap(&KanaKeymap);
+  setKeymap(KeymapTypes::Kana);
   romkan::toggleKana();
 }
 
 void
 Skk::cancelCode()
 {
-  setKeymap(&KanaKeymap);
+  setKeymap(KeymapTypes::Kana);
   showmode(KANA_MODE);
 }
 
@@ -197,7 +197,7 @@ void
 Skk::toAsc()
 {
   romkan::flushKana();
-  setKeymap(&NormalKeymap);
+  setKeymap(KeymapTypes::Normal);
   showmode(SKK_MODE);
 }
 
@@ -205,7 +205,7 @@ void
 Skk::toZenA()
 {
   romkan::flushKana();
-  setKeymap(&ZenkakuKeymap);
+  setKeymap(KeymapTypes::Zenkaku);
   showmode(ZENEI_MODE);
 }
 
@@ -213,7 +213,7 @@ void
 Skk::toEsc()
 {
   romkan::flushKana();
-  setKeymap(&EscapedKeymap);
+  setKeymap(KeymapTypes::Escaped);
   showmode(SKK_MODE);
 }
 

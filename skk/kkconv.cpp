@@ -3,7 +3,6 @@
 #include "connsh.h"
 #include "dictinary.h"
 #include "etc.h"
-#include "fep.h"
 #include "romkan.h"
 #include "skk.h"
 #include "stty.h"

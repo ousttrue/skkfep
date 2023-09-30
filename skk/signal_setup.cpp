@@ -1,28 +1,11 @@
-#include "fep.h"
+#include "signal_setup.h"
 #include "app.h"
 #include "connsh.h"
 #include "etc.h"
-#include "romkan.h"
-#include "skk.h"
 #include "statusline.h"
 #include "stty.h"
 #include "terms.h"
-#include "termsize.h"
-#include <errno.h>
-#include <locale.h>
 #include <signal.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <wait.h>
-
-
-extern char* version;
-extern char ShellName[];
-extern char** ShellArg;
 
 #ifndef NO_SUSPEND
 void
@@ -128,4 +111,3 @@ init_signals()
   signal(SIGUSR1, sig_usr1);
   signal(SIGUSR2, sig_usr2);
 }
-

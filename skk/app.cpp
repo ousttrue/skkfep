@@ -1,8 +1,8 @@
 #include "app.h"
 #include "connsh.h"
 #include "dictinary.h"
-#include "fep.h"
 #include "kkconv.h"
+#include "signal_setup.h"
 #include "skk.h"
 #include "statusline.h"
 #include "stty.h"
@@ -114,9 +114,7 @@ App::Initialize(std::string_view UserDicName,
     return false;
   }
 
-  g_skk.setKanaKey();
   OpenDictionary(UserDicName);
-  g_skk.toAsc();
   initFep();
 
   return true;

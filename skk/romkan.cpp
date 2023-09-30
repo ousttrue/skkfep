@@ -1,7 +1,6 @@
 #include "romkan.h"
 #include "connsh.h"
 #include "etc.h"
-#include "fep.h"
 #include "skk.h"
 #include "statusline.h"
 #include "stty.h"
