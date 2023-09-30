@@ -2,8 +2,8 @@
 #include "app.h"
 #include "connsh.h"
 #include "etc.h"
-#include "keybind.h"
 #include "romkan.h"
+#include "skk.h"
 #include "statusline.h"
 #include "stty.h"
 #include "terms.h"
@@ -19,7 +19,6 @@
 #include <unistd.h>
 #include <wait.h>
 
-#define FLUSH_TIMEOUT 300000 /* timeout ( micro-sec ) */
 
 extern char* version;
 extern char ShellName[];
@@ -71,7 +70,7 @@ sig_usr1(int)
 {
   signal(SIGUSR1, SIG_IGN);
   initFep();
-  toggleEscape(ViEsc);
+  g_skk.toggleEscape(ViEsc);
   signal(SIGUSR1, sig_usr1);
 }
 
@@ -80,7 +79,7 @@ sig_usr2(int)
 {
   signal(SIGUSR2, SIG_IGN);
   initFep();
-  toggleEscape(EmacsEsc);
+  g_skk.toggleEscape(EmacsEsc);
   signal(SIGUSR2, sig_usr2);
 }
 
@@ -89,7 +88,7 @@ sig_int(int)
 {
   signal(SIGHUP, SIG_IGN);
   initFep();
-  toggleEscape(NoEsc);
+  g_skk.toggleEscape(NoEsc);
   signal(SIGHUP, sig_int);
 }
 
@@ -130,96 +129,3 @@ init_signals()
   signal(SIGUSR2, sig_usr2);
 }
 
-void
-flushOut(int minchar)
-{
-  int i, nchar, ntimeout;
-  fd_set readfds;
-  struct timeval timeout;
-
-  FD_ZERO(&readfds);
-  FD_SET(Shellfd, &readfds);
-  timeout.tv_sec = FLUSH_TIMEOUT / 1000000;
-  timeout.tv_usec = FLUSH_TIMEOUT % 1000000;
-  ntimeout = 0;
-  nchar = 0;
-
-  char shellBuf[256];
-  while (ntimeout < minchar) {
-    i = select(Shellfd + 1, &readfds, NULL, NULL, &timeout);
-    if (i == -1 && errno == EINTR)
-      continue;
-    if (i > 0) {
-      i = read(Shellfd, shellBuf, std::size(shellBuf));
-      writeShTty(shellBuf, i);
-      nchar += i;
-      if (nchar >= minchar)
-        break;
-    } else
-      ntimeout++;
-  }
-}
-
-void
-nulcmd(char c)
-{
-}
-
-void
-thru(char c)
-{
-  writeTtyShell1(c);
-}
-
-void
-toAsc(char c)
-{
-  romkan::flushKana();
-  setKeymap(convertKeymap(NormalKeymap));
-  showmode(SKK_MODE);
-}
-
-void
-toZenA(char c)
-{
-  romkan::flushKana();
-  setKeymap(&ZenkakuKeymap);
-  showmode(ZENEI_MODE);
-}
-
-void
-thruToAsc(char c)
-{
-  toAsc(c);
-  thru(c);
-}
-
-void
-toEsc(char c)
-{
-  romkan::flushKana();
-  setKeymap(convertKeymap(EscapedKeymap));
-  showmode(SKK_MODE);
-}
-
-void
-thruToEsc(char c)
-{
-  toEsc(c);
-  thru(c);
-}
-
-void
-thruBack(char c)
-{
-  thru(c);
-  romkan::toKana(c);
-}
-
-void
-thru1(char c)
-{
-  thru(c);
-  restoreKeymap();
-  showlastmode();
-}

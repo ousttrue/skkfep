@@ -19,9 +19,6 @@ void
 tty_ready();
 
 void
-init_signals();
-
-void
 writes(std::string_view s);
 
 void

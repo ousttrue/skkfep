@@ -1,13 +1,12 @@
 skk_lib = static_library('skk', [
   'app.cpp',
   'fep.cpp',
-  'keybind.cpp',
   'kkconv.cpp',
-  'keymap.cpp',
   'etc.cpp',
   'romkan.cpp',
   'dictionary.cpp',
   'skk.cpp',
+  'skk_keymap.cpp',
   ],
   dependencies: [termpty_dep],
 )

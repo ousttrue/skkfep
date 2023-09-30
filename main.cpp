@@ -1,6 +1,6 @@
 #include "app.h"
-#include "keybind.h"
 #include "kkconv.h"
+#include "skk.h"
 #include "statusline.h"
 #include "terms.h"
 #include "version.h"
@@ -22,7 +22,7 @@ ParseArgs(int argc, char** argv)
 {
   for (int i = 1; i < argc; i++) {
     if (!strncmp(argv[i], "-k", 2))
-      KanaKey = argv[i] + 2;
+      g_skk.KanaKey = argv[i] + 2;
     else if (!strcmp(argv[i], "-udic"))
       UserDicName = argv[++i];
     else if (!strcmp(argv[i], "-e")) {
@@ -32,11 +32,11 @@ ParseArgs(int argc, char** argv)
     } else if (!strcmp(argv[i], "-P")) {
       PreserveOnFailure ^= 1;
     } else if (!strcmp(argv[i], "-esc")) {
-      setEscape(SimpleEsc, true);
+      g_skk.setEscape(SimpleEsc, true);
     } else if (!strcmp(argv[i], "-viesc")) {
-      setEscape(ViEsc, true);
+      g_skk.setEscape(ViEsc, true);
     } else if (!strcmp(argv[i], "-emacsesc")) {
-      setEscape(EmacsEsc, true);
+      g_skk.setEscape(EmacsEsc, true);
     } else if (!strcmp(argv[i], "-rs")) {
       ReverseStatus = 1;
     }

@@ -39,9 +39,6 @@ void
 flushLastConso(char c, const OutFunc& output, void (*flush)(int));
 
 void
-toKana(char c);
-
-void
 tglK(char c);
 
 void
@@ -63,9 +60,6 @@ void
 inputCode(char);
 
 void
-cancelCode(char);
-
-void
 codein(char c);
 
 void
@@ -73,5 +67,8 @@ enterCode(char);
 
 void
 hira2kata(char* buf);
+
+void
+toggleKana();
 
 } // namespace

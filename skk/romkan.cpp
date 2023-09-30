@@ -2,7 +2,7 @@
 #include "connsh.h"
 #include "etc.h"
 #include "fep.h"
-#include "keybind.h"
+#include "skk.h"
 #include "statusline.h"
 #include "stty.h"
 #include "terms.h"
@@ -478,16 +478,6 @@ flushLastConso(char c, const OutFunc& output, void (*flush)(int))
 }
 
 void
-toKana(char c)
-{
-  setKeymap(&KanaKeymap);
-  if (CurrentTab == HiraTab)
-    showmode(KANA_MODE);
-  else
-    showmode(KKANA_MODE);
-}
-
-void
 tglK(char c)
 {
   flushKana();
@@ -568,15 +558,8 @@ inputCode(char)
   if (status::type() == StatusType::NoStatusLine)
     return;
   codeinMsg();
-  setKeymap(convertKeymap(CodeInputKeymap));
+  g_skk.setKeymap(KeymapTypes::CodeInput);
   codecol = 0;
-}
-
-void
-cancelCode(char)
-{
-  setKeymap(&KanaKeymap);
-  showmode(KANA_MODE);
 }
 
 void
@@ -606,7 +589,7 @@ enterCode(char)
     kbuf[2] = '\0';
     writeShells(kbuf);
   }
-  cancelCode({});
+  g_skk.cancelCode();
 }
 
 void
@@ -629,6 +612,15 @@ hira2kata(char* buf)
     } else
       i++;
   }
+}
+
+void
+toggleKana()
+{
+  if (CurrentTab == HiraTab)
+    showmode(KANA_MODE);
+  else
+    showmode(KKANA_MODE);
 }
 
 } // namespace

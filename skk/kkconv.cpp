@@ -4,8 +4,8 @@
 #include "dictinary.h"
 #include "etc.h"
 #include "fep.h"
-#include "keybind.h"
 #include "romkan.h"
+#include "skk.h"
 #include "stty.h"
 #include "terms.h"
 #include <ctype.h>
@@ -84,11 +84,12 @@ bufferedInput(const char* s)
 void
 kkBeg(char)
 {
-  setKeymap(&KanjiInputKeymap);
+  g_skk.setKeymap(SkkModes::KINPUT_MODE);
   showmode(KINPUT_MODE);
   kanjiInputEffect(1);
   WordBufLen = 0;
 }
+
 void
 kkBegV(char c)
 {
@@ -107,7 +108,7 @@ void
 kkBegA(char c)
 {
   romkan::flushKana();
-  setKeymap(&KAlphaInputKeymap);
+  g_skk.setKeymap(KeymapTypes::KAlphaInput);
   showmode(KINPUT_MODE);
   kanjiInputEffect(1);
   WordBufLen = 0;
@@ -211,7 +212,7 @@ fxthru(char c)
 {
   /* fix and through */
   fixIt({});
-  keyinput(c);
+  g_skk.input(c);
 }
 
 void
@@ -239,14 +240,14 @@ void
 kfFixToAsc(char c)
 {
   kfFix(c);
-  toAsc(c);
+  g_skk.toAsc();
 }
 
 void
 kfFixToZenA(char c)
 {
   kfFix(c);
-  toZenA(c);
+  g_skk.toZenA();
 }
 
 void
@@ -260,7 +261,7 @@ void
 thruKfFixToAsc(char c)
 {
   kfFix(c);
-  toAsc(c);
+  g_skk.toAsc();
   thru(c);
 }
 
@@ -268,7 +269,7 @@ void
 thruKfFixToEsc(char c)
 {
   kfFix(c);
-  toEsc(c);
+  g_skk.toEsc();
   thru(c);
 }
 
@@ -276,7 +277,7 @@ void
 okfFix(char c)
 {
   cancelOkuri({});
-  if (is_okuri_input())
+  if (g_skk.is_okuri_input())
     cancelOkuri({});
   kfFix(0);
 }
@@ -285,14 +286,14 @@ void
 okfFixToAsc(char c)
 {
   okfFix(c);
-  toAsc(c);
+  g_skk.toAsc();
 }
 
 void
 okfFixToZenA(char c)
 {
   okfFix(c);
-  toZenA(c);
+  g_skk.toZenA();
 }
 
 void
@@ -306,7 +307,7 @@ void
 thruOkfFixToAsc(char c)
 {
   okfFix(c);
-  toAsc(c);
+  g_skk.toAsc();
   thru(c);
 }
 
@@ -314,7 +315,7 @@ void
 thruOkfFixToEsc(char c)
 {
   okfFix(c);
-  toEsc(c);
+  g_skk.toEsc();
   thru(c);
 }
 
@@ -392,7 +393,7 @@ kkconv(char c)
   if (OkuriInput)
     l += strlen(OkuriBuf) - 1;
   rubout(l);
-  setKeymap(convertKeymap(SelectionKeymap));
+  g_skk.setKeymap(KeymapTypes::Selection);
 
   if (Current.IsEnabled()) {
     showCand();
@@ -414,7 +415,7 @@ toOkuri()
   OkuriInput = 1;
   *OkuriBuf = '\0';
   OkuriBufLen = 0;
-  setKeymap(&OkuriInputKeymap);
+  g_skk.setKeymap(KeymapTypes::OkuriInput);
 }
 
 void
@@ -435,7 +436,7 @@ kOkuri(char c)
   }
   toOkuri();
   write1('*');
-  keyinput(okuri, 1);
+  g_skk.input(okuri, 1);
 }
 
 void
@@ -518,7 +519,7 @@ pvCand(char)
 void
 backToKanjiInput()
 {
-  restoreKeymap();
+  g_skk.restoreKeymap();
   showmode(KINPUT_MODE);
   kanjiInputEffect(1);
   if (OkuriInput) {
@@ -537,7 +538,7 @@ cancelOkuri(char)
   if (Nconso == 0) {
     rubout(1);
     OkuriInput = 0;
-    setKeymap(&KanjiInputKeymap);
+    g_skk.setKeymap(KeymapTypes::KanjiInput);
   } else {
     romkan::cancelConso();
     clearOkuri();
@@ -576,7 +577,7 @@ void
 thruFixItToAsc(char c)
 {
   fixIt(c);
-  toAsc(c);
+  g_skk.toAsc();
   thru(c);
 }
 
@@ -584,7 +585,7 @@ void
 thruFixItToEsc(char c)
 {
   fixIt(c);
-  toEsc(c);
+  g_skk.toEsc();
   thru(c);
 }
 
@@ -607,7 +608,7 @@ endKanjiInput()
   *OkuriBuf = '\0';
   OkuriBufLen = 0;
   OkuriInput = 0;
-  romkan::toKana({});
+  g_skk.toKana();
   BlockTty = 0;
 }
 

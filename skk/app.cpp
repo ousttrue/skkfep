@@ -2,8 +2,8 @@
 #include "connsh.h"
 #include "dictinary.h"
 #include "fep.h"
-#include "keybind.h"
 #include "kkconv.h"
+#include "skk.h"
 #include "statusline.h"
 #include "stty.h"
 #include "terms.h"
@@ -114,9 +114,9 @@ App::Initialize(std::string_view UserDicName,
     return false;
   }
 
-  setKanaKey();
+  g_skk.setKanaKey();
   OpenDictionary(UserDicName);
-  toAsc({});
+  g_skk.toAsc();
   initFep();
 
   return true;
@@ -175,6 +175,6 @@ App::Input(uint8_t c)
     write(fileno(Shellout), &c, 1);
   } else {
     // ascii
-    keyinput(c, o);
+    g_skk.input(c, o);
   }
 }
