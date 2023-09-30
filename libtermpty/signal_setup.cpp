@@ -1,7 +1,6 @@
 #include "signal_setup.h"
-#include "app.h"
 #include "connsh.h"
-#include "etc.h"
+// #include "etc.h"
 #include "statusline.h"
 #include "stty.h"
 #include "terms.h"
@@ -22,7 +21,8 @@ susp_cont(int)
   signal(SIGTSTP, suspend);
   reset_tty_without_close();
   if (!set_tty()) {
-    App::Instance().Exit(-1);
+    // App::Instance().Exit(-1);
+    exit(-1);
   }
   kill(ShellPID, SIGCONT);
 }
@@ -44,7 +44,7 @@ winchange(int)
     tty = 1; /* stdout */
   set_termsize(tty, size);
   initFep();
-  showcurmode();
+  // showcurmode();
   signal(SIGWINCH, winchange);
 }
 
@@ -53,7 +53,7 @@ sig_usr1(int)
 {
   signal(SIGUSR1, SIG_IGN);
   initFep();
-  g_skk.toggleEscape(ViEsc);
+  // g_skk.toggleEscape(ViEsc);
   signal(SIGUSR1, sig_usr1);
 }
 
@@ -62,7 +62,7 @@ sig_usr2(int)
 {
   signal(SIGUSR2, SIG_IGN);
   initFep();
-  g_skk.toggleEscape(EmacsEsc);
+  // g_skk.toggleEscape(EmacsEsc);
   signal(SIGUSR2, sig_usr2);
 }
 
@@ -71,38 +71,46 @@ sig_int(int)
 {
   signal(SIGHUP, SIG_IGN);
   initFep();
-  g_skk.toggleEscape(NoEsc);
+  // g_skk.toggleEscape(NoEsc);
   signal(SIGHUP, sig_int);
 }
 
+std::function<void(const char*)> g_reset;
+
 void
-init_signals()
+init_signals(const std::function<void(const char*)>& reset)
 {
-  signal(SIGHUP, [](int) { App::Instance().Reset("Hungup"); });
+  g_reset = reset;
+
+  signal(SIGHUP, [](int) { g_reset("Hungup"); });
   signal(SIGINT, sig_int);
   /*	signal(SIGQUIT,iot_exit); */
   signal(SIGILL, [](int) {
     reset_tty();
     signal(SIGCHLD, SIG_DFL);
-    App::Instance().Exit(-1);
+    // App::Instance().Exit(-1);
+    exit(-1);
   });
   signal(SIGIOT, [](int) {
     reset_tty();
     fprintf(stderr, "Abort.\n");
-    App::Instance().Abort();
+    // App::Instance().Abort();
+    abort();
   });
   signal(SIGFPE, [](int) {
     reset_tty();
     signal(SIGCHLD, SIG_DFL);
-    App::Instance().Exit(-1);
+    // App::Instance().Exit(-1);
+    exit(-1);
   });
   signal(SIGSEGV, [](int) {
     reset_tty();
     fprintf(stderr, "SEGMENTATION VIOLATION\n");
-    App::Instance().Abort();
+    // App::Instance().Abort();
+    abort();
   });
-  signal(SIGPIPE, [](int) { App::Instance().Reset("Pipe down"); });
-  signal(SIGTERM, [](int) { App::Instance().Reset("Terminate"); });
+  signal(SIGPIPE, [](int) { g_reset("Pipe down"); });
+  signal(SIGTERM, [](int) { g_reset("Terminate"); });
 #ifndef NO_SUSPEND
   signal(SIGTSTP, suspend);
   signal(SIGCONT, susp_cont);

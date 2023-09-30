@@ -54,21 +54,11 @@ void
 inputZenkakuEx(char c, const OutFunc& output);
 
 void
-codeinMsg();
-
-void
-inputCode(char);
-
-void
-codein(char c);
-
-void
-enterCode(char);
-
-void
 hira2kata(char* buf);
 
 void
 toggleKana();
 
 } // namespace
+
+

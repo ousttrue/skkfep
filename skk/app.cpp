@@ -96,7 +96,7 @@ App::Initialize(std::string_view UserDicName,
   }
 
   // fork
-  init_signals();
+  init_signals([](const char* msg) { App::Instance().Reset(msg); });
   auto callback = [](int) {
     int cpid;
     int statusp;
