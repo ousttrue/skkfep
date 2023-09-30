@@ -1,7 +1,8 @@
 #pragma once
 #include <functional>
+#include <string>
 
-using OutFunc = std::function<void(const char* s)>;
+using OutFunc = std::function<void(std::string_view s)>;
 
 #define MAX_CONSO 5
 extern char LastConso[MAX_CONSO]; /* LastConso[0] is always '\0' */
@@ -16,12 +17,6 @@ iKanaV(char c);
 
 void
 iKanaC(char c);
-
-void
-iZenAl(char c);
-
-void
-iZenEx(char c);
 
 void
 flthru(char c);
@@ -48,17 +43,9 @@ void
 kanaBS(char c);
 
 void
-inputZenkakuAlpha(char c, const OutFunc& output);
-
-void
-inputZenkakuEx(char c, const OutFunc& output);
-
-void
 hira2kata(char* buf);
 
 void
 toggleKana();
 
 } // namespace
-
-

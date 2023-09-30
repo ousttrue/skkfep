@@ -1,8 +1,8 @@
 #pragma once
 #include "termsize.h"
-
 #include <stdio.h>
 #include <string.h>
+#include <string>
 #include <unistd.h>
 
 extern int Shellfd;
@@ -26,10 +26,9 @@ writeShell1(char c)
 }
 
 inline void
-writeShells(const char* s)
+writeShells(std::string_view s)
 {
-  int l = strlen(s);
-  write(fileno(Shellout), s, l);
+  write(fileno(Shellout), s.data(), s.size());
 }
 
 inline void

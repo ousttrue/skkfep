@@ -7,6 +7,7 @@
 #include "skk.h"
 #include "stty.h"
 #include "terms.h"
+#include "zenkakualpha.h"
 #include <ctype.h>
 #include <optional>
 #include <string.h>
@@ -73,11 +74,11 @@ static char OkuriBuf[OKURI_LEN];
 static int OkuriBufLen;
 
 static void
-bufferedInput(const char* s)
+bufferedInput(std::string_view s)
 {
   writes(s);
-  for (; *s != '\0'; s++)
-    WordBuf[WordBufLen++] = *s;
+  for (auto c : s)
+    WordBuf[WordBufLen++] = c;
 }
 
 void
@@ -138,17 +139,17 @@ kKanaV(char c)
 }
 
 static void
-putOkuri(const char* s)
+putOkuri(std::string_view s)
 {
   int l = OkuriBufLen;
   writes(s);
-  for (auto p = s; *p; p++) {
-    OkuriBuf[OkuriBufLen++] = *p;
+  for (auto c : s) {
+    OkuriBuf[OkuriBufLen++] = c;
     if (OkuriBufLen >= OKURI_LEN) {
       bell();
       OkuriBuf[l] = '\0';
       OkuriBufLen = l;
-      rubout(strlen(s));
+      rubout(s.size());
       return;
     }
   }
@@ -188,13 +189,13 @@ okKanaC(char c /*, char first*/)
 void
 kZenAl(char c)
 {
-  romkan::inputZenkakuAlpha(c, bufferedInput);
+  bufferedInput(zenkakualpha::inputZenkakuAlpha(c));
 }
 
 void
 kZenEx(char c)
 {
-  romkan::inputZenkakuEx(c, bufferedInput);
+  bufferedInput(zenkakualpha::inputZenkakuEx(c));
 }
 
 void
