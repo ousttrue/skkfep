@@ -50,9 +50,6 @@ void
 set_termsize(int tty, const TermSize& size);
 
 void
-flushOut(int minchar);
-
-void
 thru(char c);
 
 } // namespace

@@ -86,37 +86,37 @@ extern CON Kindex;
 namespace romkan {
 
 // 母音
-void
+std::string
 iKanaV(char c);
 
 // 子音
-void
+std::string
 iKanaC(char c);
 
-void
+std::string
 flthru(char c);
 
-void
+std::string
 flushKana();
 
 // 母音
-void
-inputKanaVowel(char c, const OutFunc& output);
+std::string
+inputKanaVowel(char c);
 
 // 子音
-void
-inputKanaConso(char c, const OutFunc& output, void (*flush)(int));
+std::string
+inputKanaConso(char c, void (*flush)(int));
 
 void
 flushLastConso(char c, const OutFunc& output, void (*flush)(int));
 
-void
-tglK(char c);
+std::string
+tglK();
 
 void
 cancelConso();
 
-void
+std::string
 kanaBS(char c);
 
 void

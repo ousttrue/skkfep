@@ -1,6 +1,7 @@
 #include "kkconv.h"
 #include "connsh.h"
 #include "dictinary.h"
+#include "flushout.h"
 #include "romkan.h"
 #include "skk.h"
 #include "stty.h"
@@ -93,14 +94,14 @@ void
 kkBegV(char c)
 {
   kkBeg({});
-  romkan::inputKanaVowel(tolower(c), bufferedInput);
+  bufferedInput(romkan::inputKanaVowel(tolower(c)));
 }
 
 void
 kkBegC(char c)
 {
   kkBeg({});
-  romkan::inputKanaConso(tolower(c), bufferedInput, NULL);
+  bufferedInput(romkan::inputKanaConso(tolower(c), NULL));
 }
 
 void
@@ -134,7 +135,7 @@ kaBS(char c)
 void
 kKanaV(char c)
 {
-  romkan::inputKanaVowel(c, bufferedInput);
+  bufferedInput(romkan::inputKanaVowel(c));
 }
 
 static void
@@ -162,14 +163,14 @@ okKanaV(char c /*, char first*/)
     WordBuf[WordBufLen++] = c;
   }
   rubout(1);
-  romkan::inputKanaVowel(tolower(c), putOkuri);
+  putOkuri(romkan::inputKanaVowel(tolower(c)));
   kkconv({});
 }
 
 void
 kKanaC(char c)
 {
-  romkan::inputKanaConso(c, bufferedInput, NULL);
+  bufferedInput(romkan::inputKanaConso(c, NULL));
 }
 
 void
@@ -182,7 +183,7 @@ okKanaC(char c /*, char first*/)
     romkan::flushLastConso('\0', bufferedInput, NULL);
     WordBuf[WordBufLen++] = c;
   }
-  romkan::inputKanaConso(tolower(c), putOkuri, NULL);
+  putOkuri(romkan::inputKanaConso(tolower(c), NULL));
 }
 
 void
@@ -231,7 +232,7 @@ kfFix(char c)
   WordBuf[WordBufLen] = '\0';
   kanjiInputEffect(0);
   child::writeShells(WordBuf);
-  child::flushOut(WordBufLen);
+  flushOut(WordBufLen);
   endKanjiInput();
 }
 
@@ -549,7 +550,7 @@ fixIt(char c)
     if (OkuriInput) {
       child::writeShells(OkuriBuf);
     }
-    child::flushOut(l);
+    flushOut(l);
   }
   endKanjiInput();
 }

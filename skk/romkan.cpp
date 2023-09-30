@@ -1,10 +1,10 @@
 #include "romkan.h"
-#include "connsh.h"
+#include "flushout.h"
 #include "skk.h"
-#include "statusline.h"
 #include "stty.h"
 #include "terms.h"
 #include <ctype.h>
+#include <sstream>
 #include <string.h>
 
 #define KANA_NN [(int)CON::NN][0]
@@ -23,33 +23,39 @@ CON Kindex = {};
 static const char* (*CurrentTab)[5] = HiraTab;
 
 namespace romkan {
-void
+
+std::string
 iKanaV(char c)
 {
-  inputKanaVowel(c, child::writeShells);
+  return inputKanaVowel(c);
 }
 
-void
+std::string
 iKanaC(char c)
 {
-  inputKanaConso(c, child::writeShells, child::flushOut);
+  return inputKanaConso(c, flushOut);
 }
 
-void
+std::string
 flthru(char c)
 {
-  flushKana();
-  child::thru(c);
+  std::stringstream ss;
+  ss << flushKana();
+  ss << c;
+  return ss.str();
 }
 
-void
+std::string
 flushKana()
 {
-  flushLastConso('\0', child::writeShells, child::flushOut);
+  std::stringstream ss;
+  flushLastConso(
+    '\0', [&ss](auto s) { ss << s; }, flushOut);
+  return ss.str();
 }
 
-void
-inputKanaVowel(char c, const OutFunc& output)
+std::string
+inputKanaVowel(char c)
 {
   auto vowel = vowel_from_char(c);
   if (Kindex != CON::_0) { /* if preceding consonant exists */
@@ -57,19 +63,20 @@ inputKanaVowel(char c, const OutFunc& output)
     erase(Nconso);
     csrLeft(Nconso);
   }
+  std::string out;
   if (SmallTU && vowel == Vowel::U) {
-    output(CurrentTab KANA_XTU);
+    out = CurrentTab KANA_XTU;
   } else {
-    output(CurrentTab[(int)Kindex][(int)vowel]);
+    out = CurrentTab[(int)Kindex][(int)vowel];
   }
   SmallTU = 0;
   Kindex = {};
   Nconso = 0;
+  return out;
 }
 
-void
-inputKanaConso(char c, const OutFunc& output, void (*flush)(int))
-
+std::string
+inputKanaConso(char c, void (*flush)(int))
 {
   char notOverwrite = 0;
   switch (c) {
@@ -97,10 +104,9 @@ inputKanaConso(char c, const OutFunc& output, void (*flush)(int))
     case 'n':
       if (LastConso[Nconso] == 'n') {
         csrLeft(Nconso);
-        output(CurrentTab KANA_NN);
         Nconso = 0;
         Kindex = {};
-        return;
+        return CurrentTab KANA_NN;
       }
       Kindex = CON::N;
       break;
@@ -178,12 +184,15 @@ inputKanaConso(char c, const OutFunc& output, void (*flush)(int))
       Kindex = CON::V;
       break;
   }
+  std::stringstream ss;
   if (!notOverwrite) {
-    flushLastConso(c, output, flush);
+    flushLastConso(
+      c, [&ss](auto s) { ss << s; }, flush);
   }
   Nconso++;
   LastConso[Nconso] = c;
   terminal::write1(c);
+  return ss.str();
 }
 
 void
@@ -213,10 +222,10 @@ flushLastConso(char c, const OutFunc& output, void (*flush)(int))
   Nconso = 0;
 }
 
-void
-tglK(char c)
+std::string
+tglK()
 {
-  flushKana();
+  auto out = flushKana();
   if (CurrentTab == HiraTab) {
     CurrentTab = KataTab;
     g_skk.showmode(KKANA_MODE);
@@ -224,6 +233,7 @@ tglK(char c)
     CurrentTab = HiraTab;
     g_skk.showmode(KANA_MODE);
   }
+  return out;
 }
 
 void
@@ -235,22 +245,24 @@ cancelConso()
   SmallTU = 0;
 }
 
-void
+std::string
 kanaBS(char c)
 {
   int i, n;
   char con[MAX_CONSO];
 
+  std::stringstream ss;
   if (Nconso) {
     n = Nconso;
     for (i = 1; i < Nconso; i++)
       con[i] = LastConso[i];
     cancelConso();
     for (i = 1; i < n; i++)
-      iKanaC(con[i]);
+      ss << iKanaC(con[i]);
   } else {
-    child::thru(c);
+    ss << c;
   }
+  return ss.str();
 }
 
 void
