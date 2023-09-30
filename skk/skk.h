@@ -3,6 +3,7 @@
 #include <span>
 #include <stdint.h>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 enum SkkModes
@@ -72,17 +73,12 @@ enum EscapeBehavior
 
 using KeyFunc = void (*)(char);
 
-struct SparseKeymapBody
-{
-  uint8_t key = 0;
-  KeyFunc function = {};
-};
-
 struct SparseKeymap
 {
   KeyFunc defaultfunc = {};
-  std::vector<SparseKeymapBody> keymap;
+  std::unordered_map<uint8_t, KeyFunc> keymap;
 };
+
 struct Keymap
 {
   KeyFunc Keymap[128];
@@ -96,12 +92,12 @@ struct Keymap
 
   KeyFunc& operator[](size_t index) { return Keymap[index]; }
 
-  void overrideKeymap(std::span<const SparseKeymapBody> body)
+  void overrideKeymap(const std::unordered_map<uint8_t, KeyFunc>& keymap)
   {
-    for (auto keymap : body) {
-      int c = (unsigned char)keymap.key;
+    for (auto [k, v] : keymap) {
+      int c = (unsigned char)k;
       if (c < 128) {
-        Keymap[c] = keymap.function;
+        Keymap[c] = v;
       }
     }
   }
@@ -126,8 +122,8 @@ class Skk
   Keymap KAlphaInputKeymap;
   KeymapPtr CurrentKeymap;
   KeymapPtr lastKeymap;
-  std::vector<SparseKeymapBody> _ViEscKeymap;
-  std::vector<SparseKeymapBody> _EmacsEscKeymap;
+  std::unordered_map<uint8_t, KeyFunc> _ViEscKeymap;
+  std::unordered_map<uint8_t, KeyFunc> _EmacsEscKeymap;
 
 public:
   std::string KanaKey;

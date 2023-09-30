@@ -187,17 +187,15 @@ Skk::convertKeymap(const SparseKeymap& skm)
 void
 Skk::changeKey(SparseKeymap* skm, KeyFunc func, uint8_t newkey)
 {
-  for (auto& keymap : skm->keymap) {
-    if (keymap.function == func) {
-      keymap.key = newkey;
-      return;
-    }
-  }
+  // TODO: remove old map
+  // for (auto [k, v] : skm->keymap) {
+  //   if (v == func) {
+  //     keymap.key = newkey;
+  //     return;
+  //   }
+  // }
 
-  skm->keymap.push_back({
-    .key = newkey,
-    .function = func,
-  });
+  skm->keymap[newkey] = func;
 }
 
 bool
