@@ -1,5 +1,6 @@
 #pragma once
 #include <assert.h>
+#include <functional>
 #include <span>
 #include <stdint.h>
 #include <string>
@@ -71,35 +72,26 @@ enum EscapeBehavior
   ToggleEsc
 };
 
-using KeyFunc = void (*)(char);
-
-struct SparseKeymap
-{
-  KeyFunc defaultfunc = {};
-  std::unordered_map<uint8_t, KeyFunc> keymap;
-};
+using KeyFunc = std::function<void(uint8_t)>;
 
 struct Keymap
 {
-  KeyFunc Keymap[128];
+  KeyFunc DefaultFunc = {};
+  std::unordered_map<uint8_t, KeyFunc> Keymap;
 
   void setall(const KeyFunc& f)
   {
-    for (auto& func : Keymap) {
-      func = f;
-    }
+    DefaultFunc = f;
+    Keymap.clear();
   }
 
-  KeyFunc& operator[](size_t index) { return Keymap[index]; }
-
-  void overrideKeymap(const std::unordered_map<uint8_t, KeyFunc>& keymap)
+  KeyFunc& operator[](uint8_t key)
   {
-    for (auto [k, v] : keymap) {
-      int c = (unsigned char)k;
-      if (c < 128) {
-        Keymap[c] = v;
-      }
+    auto found = Keymap.find(key);
+    if (found != Keymap.end()) {
+      return found->second;
     }
+    return DefaultFunc;
   }
 };
 using KeymapPtr = Keymap*;
@@ -109,10 +101,10 @@ nulcmd(char c);
 
 class Skk
 {
-  SparseKeymap NormalKeymap;
-  SparseKeymap SelectionKeymap;
-  SparseKeymap CodeInputKeymap;
-  SparseKeymap EscapedKeymap;
+  Keymap NormalKeymap;
+  Keymap SelectionKeymap;
+  Keymap CodeInputKeymap;
+  Keymap EscapedKeymap;
   EscapeBehavior CurrentEscapeBehavior = NoEsc;
   EscapeBehavior LastEscapeBehavior = SimpleEsc;
   Keymap KanaKeymap;
@@ -155,7 +147,7 @@ public:
   {
     switch (t) {
       case KeymapTypes::Selection:
-        setKeymap(convertKeymap(SelectionKeymap));
+        setKeymap(&SelectionKeymap);
         break;
 
       case KeymapTypes::Normal:
@@ -168,7 +160,6 @@ public:
         break;
     }
   }
-  void changeKey(SparseKeymap* skm, KeyFunc func, uint8_t newkey);
   void restoreKeymap();
 
   void setEscape(EscapeBehavior b, bool init = false);
@@ -186,7 +177,6 @@ public:
 
 private:
   void initializeKeymap();
-  KeymapPtr convertKeymap(const SparseKeymap& skm);
 };
 extern Skk g_skk;
 
