@@ -178,6 +178,10 @@ App::Run()
               g_skk.setKeymap(*output.NextKeymap);
             }
 
+            // romkan::flushKana();
+            // setKeymap(KeymapTypes::Zenkaku);
+            // showmode(ZENEI_MODE);
+
             if (output.Predit.size()) {
               terminal::writes(output.Predit);
             }

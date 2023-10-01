@@ -91,9 +91,12 @@ Skk::initialize()
         return SkkOutput{};
       } },
     { 'L',
-      [self = this](auto, auto) {
-        self->toZenA();
-        return SkkOutput{};
+      [](auto, auto) {
+        return SkkOutput{
+          .Through = romkan::flushKana(),
+          .NextMode = ZENEI_MODE,
+          .NextKeymap = KeymapTypes::Zenkaku,
+        };
       } },
     { 'M',
       [self = this](auto c, auto) {
@@ -180,9 +183,12 @@ Skk::initialize()
     { 'j', romkan::iKanaC },
     { 'k', romkan::iKanaC },
     { 'l',
-      [self = this](auto, auto) {
-        self->toAsc();
-        return SkkOutput{};
+      [](auto, auto) {
+        return SkkOutput{
+          .Through = romkan::flushKana(),
+          .NextMode = SkkModes::SKK_MODE,
+          .NextKeymap = KeymapTypes::Normal,
+        };
       } },
     { 'm', romkan::iKanaC },
     { 'n', romkan::iKanaC },
@@ -316,7 +322,7 @@ Skk::initialize()
     { 'I', [self = this](auto c, auto) { return kOkuri(self, c); } },
     { 'J', [self = this](auto c, auto) { return kOkuri(self, c); } },
     { 'K', [self = this](auto c, auto) { return kOkuri(self, c); } },
-    { 'L', [self = this](auto c, auto) { return kfFixToZenA(self, c); } },
+    { 'L', kfFixToZenA },
     { 'M', [self = this](auto c, auto) { return kOkuri(self, c); } },
     { 'N', [self = this](auto c, auto) { return kOkuri(self, c); } },
     { 'O', [self = this](auto c, auto) { return kOkuri(self, c); } },
@@ -348,7 +354,7 @@ Skk::initialize()
     { 'i', kKanaV },
     { 'j', kKanaC },
     { 'k', kKanaC },
-    { 'l', [self = this](auto c, auto) { return kfFixToAsc(self, c); } },
+    { 'l', kfFixToAsc },
     { 'm', kKanaC },
     { 'n', kKanaC },
     { 'o', kKanaV },
@@ -560,33 +566,18 @@ Skk::initialize()
     { '>', [self = this](auto c, auto) { return stSuffix(self, c); } },
     { '?', [self = this](auto c, auto) { return stSuffix(self, c); } },
     { '<', [self = this](auto c, auto) { return stSuffix(self, c); } },
-    { EXTRA_CODE,
-      [self = this](auto c, auto) { return thruFixItToAsc(self, c); } },
+    { EXTRA_CODE, thruFixItToAsc },
   };
 
   auto& CodeInputKeymap = m_keymaps[KeymapTypes::CodeInput];
   CodeInputKeymap.DefaultFunc = nulcmd;
   CodeInputKeymap.Keymap = {
     { CTRL_C,
-      [self = this](auto, auto) {
-        self->cancelCode();
-        return SkkOutput{};
-      } },
+      [](auto, auto) { return SkkOutput{ .NextKeymap = KeymapTypes::Kana }; } },
     { CTRL_G,
-      [self = this](auto, auto) {
-        self->cancelCode();
-        return SkkOutput{};
-      } },
-    { CTRL_J,
-      [self = this](auto, auto) {
-        g_codeinput.enterCode(self);
-        return SkkOutput{};
-      } },
-    { CTRL_M,
-      [self = this](auto, auto) {
-        g_codeinput.enterCode(self);
-        return SkkOutput{};
-      } },
+      [](auto, auto) { return SkkOutput{ .NextKeymap = KeymapTypes::Kana }; } },
+    { CTRL_J, [](auto, auto) { return g_codeinput.enterCode(); } },
+    { CTRL_M, [](auto, auto) { return g_codeinput.enterCode(); } },
     { CTRL_T,
       [](auto, auto) { return SkkOutput{ .NextKeymap = KeymapTypes::Kana }; } },
     { '0', [](auto c, auto) { return g_codeinput.codein(c); } },

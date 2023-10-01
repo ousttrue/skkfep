@@ -252,18 +252,22 @@ kfFix(char c, bool)
 }
 
 SkkOutput
-kfFixToAsc(Skk* skk, char c)
+kfFixToAsc(char c, bool)
 {
   auto output = kfFix(c);
-  skk->toAsc();
+  output.Through += romkan::flushKana();
+  output.NextKeymap = KeymapTypes::Normal;
+  output.NextMode = SkkModes::SKK_MODE;
   return output;
 }
 
 SkkOutput
-kfFixToZenA(Skk* skk, char c)
+kfFixToZenA(char c, bool)
 {
   auto output = kfFix(c);
-  skk->toZenA();
+  output.Through += romkan::flushKana();
+  output.NextKeymap = KeymapTypes::Zenkaku;
+  output.NextMode = ZENEI_MODE;
   return output;
 }
 
@@ -276,10 +280,12 @@ kfFixThru(Skk* skk, char c)
 }
 
 SkkOutput
-thruKfFixToAsc(Skk* skk, char c)
+thruKfFixToAsc(char c, bool)
 {
   auto output = kfFix(c);
-  skk->toAsc();
+  output.Through += romkan::flushKana();
+  output.NextKeymap = KeymapTypes::Normal;
+  output.NextMode = SkkModes::SKK_MODE;
   output.Through += c;
   return output;
 }
@@ -297,7 +303,9 @@ SkkOutput
 okfFixToAsc(Skk* skk, char c)
 {
   auto output = okfFix(skk, c);
-  skk->toAsc();
+  output.Through += romkan::flushKana();
+  output.NextKeymap = KeymapTypes::Normal;
+  output.NextMode = SkkModes::SKK_MODE;
   return output;
 }
 
@@ -305,7 +313,9 @@ SkkOutput
 okfFixToZenA(Skk* skk, char c)
 {
   auto output = okfFix(skk, c);
-  skk->toZenA();
+  output.Through += romkan::flushKana();
+  output.NextKeymap = KeymapTypes::Zenkaku;
+  output.NextMode = ZENEI_MODE;
   return output;
 }
 
@@ -321,7 +331,9 @@ SkkOutput
 thruOkfFixToAsc(Skk* skk, char c)
 {
   auto output = okfFix(skk, c);
-  skk->toAsc();
+  output.Through += romkan::flushKana();
+  output.NextKeymap = KeymapTypes::Normal;
+  output.NextMode = SkkModes::SKK_MODE;
   output.Through += c;
   return output;
 }
@@ -595,10 +607,12 @@ fixIt(char, bool)
 }
 
 SkkOutput
-thruFixItToAsc(Skk* skk, char c)
+thruFixItToAsc(char c, bool o)
 {
   auto output = fixIt();
-  skk->toAsc();
+  output.Through += romkan::flushKana();
+  output.NextKeymap = KeymapTypes::Normal;
+  output.NextMode = SkkModes::SKK_MODE;
   output.Through += c;
   return output;
 }

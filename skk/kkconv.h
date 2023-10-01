@@ -57,16 +57,16 @@ SkkOutput
 kfFix(char c, bool o = {});
 
 SkkOutput
-kfFixToAsc(Skk* skk, char c);
+kfFixToAsc(char c, bool o = {});
 
 SkkOutput
-kfFixToZenA(Skk* skk, char c);
+kfFixToZenA(char c, bool o = {});
 
 SkkOutput
 kfFixThru(Skk* skk, char c);
 
 SkkOutput
-thruKfFixToAsc(Skk* skk, char c);
+thruKfFixToAsc(char c, bool o = {});
 
 SkkOutput
 okfFix(Skk* skk, char c);
@@ -124,7 +124,7 @@ SkkOutput
 fixIt(char c = {}, bool o = {});
 
 SkkOutput
-thruFixItToAsc(Skk* skk, char c);
+thruFixItToAsc(char c, bool o = {});
 
 SkkOutput
 cancelSel(Skk* skk, char c);

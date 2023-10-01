@@ -9,6 +9,6 @@ struct KanjiCodeInput
   SkkOutput inputCode(class Skk* skk);
   SkkOutput codein(char c);
   // 入力確定
-  void enterCode(class Skk* skk);
+  SkkOutput enterCode();
 };
 extern KanjiCodeInput g_codeinput;

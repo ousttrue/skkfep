@@ -81,10 +81,6 @@ public:
 
   bool is_okuri_input();
 
-  void cancelCode();
-  void toAsc();
-  void toZenA();
   void kkBeg();
   SkkOutput input(uint8_t c, bool okuri = false);
-  void putc(char c);
 };

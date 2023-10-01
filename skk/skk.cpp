@@ -19,7 +19,8 @@ Skk::Skk()
   KanaKey = DEFAULT_KANAKEY;
   initialize();
   setKanaKey();
-  toAsc();
+  setKeymap(KeymapTypes::Normal);
+  showmode(SKK_MODE);
 }
 
 Skk::~Skk() {}
@@ -152,29 +153,6 @@ bool
 Skk::is_okuri_input()
 {
   return CurrentKeymap == &OkuriInputKeymap();
-}
-
-void
-Skk::cancelCode()
-{
-  setKeymap(KeymapTypes::Kana);
-  showmode(KANA_MODE);
-}
-
-void
-Skk::toAsc()
-{
-  romkan::flushKana();
-  setKeymap(KeymapTypes::Normal);
-  showmode(SKK_MODE);
-}
-
-void
-Skk::toZenA()
-{
-  romkan::flushKana();
-  setKeymap(KeymapTypes::Zenkaku);
-  showmode(ZENEI_MODE);
 }
 
 void

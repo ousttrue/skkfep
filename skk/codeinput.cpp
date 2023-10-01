@@ -42,18 +42,20 @@ KanjiCodeInput::codein(char c)
 #define HEX1(x) ((x) > '9' ? ((x) - 'a' + 10) : ((x) - '0'))
 #define HEX2INT(a, b) ((HEX1(a) << 4) + HEX1(b))
 
-void
-KanjiCodeInput::enterCode(Skk* skk)
+SkkOutput
+KanjiCodeInput::enterCode()
 {
   fromMsg();
+  SkkOutput output;
   if (codecol == 4) {
     char kbuf[3];
     kbuf[0] = (HEX2INT(codebuf[0], codebuf[1]) | 0x80);
     kbuf[1] = (HEX2INT(codebuf[2], codebuf[3]) | 0x80);
     kbuf[2] = '\0';
-    child::writeShells(kbuf);
+    output.Through += kbuf;
   }
-  skk->cancelCode();
+  output.NextKeymap = KeymapTypes::Kana;
+  return output;
 }
 
 KanjiCodeInput g_codeinput;
