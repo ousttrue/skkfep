@@ -50,11 +50,11 @@ kfthru(char c, bool o = {});
 SkkOutput
 fxthru(Skk* skk, char c);
 
-void
-kfCancel(Skk* skk, char c);
+SkkOutput
+kfCancel(char c, bool o = {});
 
 SkkOutput
-kfFix(Skk* skk, char c);
+kfFix(char c, bool o = {});
 
 SkkOutput
 kfFixToAsc(Skk* skk, char c);
@@ -121,7 +121,7 @@ void
 clearOkuri(Skk* skk);
 
 SkkOutput
-fixIt(Skk* skk);
+fixIt(char c = {}, bool o = {});
 
 SkkOutput
 thruFixItToAsc(Skk* skk, char c);
@@ -130,4 +130,4 @@ SkkOutput
 cancelSel(Skk* skk, char c);
 
 SkkOutput
-h2kkana(Skk* skk, char c);
+h2kkana(char c, bool o = {});

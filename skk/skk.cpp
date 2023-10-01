@@ -53,6 +53,18 @@ Skk::setKeymap(KeymapPtr _new)
 }
 
 void
+Skk::setKeymap(KeymapTypes t)
+{
+  setKeymap(&m_keymaps[t]);
+  if (t == KeymapTypes::Kana) {
+    if (romkan::isHiragana())
+      showmode(KANA_MODE);
+    else
+      showmode(KKANA_MODE);
+  }
+}
+
+void
 Skk::restoreKeymap()
 {
   CurrentKeymap = lastKeymap;
@@ -112,45 +124,34 @@ Skk::setKanaKey()
 {
   auto k = code(KanaKey.c_str());
   printf("KanaKey=^%c\n", k ^ 0x40);
-  NormalKeymap().Keymap[k] = [self = this](auto, auto) {
-    self->toKana();
-    return SkkOutput{};
+  NormalKeymap().Keymap[k] = [](auto, auto) {
+    return SkkOutput{
+      .NextKeymap = KeymapTypes::Kana,
+    };
   };
-  SelectionKeymap().Keymap[k] = [self = this](auto, auto) {
-    fixIt(self);
-    return SkkOutput{};
-  };
-  CodeInputKeymap().Keymap[k] = [self = this](auto, auto) {
-    self->toKana();
-    return SkkOutput{};
+  SelectionKeymap().Keymap[k] = fixIt;
+  CodeInputKeymap().Keymap[k] = [](auto, auto) {
+    return SkkOutput{
+      .NextKeymap = KeymapTypes::Kana,
+    };
   };
   KanaKeymap().Keymap[k] = nulcmd;
-  ZenkakuKeymap().Keymap[k] = [self = this](auto, auto) {
-    self->toKana();
-    return SkkOutput{};
+  ZenkakuKeymap().Keymap[k] = [](auto, auto) {
+    return SkkOutput{
+      .NextKeymap = KeymapTypes::Kana,
+    };
   };
-  KanjiInputKeymap().Keymap[k] = [self = this](auto c, auto) {
-    return kfFix(self, c);
-  };
+  KanjiInputKeymap().Keymap[k] = kfFix;
   OkuriInputKeymap().Keymap[k] = [self = this](auto c, auto) {
     return okfFix(self, c);
   };
-  KAlphaInputKeymap().Keymap[k] = [self = this](auto c, auto) {
-    return kfFix(self, c);
-  };
+  KAlphaInputKeymap().Keymap[k] = kfFix;
 }
 
 bool
 Skk::is_okuri_input()
 {
   return CurrentKeymap == &OkuriInputKeymap();
-}
-
-void
-Skk::toKana()
-{
-  setKeymap(KeymapTypes::Kana);
-  toggleKana();
 }
 
 void
@@ -183,13 +184,4 @@ Skk::kkBeg()
   showmode(KINPUT_MODE);
   kanjiInputEffect(1);
   kkClearBuf();
-}
-
-void
-Skk::toggleKana()
-{
-  if (romkan::isHiragana())
-    showmode(KANA_MODE);
-  else
-    showmode(KKANA_MODE);
 }

@@ -213,7 +213,7 @@ SkkOutput
 fxthru(Skk* skk, char c)
 {
   /* fix and through */
-  auto output = fixIt(skk);
+  auto output = fixIt();
   output += skk->input(c);
   return output;
 }
@@ -227,19 +227,19 @@ endKanjiInput()
   BlockTty = 0;
 }
 
-void
-kfCancel(Skk* skk, char c)
+SkkOutput
+kfCancel(char c, bool)
 {
   kanjiInputEffect(0);
   romkan::cancelConso();
   rubout(WordBufLen);
   WordBuf[WordBufLen] = '\0';
   endKanjiInput();
-  skk->toKana();
+  return SkkOutput{ .NextKeymap = KeymapTypes::Kana };
 }
 
 SkkOutput
-kfFix(Skk* skk, char c)
+kfFix(char c, bool)
 {
   SkkOutput output;
   csrLeft(WordBufLen);
@@ -247,14 +247,14 @@ kfFix(Skk* skk, char c)
   kanjiInputEffect(0);
   output.Through += WordBuf;
   endKanjiInput();
-  skk->toKana();
+  output.NextKeymap = KeymapTypes::Kana;
   return output;
 }
 
 SkkOutput
 kfFixToAsc(Skk* skk, char c)
 {
-  auto output = kfFix(skk, c);
+  auto output = kfFix(c);
   skk->toAsc();
   return output;
 }
@@ -262,7 +262,7 @@ kfFixToAsc(Skk* skk, char c)
 SkkOutput
 kfFixToZenA(Skk* skk, char c)
 {
-  auto output = kfFix(skk, c);
+  auto output = kfFix(c);
   skk->toZenA();
   return output;
 }
@@ -270,7 +270,7 @@ kfFixToZenA(Skk* skk, char c)
 SkkOutput
 kfFixThru(Skk* skk, char c)
 {
-  auto output = kfFix(skk, c);
+  auto output = kfFix(c);
   output.Through += c;
   return output;
 }
@@ -278,7 +278,7 @@ kfFixThru(Skk* skk, char c)
 SkkOutput
 thruKfFixToAsc(Skk* skk, char c)
 {
-  auto output = kfFix(skk, c);
+  auto output = kfFix(c);
   skk->toAsc();
   output.Through += c;
   return output;
@@ -290,7 +290,7 @@ okfFix(Skk* skk, char c)
   cancelOkuri(skk);
   if (skk->is_okuri_input())
     cancelOkuri(skk);
-  return kfFix(skk, 0);
+  return kfFix(0);
 }
 
 SkkOutput
@@ -394,7 +394,7 @@ kkconv(Skk* skk, char c)
   romkan::cancelConso();
   if (WordBufLen == 0 || (OkuriInput && WordBufLen == 1)) {
     endKanjiInput();
-    skk->toKana();
+    output.NextKeymap = KeymapTypes::Kana;
   }
   skk->showmode(KSELECT_MODE);
 
@@ -424,7 +424,7 @@ kkconv(Skk* skk, char c)
       return output;
     } else {
       endKanjiInput();
-      skk->toKana();
+      output.NextKeymap = KeymapTypes::Kana;
       return output;
     }
   }
@@ -452,9 +452,8 @@ kOkuri(Skk* skk, char c)
     }
     romkan::cancelConso();
     endKanjiInput();
-    skk->toKana();
     kanjiInputEffect(0);
-    return {};
+    return { .NextKeymap = KeymapTypes::Kana };
   }
   toOkuri(skk);
 
@@ -467,9 +466,10 @@ kOkuri(Skk* skk, char c)
 SkkOutput
 stSuffix(Skk* skk, char c)
 {
-  fixIt(skk);
+  auto output = fixIt();
   skk->kkBeg();
-  return kfthru(c);
+  output += kfthru(c);
+  return output;
 }
 
 SkkOutput
@@ -478,8 +478,9 @@ stPrefixCv(Skk* skk, char c)
   if (WordBufLen == 0) {
     return kfthru(c);
   } else {
-    kfthru(c);
-    kkconv(skk, ' ');
+    auto output = kfthru(c);
+    output += kkconv(skk, ' ');
+    return output;
   }
 }
 
@@ -574,7 +575,7 @@ clearOkuri(Skk* skk)
 }
 
 SkkOutput
-fixIt(Skk* skk)
+fixIt(char, bool)
 {
   kanjiSelectionEffect(0);
   SkkOutput output;
@@ -589,14 +590,14 @@ fixIt(Skk* skk)
     }
   }
   endKanjiInput();
-  skk->toKana();
+  output.NextKeymap = KeymapTypes::Kana;
   return output;
 }
 
 SkkOutput
 thruFixItToAsc(Skk* skk, char c)
 {
-  auto output = fixIt(skk);
+  auto output = fixIt();
   skk->toAsc();
   output.Through += c;
   return output;
@@ -616,14 +617,14 @@ cancelSel(Skk* skk, char c)
 }
 
 SkkOutput
-h2kkana(Skk* skk, char c)
+h2kkana(char c, bool)
 {
   kanjiInputEffect(0);
   auto output = bufferedInput(romkan::flushLastConso('\0'));
   romkan::cancelConso();
   if (WordBufLen == 0 || (OkuriInput && WordBufLen == 1)) {
     endKanjiInput();
-    skk->toKana();
+    output.NextKeymap = KeymapTypes::Kana;
   }
   WordBuf[WordBufLen] = '\0';
 
@@ -634,6 +635,6 @@ h2kkana(Skk* skk, char c)
   romkan::hira2kata(WordBuf);
   output.Through += WordBuf;
   endKanjiInput();
-  skk->toKana();
+  output.NextKeymap = KeymapTypes::Kana;
   return output;
 }

@@ -51,7 +51,7 @@ public:
 
   void setKanaKey();
   void setKeymap(KeymapPtr _new);
-  void setKeymap(KeymapTypes t) { setKeymap(&m_keymaps[t]); }
+  void setKeymap(KeymapTypes t);
   void setKeymap(SkkModes m)
   {
     switch (m) {
@@ -81,11 +81,9 @@ public:
 
   bool is_okuri_input();
 
-  void toKana();
   void cancelCode();
   void toAsc();
   void toZenA();
-  void toggleKana();
   void kkBeg();
   SkkOutput input(uint8_t c, bool okuri = false);
   void putc(char c);

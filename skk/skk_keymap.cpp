@@ -15,9 +15,8 @@ Skk::initialize()
     output.Through += c;
     return output;
   };
-  NormalKeymap.Keymap[CTRL_T] = [self = this](auto, auto) {
-    self->toKana();
-    return SkkOutput{};
+  NormalKeymap.Keymap[CTRL_T] = [](auto, auto) {
+    return SkkOutput{ .NextKeymap = KeymapTypes::Kana };
   };
 
   auto& KanaKeymap = m_keymaps[KeymapTypes::Kana];
@@ -266,11 +265,7 @@ Skk::initialize()
   auto& KanjiInputKeymap = m_keymaps[KeymapTypes::KanjiInput];
   KanjiInputKeymap.DefaultFunc = nulcmd;
   KanjiInputKeymap.Keymap = {
-    { CTRL_G,
-      [self = this](auto c, auto) {
-        kfCancel(self, c);
-        return SkkOutput{};
-      } },
+    { CTRL_G, kfCancel },
     { CTRL_H,
       [](auto c, auto) {
         kfBS(c);
@@ -358,7 +353,7 @@ Skk::initialize()
     { 'n', kKanaC },
     { 'o', kKanaV },
     { 'p', kKanaC },
-    { 'q', [self = this](auto c, auto) { return h2kkana(self, c); } },
+    { 'q', h2kkana },
     { 'r', kKanaC },
     { 's', kKanaC },
     { 't', kKanaC },
@@ -442,11 +437,7 @@ Skk::initialize()
   auto& KAlphaInputKeymap = m_keymaps[KeymapTypes::KAlphaInput];
   KAlphaInputKeymap.DefaultFunc = nulcmd;
   KAlphaInputKeymap.Keymap = {
-    { CTRL_G,
-      [self = this](auto c, auto) {
-        kfCancel(self, c);
-        return SkkOutput{};
-      } },
+    { CTRL_G, kfCancel },
     { CTRL_H,
       [](auto c, auto) {
         kaBS(c);
@@ -555,7 +546,7 @@ Skk::initialize()
   };
   SelectionKeymap.Keymap = {
     { CTRL_G, [self = this](auto c, auto) { return cancelSel(self, c); } },
-    { CTRL_T, [self = this](auto, auto) { return fixIt(self); } },
+    { CTRL_T, fixIt },
     { ' ',
       [](auto, auto) {
         nxCand();
@@ -597,10 +588,7 @@ Skk::initialize()
         return SkkOutput{};
       } },
     { CTRL_T,
-      [self = this](auto, auto) {
-        self->toKana();
-        return SkkOutput{};
-      } },
+      [](auto, auto) { return SkkOutput{ .NextKeymap = KeymapTypes::Kana }; } },
     { '0', [](auto c, auto) { return g_codeinput.codein(c); } },
     { '1', [](auto c, auto) { return g_codeinput.codein(c); } },
     { '2', [](auto c, auto) { return g_codeinput.codein(c); } },

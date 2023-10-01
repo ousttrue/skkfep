@@ -175,6 +175,7 @@ App::Run()
             }
 
             if (output.NextKeymap) {
+              g_skk.setKeymap(*output.NextKeymap);
             }
 
             if (output.Predit.size()) {
