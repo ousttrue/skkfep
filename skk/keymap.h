@@ -58,21 +58,34 @@ enum class KeymapTypes
   CodeInput,
 };
 
-// 内部ステート(入力モード、変換モード、未確定文字列)の変更と
-// 3系統の出力 pty(確定文字列 child process), std out(未確定文字列 preedit),
-// statusline(モード表示など)
 struct SkkOutput
 {
   // 確定(to child process & 出力待ちflushout)
   //   母音、子音+母音
   //   漢字選択
   //   エラー、キャンセル入力
-  std::string Through;
+  std::string Confirmed;
+
   // 未確定(to term)
   //   ローマ字未確定(子音単体)
   //   漢字未確定(未選択)
   //   送り未確定？
-  std::string Predit;
+  std::string Unconfirmed;
+
+  SkkOutput& operator+=(const SkkOutput& rhs)
+  {
+    Confirmed += rhs.Confirmed;
+    Unconfirmed += rhs.Unconfirmed;
+    return *this;
+  }
+};
+
+// 内部ステート(入力モード、変換モード、未確定文字列)の変更と
+// 3系統の出力 pty(確定文字列 child process), std out(未確定文字列 preedit),
+// statusline(モード表示など)
+struct SkkResult
+{
+  SkkOutput Output;
 
   std::optional<SkkModes> NextMode;
 
@@ -85,15 +98,27 @@ struct SkkOutput
   char ReInput = 0;
   bool Okuri = false;
 
-  SkkOutput& operator+=(const SkkOutput& rhs)
+  SkkResult& operator+=(const SkkResult& rhs)
   {
-    Through += rhs.Through;
-    Predit += rhs.Predit;
+    Output += rhs.Output;
+    if (rhs.NextMode) {
+      NextMode = rhs.NextMode;
+    }
+    if (rhs.NextKeymap) {
+      NextKeymap = rhs.NextKeymap;
+    }
+    if (rhs.RestoreKeymap) {
+      RestoreKeymap = rhs.RestoreKeymap;
+    }
+    if (rhs.ReInput) {
+      ReInput = rhs.ReInput;
+      Okuri = rhs.Okuri;
+    }
     return *this;
   }
 };
 
-using KeyFunc = std::function<SkkOutput(uint8_t, bool)>;
+using KeyFunc = std::function<SkkResult(uint8_t, bool)>;
 
 // 変換モード(直入力、▽見出し入力, *送り入力、▼Select)
 // + 入力モード(ascii, ひら、カタ、全)
@@ -106,7 +131,7 @@ struct Keymap
   KeyFunc DefaultFunc = {};
   std::unordered_map<uint8_t, KeyFunc> Keymap;
 
-  SkkOutput input(uint8_t c, bool okuri)
+  SkkResult input(uint8_t c, bool okuri)
   {
     auto found = Keymap.find(c);
 

@@ -11,12 +11,12 @@ Skk::initialize()
 {
   auto& NormalKeymap = m_keymaps[KeymapTypes::Normal];
   NormalKeymap.DefaultFunc = [](auto c, auto) {
-    SkkOutput output;
-    output.Through += c;
+    SkkResult output;
+    output.Output.Confirmed += c;
     return output;
   };
   NormalKeymap.Keymap[CTRL_T] = [](auto, auto) {
-    return SkkOutput{ .NextKeymap = KeymapTypes::Kana };
+    return SkkResult{ .NextKeymap = KeymapTypes::Kana };
   };
 
   auto& KanaKeymap = m_keymaps[KeymapTypes::Kana];
@@ -44,8 +44,8 @@ Skk::initialize()
     { 'K', kkBegC },
     { 'L',
       [](auto, auto) {
-        return SkkOutput{
-          .Through = romkan::flushKana(),
+        return SkkResult{
+          .Output = { .Confirmed = romkan::flushKana() },
           .NextMode = ZENEI_MODE,
           .NextKeymap = KeymapTypes::Zenkaku,
         };
@@ -57,7 +57,7 @@ Skk::initialize()
     { 'Q',
       [](auto, auto) {
         // self->kkBeg();
-        SkkOutput output;
+        SkkResult output;
         output.NextMode = SkkModes::KINPUT_MODE;
         // kanjiInputEffect(1);
         kkClearBuf();
@@ -88,8 +88,8 @@ Skk::initialize()
     { 'k', romkan::iKanaC },
     { 'l',
       [](auto, auto) {
-        return SkkOutput{
-          .Through = romkan::flushKana(),
+        return SkkResult{
+          .Output = { .Confirmed = romkan::flushKana() },
           .NextMode = SkkModes::SKK_MODE,
           .NextKeymap = KeymapTypes::Normal,
         };
@@ -101,7 +101,7 @@ Skk::initialize()
     { 'q',
       [self = this](auto, auto) {
         romkan::tglK(self);
-        return SkkOutput{};
+        return SkkResult{};
       } },
     { 'r', romkan::iKanaC },
     { 's', romkan::iKanaC },
@@ -116,8 +116,8 @@ Skk::initialize()
 
   auto& ZenkakuKeymap = m_keymaps[KeymapTypes::Zenkaku];
   ZenkakuKeymap.DefaultFunc = [](auto c, auto) {
-    SkkOutput output;
-    output.Through += c;
+    SkkResult output;
+    output.Output.Confirmed += c;
     return output;
   };
 
@@ -381,13 +381,13 @@ Skk::initialize()
   CodeInputKeymap.DefaultFunc = nulcmd;
   CodeInputKeymap.Keymap = {
     { CTRL_C,
-      [](auto, auto) { return SkkOutput{ .NextKeymap = KeymapTypes::Kana }; } },
+      [](auto, auto) { return SkkResult{ .NextKeymap = KeymapTypes::Kana }; } },
     { CTRL_G,
-      [](auto, auto) { return SkkOutput{ .NextKeymap = KeymapTypes::Kana }; } },
+      [](auto, auto) { return SkkResult{ .NextKeymap = KeymapTypes::Kana }; } },
     { CTRL_J, [](auto, auto) { return g_codeinput.enterCode(); } },
     { CTRL_M, [](auto, auto) { return g_codeinput.enterCode(); } },
     { CTRL_T,
-      [](auto, auto) { return SkkOutput{ .NextKeymap = KeymapTypes::Kana }; } },
+      [](auto, auto) { return SkkResult{ .NextKeymap = KeymapTypes::Kana }; } },
     { '0', [](auto c, auto) { return g_codeinput.codein(c); } },
     { '1', [](auto c, auto) { return g_codeinput.codein(c); } },
     { '2', [](auto c, auto) { return g_codeinput.codein(c); } },

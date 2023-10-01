@@ -4,13 +4,13 @@
 
 namespace zenkakualpha {
 
-SkkOutput
+SkkResult
 iZenAl(char c, bool o = {});
 
 std::string
 inputZenkakuAlpha(char c);
 
-SkkOutput
+SkkResult
 iZenEx(char c, bool o = {});
 
 std::string

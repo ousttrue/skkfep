@@ -171,15 +171,6 @@ App::Run()
             // key input may has side effect
             auto output = g_skk.input(c, okuri);
 
-            // void
-            // Skk::kkBeg()
-            // {
-            //   setKeymap(SkkModes::KINPUT_MODE);
-            //   showmode(KINPUT_MODE);
-            //   kanjiInputEffect(1);
-            //   kkClearBuf();
-            // }
-
             if (output.ReInput) {
               output = g_skk.input(output.ReInput, output.Okuri);
             }
@@ -194,12 +185,12 @@ App::Run()
               g_skk.setKeymap(*output.NextKeymap);
             }
 
-            if (output.Predit.size()) {
-              terminal::writes(output.Predit);
+            if (output.Output.Unconfirmed.size()) {
+              terminal::writes(output.Output.Unconfirmed);
             }
 
-            if (output.Through.size()) {
-              child::writeShells(output.Through);
+            if (output.Output.Confirmed.size()) {
+              child::writeShells(output.Output.Confirmed);
             }
 
             okuri = OkuriFirst;

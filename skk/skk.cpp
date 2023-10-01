@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-SkkOutput
+SkkResult
 nulcmd(char, bool)
 {
   return {};
@@ -71,7 +71,7 @@ Skk::restoreKeymap()
   CurrentKeymap = lastKeymap;
 }
 
-SkkOutput
+SkkResult
 Skk::input(uint8_t c, bool okuri)
 {
   return CurrentKeymap->input(c, okuri);
@@ -126,19 +126,19 @@ Skk::setKanaKey()
   auto k = code(KanaKey.c_str());
   printf("KanaKey=^%c\n", k ^ 0x40);
   NormalKeymap().Keymap[k] = [](auto, auto) {
-    return SkkOutput{
+    return SkkResult{
       .NextKeymap = KeymapTypes::Kana,
     };
   };
   SelectionKeymap().Keymap[k] = fixIt;
   CodeInputKeymap().Keymap[k] = [](auto, auto) {
-    return SkkOutput{
+    return SkkResult{
       .NextKeymap = KeymapTypes::Kana,
     };
   };
   KanaKeymap().Keymap[k] = nulcmd;
   ZenkakuKeymap().Keymap[k] = [](auto, auto) {
-    return SkkOutput{
+    return SkkResult{
       .NextKeymap = KeymapTypes::Kana,
     };
   };

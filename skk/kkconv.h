@@ -11,113 +11,113 @@ class Skk;
 void
 kkClearBuf();
 
-SkkOutput
+SkkResult
 kkBegV(char c, bool o = {});
 
-SkkOutput
+SkkResult
 kkBegC(char c, bool o = {});
 
-SkkOutput
+SkkResult
 kkBegA(char c, bool o = {});
 
-SkkOutput
+SkkResult
 kalpha(char c, bool o = {});
 
-SkkOutput
+SkkResult
 kaBS(char c, bool o = {});
 
-SkkOutput
+SkkResult
 kKanaV(char c, bool o = {});
 
-SkkOutput
+SkkResult
 okKanaV(char c, bool first);
 
-SkkOutput
+SkkResult
 kKanaC(char c, bool o = {});
 
-SkkOutput
+SkkResult
 okKanaC(char c, bool first);
 
-SkkOutput
+SkkResult
 kZenAl(char c, bool o = {});
 
-SkkOutput
+SkkResult
 kZenEx(char c, bool o = {});
 
-SkkOutput
+SkkResult
 kfthru(char c, bool o = {});
 
-SkkOutput
+SkkResult
 fxthru(Skk* skk, char c);
 
-SkkOutput
+SkkResult
 kfCancel(char c, bool o = {});
 
-SkkOutput
+SkkResult
 kfFix(char c, bool o = {});
 
-SkkOutput
+SkkResult
 kfFixToAsc(char c, bool o = {});
 
-SkkOutput
+SkkResult
 kfFixToZenA(char c, bool o = {});
 
-SkkOutput
+SkkResult
 kfFixThru(Skk* skk, char c);
 
-SkkOutput
+SkkResult
 thruKfFixToAsc(char c, bool o = {});
 
-SkkOutput
+SkkResult
 okfFix(char c, bool o = {});
 
-SkkOutput
+SkkResult
 okfFixToAsc(char c, bool o = {});
 
-SkkOutput
+SkkResult
 okfFixToZenA(char c, bool o = {});
 
-SkkOutput
+SkkResult
 okfFixThru(char c, bool o = {});
 
-SkkOutput
+SkkResult
 thruOkfFixToAsc(char c, bool o = {});
 
-SkkOutput
+SkkResult
 kfBS(char c, bool o = {});
 
-SkkOutput
+SkkResult
 okuriBS(char c, bool o = {});
 
-SkkOutput
+SkkResult
 kkconv(char c, bool o = {});
 
-SkkOutput
+SkkResult
 kOkuri(char c, bool o = {});
 
-SkkOutput
+SkkResult
 stSuffix(char c, bool o = {});
 
-SkkOutput
+SkkResult
 stPrefixCv(char c, bool o = {});
 
-SkkOutput
+SkkResult
 nxCand(char c = {}, bool o = {});
 
-SkkOutput
+SkkResult
 pvCand(char c = {}, bool o = {});
 
-SkkOutput
+SkkResult
 cancelOkuri(char c = {}, bool o = {});
 
-SkkOutput
+SkkResult
 fixIt(char c = {}, bool o = {});
 
-SkkOutput
+SkkResult
 thruFixItToAsc(char c, bool o = {});
 
-SkkOutput
+SkkResult
 cancelSel(char c, bool o = {});
 
-SkkOutput
+SkkResult
 h2kkana(char c, bool o = {});

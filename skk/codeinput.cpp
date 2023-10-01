@@ -13,49 +13,50 @@ KanjiCodeInput::codeinMsg()
   terminal::writes("JIS or EUC code: ");
 }
 
-SkkOutput
+SkkResult
 KanjiCodeInput::inputCode(Skk* skk)
 {
-  auto output = romkan::flushKana();
+  SkkResult result;
+  result.Output.Confirmed = romkan::flushKana();
   if (status::type() != StatusType::NoStatusLine) {
     codeinMsg();
     skk->setKeymap(KeymapTypes::CodeInput);
     codecol = 0;
   }
-  return { .Through = output };
+  return result;
 }
 
-SkkOutput
+SkkResult
 KanjiCodeInput::codein(char c)
 {
   if (codecol == 4) {
     codecol = 0;
     codeinMsg();
   }
-  SkkOutput output;
-  output.Predit += c;
+  SkkResult result;
+  result.Output.Unconfirmed += c;
   codebuf[codecol] = tolower(c);
   codecol++;
-  return output;
+  return result;
 }
 
 #define HEX1(x) ((x) > '9' ? ((x) - 'a' + 10) : ((x) - '0'))
 #define HEX2INT(a, b) ((HEX1(a) << 4) + HEX1(b))
 
-SkkOutput
+SkkResult
 KanjiCodeInput::enterCode()
 {
   fromMsg();
-  SkkOutput output;
+  SkkResult result;
   if (codecol == 4) {
     char kbuf[3];
     kbuf[0] = (HEX2INT(codebuf[0], codebuf[1]) | 0x80);
     kbuf[1] = (HEX2INT(codebuf[2], codebuf[3]) | 0x80);
     kbuf[2] = '\0';
-    output.Through += kbuf;
+    result.Output.Confirmed += kbuf;
   }
-  output.NextKeymap = KeymapTypes::Kana;
-  return output;
+  result.NextKeymap = KeymapTypes::Kana;
+  return result;
 }
 
 KanjiCodeInput g_codeinput;

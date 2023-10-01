@@ -116,13 +116,13 @@ const char* ExChars[] = { "ー", "「", "」" };
 
 namespace zenkakualpha {
 
-SkkOutput
+SkkResult
 iZenAl(char c, bool)
 {
-  SkkOutput output;
-  output.Through += romkan::flushKana();
-  output.Through += inputZenkakuAlpha(c);
-  return output;
+  SkkResult result;
+  result.Output.Confirmed += romkan::flushKana();
+  result.Output.Confirmed += inputZenkakuAlpha(c);
+  return result;
 }
 
 std::string
@@ -132,13 +132,13 @@ inputZenkakuAlpha(char c)
   return ZenkakuAlpha[c - ' '];
 }
 
-SkkOutput
+SkkResult
 iZenEx(char c, bool)
 {
-  SkkOutput output;
-  output.Through += romkan::flushKana();
-  output.Through += inputZenkakuEx(c);
-  return output;
+  SkkResult result;
+  result.Output.Confirmed += romkan::flushKana();
+  result.Output.Confirmed += inputZenkakuEx(c);
+  return result;
 }
 
 std::string

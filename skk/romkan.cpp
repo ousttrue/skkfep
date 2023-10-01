@@ -29,22 +29,22 @@ isHiragana()
   return CurrentTab == HiraTab;
 }
 
-SkkOutput
+SkkResult
 iKanaV(char c, bool)
 {
-  return { .Through = inputKanaVowel(c) };
+  return { .Output = { .Confirmed = inputKanaVowel(c) } };
 }
 
-SkkOutput
+SkkResult
 iKanaC(char c, bool)
 {
-  return { .Through = inputKanaConso(c) };
+  return { .Output = { .Confirmed = inputKanaConso(c) } };
 }
 
-SkkOutput
+SkkResult
 flthru(char c, bool)
 {
-  return { .Through = flushKana() };
+  return { .Output = { .Confirmed = flushKana() } };
 }
 
 std::string
@@ -219,7 +219,7 @@ flushLastConso(char c)
   return out;
 }
 
-SkkOutput
+SkkResult
 tglK(Skk* skk)
 {
   auto out = flushKana();
@@ -230,7 +230,7 @@ tglK(Skk* skk)
     CurrentTab = HiraTab;
     skk->showmode(KANA_MODE);
   }
-  return { .Through = out };
+  return { .Output = { .Confirmed = out } };
 }
 
 void
@@ -242,10 +242,10 @@ cancelConso()
   SmallTU = 0;
 }
 
-SkkOutput
+SkkResult
 kanaBS(char c, bool)
 {
-  SkkOutput output;
+  SkkResult output;
   if (Nconso) {
     int n = Nconso;
     char con[MAX_CONSO];
@@ -255,7 +255,7 @@ kanaBS(char c, bool)
     for (int i = 1; i < n; i++)
       output += iKanaC(con[i]);
   } else {
-    output.Through += c;
+    output.Output.Confirmed += c;
   }
   return output;
 }

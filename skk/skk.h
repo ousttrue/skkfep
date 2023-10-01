@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <unordered_map>
 
-SkkOutput
+SkkResult
 nulcmd(char, bool);
 
 class Skk
@@ -81,5 +81,5 @@ public:
 
   bool is_okuri_input();
 
-  SkkOutput input(uint8_t c, bool okuri = false);
+  SkkResult input(uint8_t c, bool okuri = false);
 };

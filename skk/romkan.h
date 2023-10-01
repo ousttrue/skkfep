@@ -94,14 +94,14 @@ bool
 isHiragana();
 
 // 母音
-SkkOutput
+SkkResult
 iKanaV(char c, bool o = {});
 
 // 子音
-SkkOutput
+SkkResult
 iKanaC(char c, bool o = {});
 
-SkkOutput
+SkkResult
 flthru(char c, bool);
 
 std::string
@@ -118,13 +118,13 @@ inputKanaConso(char c);
 std::string
 flushLastConso(char c);
 
-SkkOutput
+SkkResult
 tglK(Skk* skk);
 
 void
 cancelConso();
 
-SkkOutput
+SkkResult
 kanaBS(char c, bool o = {});
 
 void
