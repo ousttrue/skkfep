@@ -8,18 +8,18 @@ TEST(SkkTest, zenkaku)
   EXPECT_EQ(skk.currentKeymap().Type, KeymapTypes::Normal);
 
   {
-    auto res = skk.input(CTRL_J);
+    auto output = skk.input(CTRL_J);
     EXPECT_EQ(skk.currentKeymap().Type, KeymapTypes::Kana);
   }
 
   {
-    auto res = skk.input('L');
+    auto output = skk.input('L');
     EXPECT_EQ(skk.currentKeymap().Type, KeymapTypes::Zenkaku);
   }
 
   {
-    auto res = skk.input('a');
-    EXPECT_EQ(res.Output.Confirmed, "ａ");
+    auto output = skk.input('a');
+    EXPECT_EQ(output.Confirmed, "ａ");
   }
 }
 
@@ -28,12 +28,12 @@ TEST(SkkTest, romkan)
   Skk skk;
 
   {
-    auto res = skk.input(CTRL_J);
+    auto output = skk.input(CTRL_J);
     EXPECT_EQ(skk.currentKeymap().Type, KeymapTypes::Kana);
   }
 
   {
-    auto res = skk.input('a');
-    EXPECT_EQ(res.Output.Confirmed, "あ");
+    auto output = skk.input('a');
+    EXPECT_EQ(output.Confirmed, "あ");
   }
 }

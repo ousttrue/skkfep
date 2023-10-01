@@ -71,10 +71,34 @@ Skk::restoreKeymap()
   CurrentKeymap = lastKeymap;
 }
 
-SkkResult
+SkkOutput
 Skk::input(uint8_t c, bool okuri)
 {
-  return CurrentKeymap->input(c, okuri);
+  auto result = CurrentKeymap->input(c, okuri);
+  apply(result);
+
+  // process result
+  if (result.ReInput) {
+    result = CurrentKeymap->input(result.ReInput, result.Okuri);
+    apply(result);
+  }
+
+  return result.Output;
+}
+
+// update Keymap etc...
+void
+Skk::apply(const SkkResult& result)
+{
+  if (result.NextMode) {
+    showmode(*result.NextMode);
+  }
+
+  if (result.RestoreKeymap) {
+    restoreKeymap();
+  } else if (result.NextKeymap) {
+    setKeymap(*result.NextKeymap);
+  }
 }
 
 static int

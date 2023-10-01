@@ -1,8 +1,6 @@
 #include "kkconv.h"
 #include "dictinary.h"
 #include "romkan.h"
-#include "skk.h"
-#include "stty.h"
 #include "terms.h"
 #include "zenkakualpha.h"
 #include <ctype.h>
@@ -268,11 +266,11 @@ kfthru(char c, bool)
 }
 
 SkkResult
-fxthru(Skk* skk, char c)
+fxthru(char, bool)
 {
   /* fix and through */
   auto output = fixIt();
-  output += skk->input(c);
+  output.ReInput = true;
   return output;
 }
 
@@ -330,7 +328,7 @@ kfFixToZenA(char c, bool)
 }
 
 SkkResult
-kfFixThru(Skk* skk, char c)
+kfFixThru(char c, bool)
 {
   auto output = kfFix(c);
   output.Output.Confirmed += c;

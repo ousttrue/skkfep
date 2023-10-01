@@ -177,7 +177,7 @@ Skk::initialize()
   KanjiInputKeymap.Keymap = {
     { CTRL_G, kfCancel },
     { CTRL_H, kfBS },
-    { CTRL_M, [self = this](auto c, auto) { return kfFixThru(self, c); } },
+    { CTRL_M, kfFixThru },
     { ' ', kkconv },
     { '!', kZenAl },
     { '"', kfthru },
@@ -367,9 +367,7 @@ Skk::initialize()
   };
 
   auto& SelectionKeymap = m_keymaps[KeymapTypes::Selection];
-  SelectionKeymap.DefaultFunc = [self = this](auto c, auto) {
-    return fxthru(self, c);
-  };
+  SelectionKeymap.DefaultFunc = fxthru;
   SelectionKeymap.Keymap = {
     { CTRL_G, cancelSel }, { CTRL_T, fixIt },
     { ' ', nxCand },       { 'x', pvCand },

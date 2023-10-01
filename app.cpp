@@ -169,29 +169,18 @@ App::Run()
           } else {
             // ascii
             // key input may has side effect
-            auto output = g_skk.input(c, okuri);
+            auto [confirmed, unconfirmed] = g_skk.input(c, okuri);
 
-            if (output.ReInput) {
-              output = g_skk.input(output.ReInput, output.Okuri);
+            if (unconfirmed.size()) {
+              // TODO: decoration. ▽, ▼ standout, underline...etc
+              terminal::writes(unconfirmed);
             }
 
-            if (output.NextMode) {
-              g_skk.showmode(*output.NextMode);
+            if (confirmed.size()) {
+              child::writeShells(confirmed);
             }
 
-            if (output.RestoreKeymap) {
-              g_skk.restoreKeymap();
-            } else if (output.NextKeymap) {
-              g_skk.setKeymap(*output.NextKeymap);
-            }
-
-            if (output.Output.Unconfirmed.size()) {
-              terminal::writes(output.Output.Unconfirmed);
-            }
-
-            if (output.Output.Confirmed.size()) {
-              child::writeShells(output.Output.Confirmed);
-            }
+            // TODO: status line update
 
             okuri = OkuriFirst;
           }

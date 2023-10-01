@@ -81,5 +81,6 @@ public:
 
   bool is_okuri_input();
 
-  SkkResult input(uint8_t c, bool okuri = false);
+  SkkOutput input(uint8_t c, bool okuri = false);
+  void apply(const SkkResult& result);
 };

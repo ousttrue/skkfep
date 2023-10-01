@@ -6,8 +6,6 @@ extern char PreserveOnFailure;
 extern char OkuriFirst;
 extern struct Dictionary* UserDic;
 
-class Skk;
-
 void
 kkClearBuf();
 
@@ -48,7 +46,7 @@ SkkResult
 kfthru(char c, bool o = {});
 
 SkkResult
-fxthru(Skk* skk, char c);
+fxthru(char c = {}, bool o = {});
 
 SkkResult
 kfCancel(char c, bool o = {});
@@ -63,7 +61,7 @@ SkkResult
 kfFixToZenA(char c, bool o = {});
 
 SkkResult
-kfFixThru(Skk* skk, char c);
+kfFixThru(char c, bool o = {});
 
 SkkResult
 thruKfFixToAsc(char c, bool o = {});
