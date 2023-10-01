@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <optional>
 #include <stdint.h>
 #include <string>
 
@@ -31,12 +32,28 @@ mode_string(SkkModes m)
   }
 }
 
+enum class KeymapTypes
+{
+  Normal,
+  Selection,
+  CodeInput,
+  Kana,
+  Zenkaku,
+  KanjiInput,
+  OkuriInput,
+  KAlphaInput,
+};
+
 struct SkkOutput
 {
   // To child process
   std::string Through;
   // To term
   std::string Predit;
+
+  std::optional<SkkModes> NextMode;
+
+  std::optional<KeymapTypes> NextKeymap;
 
   SkkOutput& operator+=(const SkkOutput& rhs)
   {
@@ -62,18 +79,6 @@ struct SkkOutput
 // * 見出し語 romaji
 //
 using KeyFunc = std::function<SkkOutput(uint8_t, bool)>;
-
-enum class KeymapTypes
-{
-  Normal,
-  Selection,
-  CodeInput,
-  Kana,
-  Zenkaku,
-  KanjiInput,
-  OkuriInput,
-  KAlphaInput,
-};
 
 struct Keymap
 {

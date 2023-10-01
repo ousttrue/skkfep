@@ -132,6 +132,7 @@ App::Run()
   FD_ZERO(&selfds);
   int fdnum = child::Shellfd + 1;
 
+  char okuri = 0;
   for (;;) {
     FD_SET(0, &selfds);
     FD_SET(child::Shellfd, &selfds);
@@ -157,31 +158,37 @@ App::Run()
       int i;
       if (ioctl(0, FIONREAD, &i) == 0) {
         for (; i; --i) {
+          OkuriFirst = 0;
+
           int c = getchar();
-          Input(c);
+
+          if (c & 0x80) {
+            // not ascii
+            // thru(c);
+            write(fileno(child::Shellout), &c, 1);
+          } else {
+            // ascii
+            // key input may has side effect
+            auto output = g_skk.input(c, okuri);
+
+            if (output.NextMode) {
+            }
+
+            if (output.NextKeymap) {
+            }
+
+            if (output.Predit.size()) {
+              terminal::writes(output.Predit);
+            }
+
+            if (output.Through.size()) {
+              child::writeShells(output.Through);
+            }
+
+            okuri = OkuriFirst;
+          }
         }
       }
-    }
-  }
-}
-
-void
-App::Input(uint8_t c)
-{
-  char o = OkuriFirst;
-  OkuriFirst = 0;
-  if (c & 0x80) {
-    // not ascii
-    // thru(c);
-    write(fileno(child::Shellout), &c, 1);
-  } else {
-    // ascii
-    auto output = g_skk.input(c, o);
-    if (output.Predit.size()) {
-      terminal::writes(output.Predit);
-    }
-    if (output.Through.size()) {
-      child::writeShells(output.Through);
     }
   }
 }

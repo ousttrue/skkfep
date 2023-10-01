@@ -35,6 +35,4 @@ private:
   void PtyFree();
   void OpenDictionary(std::string_view path);
   void SaveJisyo();
-
-  void Input(uint8_t c);
 };
