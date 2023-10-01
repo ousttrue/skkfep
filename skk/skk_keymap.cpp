@@ -6,6 +6,48 @@
 #include "zenkakualpha.h"
 #include <stdio.h>
 
+static int
+code(const char* p)
+{
+  int k;
+  if (p[0] == '\\') {
+    switch (p[1]) {
+      case 'a':
+        return '\007';
+      case 'b':
+        return '\b';
+      case 'f':
+        return '\f';
+      case 'n':
+        return '\n';
+      case 'r':
+        return '\r';
+      case 't':
+        return '\t';
+      case 'v':
+        return '\v';
+      case 'x':
+        sscanf(p + 2, "%x", &k);
+        return k;
+      default:
+        if (('0' <= p[1]) && (p[1] <= '9')) {
+          sscanf(p + 1, "%o", &k);
+          return k;
+        } else {
+          p++;
+        }
+        break;
+    }
+  } else if (p[0] == '^') {
+    p++;
+  }
+  k = p[0];
+  if (k >= '`')
+    k -= ('a' - 'A');
+  if (k >= ' ')
+    k ^= 0x40;
+  return k;
+}
 void
 Skk::initialize()
 {
@@ -409,4 +451,27 @@ Skk::initialize()
     { 'e', [](auto c, auto) { return g_codeinput.codein(c); } },
     { 'f', [](auto c, auto) { return g_codeinput.codein(c); } },
   };
+
+  auto k = code(KanaKey.c_str());
+  // printf("KanaKey=^%c\n", k ^ 0x40);
+  NormalKeymap.Keymap[k] = [](auto, auto) {
+    return SkkResult{
+      .NextKeymap = KeymapTypes::Kana,
+    };
+  };
+  SelectionKeymap.Keymap[k] = fixIt;
+  CodeInputKeymap.Keymap[k] = [](auto, auto) {
+    return SkkResult{
+      .NextKeymap = KeymapTypes::Kana,
+    };
+  };
+  KanaKeymap.Keymap[k] = nulcmd;
+  ZenkakuKeymap.Keymap[k] = [](auto, auto) {
+    return SkkResult{
+      .NextKeymap = KeymapTypes::Kana,
+    };
+  };
+  KanjiInputKeymap.Keymap[k] = kfFix;
+  OkuriInputKeymap.Keymap[k] = okfFix;
+  KAlphaInputKeymap.Keymap[k] = kfFix;
 }

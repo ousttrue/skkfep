@@ -49,7 +49,6 @@ public:
   void showcurmode();
   void showlastmode();
 
-  void setKanaKey();
   void setKeymap(KeymapPtr _new);
   void setKeymap(KeymapTypes t);
   void setKeymap(SkkModes m)
@@ -78,9 +77,8 @@ public:
     }
   }
   void restoreKeymap();
-
-  bool is_okuri_input();
-
   SkkOutput input(uint8_t c, bool okuri = false);
+
+private:
   void apply(const SkkResult& result);
 };

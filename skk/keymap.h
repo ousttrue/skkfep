@@ -134,13 +134,11 @@ struct Keymap
   SkkResult input(uint8_t c, bool okuri)
   {
     auto found = Keymap.find(c);
-
-    auto f = DefaultFunc;
-    if (found != Keymap.end()) {
-      f = found->second;
+    if (found == Keymap.end()) {
+      return DefaultFunc(c, okuri);
+    } else {
+      return found->second(c, okuri);
     }
-
-    return f(c, okuri);
   }
 
   void setall(const KeyFunc& f)
