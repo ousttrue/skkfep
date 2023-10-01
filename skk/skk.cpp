@@ -152,12 +152,3 @@ Skk::is_okuri_input()
 {
   return CurrentKeymap == &OkuriInputKeymap();
 }
-
-void
-Skk::kkBeg()
-{
-  setKeymap(SkkModes::KINPUT_MODE);
-  showmode(KINPUT_MODE);
-  kanjiInputEffect(1);
-  kkClearBuf();
-}

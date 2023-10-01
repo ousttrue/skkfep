@@ -77,6 +77,56 @@ bufferedInput(std::string_view s)
   return { .Predit = { s.begin(), s.end() } };
 }
 
+static SkkOutput
+showCand()
+{
+  kanjiSelectionEffect(1);
+  SkkOutput output;
+  output.Predit += *Current.Cand;
+  if (OkuriInput) {
+    output.Predit += OkuriBuf;
+  }
+  return output;
+}
+
+static SkkOutput
+toOkuri()
+{
+  OkuriInput = 1;
+  *OkuriBuf = '\0';
+  OkuriBufLen = 0;
+  return {
+    .NextKeymap = KeymapTypes::OkuriInput,
+  };
+}
+
+static SkkOutput
+clearOkuri()
+{
+  WordBufLen--;
+  WordBuf[WordBufLen] = '\0';
+  return toOkuri();
+}
+
+/* back to kanji input mode */
+static SkkOutput
+backToKanjiInput()
+{
+  SkkOutput output;
+  output.RestoreKeymap = true;
+  output.NextMode = KINPUT_MODE;
+  kanjiInputEffect(1);
+  if (OkuriInput) {
+    output += clearOkuri();
+    OkuriFirst = 1;
+    output.Predit += WordBuf;
+    output.Predit += '*';
+  } else {
+    output.Predit += WordBuf;
+  }
+  return output;
+}
+
 void
 kkClearBuf()
 {
@@ -84,27 +134,37 @@ kkClearBuf()
 }
 
 SkkOutput
-kkBegV(Skk* skk, char c)
+kkBegV(char c, bool)
 {
-  skk->kkBeg();
-  return bufferedInput(romkan::inputKanaVowel(tolower(c)));
+  SkkOutput output;
+  output.NextMode = SkkModes::KINPUT_MODE;
+  kanjiInputEffect(1);
+  kkClearBuf();
+  output += bufferedInput(romkan::inputKanaVowel(tolower(c)));
+  return output;
 }
 
 SkkOutput
-kkBegC(Skk* skk, char c)
+kkBegC(char c, bool)
 {
-  skk->kkBeg();
-  return bufferedInput(romkan::inputKanaConso(tolower(c)));
+  SkkOutput output;
+  output.NextMode = SkkModes::KINPUT_MODE;
+  kanjiInputEffect(1);
+  kkClearBuf();
+  output += bufferedInput(romkan::inputKanaConso(tolower(c)));
+  return output;
 }
 
-void
-kkBegA(Skk* skk, char c)
+SkkOutput
+kkBegA(char c, bool)
 {
   romkan::flushKana();
-  skk->setKeymap(KeymapTypes::KAlphaInput);
-  skk->showmode(KINPUT_MODE);
+  SkkOutput output;
+  output.NextKeymap = KeymapTypes::KAlphaInput;
+  output.NextMode = KINPUT_MODE;
   kanjiInputEffect(1);
   WordBufLen = 0;
+  return output;
 }
 
 SkkOutput
@@ -116,7 +176,7 @@ kalpha(char c, bool)
   return output;
 }
 
-void
+SkkOutput
 kaBS(char c, bool)
 {
   if (WordBufLen > 0) {
@@ -125,6 +185,7 @@ kaBS(char c, bool)
     WordBufLen--;
     kanjiInputEffect(1);
   }
+  return {};
 }
 
 SkkOutput
@@ -154,14 +215,14 @@ putOkuri(std::string_view s)
 }
 
 SkkOutput
-okKanaV(Skk* skk, char c, bool first)
+okKanaV(char c, bool first)
 {
   if (first) {
     WordBuf[WordBufLen++] = c;
   }
   rubout(1);
   auto output = putOkuri(romkan::inputKanaVowel(tolower(c)));
-  output += kkconv(skk, c);
+  output += kkconv(c);
   return output;
 }
 
@@ -336,7 +397,7 @@ thruOkfFixToAsc(char c, bool)
   return output;
 }
 
-void
+SkkOutput
 kfBS(char c, bool)
 {
   kanjiInputEffect(0);
@@ -361,10 +422,11 @@ kfBS(char c, bool)
     }
   }
   kanjiInputEffect(1);
+  return {};
 }
 
 SkkOutput
-okuriBS(Skk* skk, char c)
+okuriBS(char c, bool)
 {
   kanjiInputEffect(0);
   int n = Nconso;
@@ -384,20 +446,8 @@ okuriBS(Skk* skk, char c)
   return output;
 }
 
-static SkkOutput
-showCand()
-{
-  kanjiSelectionEffect(1);
-  SkkOutput output;
-  output.Predit += *Current.Cand;
-  if (OkuriInput) {
-    output.Predit += OkuriBuf;
-  }
-  return output;
-}
-
 SkkOutput
-kkconv(Skk* skk, char c)
+kkconv(char c, bool)
 {
   kanjiInputEffect(0);
   auto output = bufferedInput(romkan::flushLastConso('\0'));
@@ -406,7 +456,7 @@ kkconv(Skk* skk, char c)
     endKanjiInput();
     output.NextKeymap = KeymapTypes::Kana;
   }
-  skk->showmode(KSELECT_MODE);
+  output.NextMode = KSELECT_MODE;
 
   WordBuf[WordBufLen] = '\0';
   Current.List = UserDic->getCand(WordBuf);
@@ -420,7 +470,7 @@ kkconv(Skk* skk, char c)
   if (OkuriInput)
     l += strlen(OkuriBuf) - 1;
   rubout(l);
-  skk->setKeymap(KeymapTypes::Selection);
+  output.NextKeymap = KeymapTypes::Selection;
 
   if (Current.IsEnabled()) {
     BlockTty = 1;
@@ -430,7 +480,7 @@ kkconv(Skk* skk, char c)
     /* Really, enter register mode */
     if (PreserveOnFailure) {
       bell();
-      output += backToKanjiInput(skk);
+      output += backToKanjiInput();
       return output;
     } else {
       endKanjiInput();
@@ -438,17 +488,6 @@ kkconv(Skk* skk, char c)
       return output;
     }
   }
-}
-
-static SkkOutput
-toOkuri()
-{
-  OkuriInput = 1;
-  *OkuriBuf = '\0';
-  OkuriBufLen = 0;
-  return {
-    .NextKeymap = KeymapTypes::OkuriInput,
-  };
 }
 
 SkkOutput
@@ -475,22 +514,24 @@ kOkuri(char c, bool)
 }
 
 SkkOutput
-stSuffix(Skk* skk, char c)
+stSuffix(char c, bool)
 {
   auto output = fixIt();
-  skk->kkBeg();
+  output.NextMode = SkkModes::KINPUT_MODE;
+  kanjiInputEffect(1);
+  kkClearBuf();
   output += kfthru(c);
   return output;
 }
 
 SkkOutput
-stPrefixCv(Skk* skk, char c)
+stPrefixCv(char c, bool)
 {
   if (WordBufLen == 0) {
     return kfthru(c);
   } else {
     auto output = kfthru(c);
-    output += kkconv(skk, ' ');
+    output += kkconv(' ');
     return output;
   }
 }
@@ -508,63 +549,39 @@ clearCurrent()
   return l;
 }
 
-void
-nxCand()
+SkkOutput
+nxCand(char, bool)
 {
   auto l = clearCurrent();
 
   Current.Increment();
 
   // draw
+  SkkOutput output;
   csrLeft(l);
   kanjiSelectionEffect(1);
-  terminal::writes(Current.Cand->c_str());
-
-  if (OkuriInput)
-    terminal::writes(OkuriBuf);
+  output.Predit += *Current.Cand;
+  if (OkuriInput) {
+    output.Predit += OkuriBuf;
+  }
+  return output;
 }
 
-void
-pvCand(Skk* skk)
+SkkOutput
+pvCand(char, bool)
 {
   auto l = clearCurrent();
 
+  SkkOutput output;
   if (Current.Decrement()) {
     csrLeft(l);
     kanjiSelectionEffect(1);
-    terminal::writes(Current.Cand->c_str());
-
-    if (OkuriInput)
-      terminal::writes(OkuriBuf);
-
+    output.Predit += Current.Cand->c_str();
+    if (OkuriInput) {
+      output.Predit += OkuriBuf;
+    }
   } else {
-    backToKanjiInput(skk);
-  }
-}
-
-static SkkOutput
-clearOkuri()
-{
-  WordBufLen--;
-  WordBuf[WordBufLen] = '\0';
-  return toOkuri();
-}
-
-/* back to kanji input mode */
-SkkOutput
-backToKanjiInput(Skk* skk)
-{
-  SkkOutput output;
-  output.RestoreKeymap = true;
-  output.NextMode = KINPUT_MODE;
-  kanjiInputEffect(1);
-  if (OkuriInput) {
-    output += clearOkuri();
-    OkuriFirst = 1;
-    output.Predit += WordBuf;
-    output.Predit += '*';
-  } else {
-    output.Predit += WordBuf;
+    output += backToKanjiInput();
   }
   return output;
 }
@@ -619,7 +636,7 @@ thruFixItToAsc(char c, bool o)
 }
 
 SkkOutput
-cancelSel(Skk* skk, char c)
+cancelSel(char c, bool)
 {
   kanjiSelectionEffect(0);
   if (Current.IsEnabled()) {
@@ -628,7 +645,7 @@ cancelSel(Skk* skk, char c)
       l += strlen(OkuriBuf);
     rubout(l);
   }
-  return backToKanjiInput(skk);
+  return backToKanjiInput();
 }
 
 SkkOutput

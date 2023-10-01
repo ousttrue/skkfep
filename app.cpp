@@ -171,6 +171,15 @@ App::Run()
             // key input may has side effect
             auto output = g_skk.input(c, okuri);
 
+            // void
+            // Skk::kkBeg()
+            // {
+            //   setKeymap(SkkModes::KINPUT_MODE);
+            //   showmode(KINPUT_MODE);
+            //   kanjiInputEffect(1);
+            //   kkClearBuf();
+            // }
+
             if (output.ReInput) {
               output = g_skk.input(output.ReInput, output.Okuri);
             }

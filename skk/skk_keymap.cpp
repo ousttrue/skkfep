@@ -27,69 +27,21 @@ Skk::initialize()
     { ',', zenkakualpha::iZenAl },
     { '-', zenkakualpha::iZenEx },
     { '.', zenkakualpha::iZenAl },
-    { '/',
-      [self = this](auto c, auto) {
-        kkBegA(self, c);
-        return SkkOutput{};
-      } },
+    { '/', kkBegA },
     { ':', zenkakualpha::iZenAl },
     { ';', zenkakualpha::iZenAl },
     { '?', zenkakualpha::iZenAl },
-    { 'A',
-      [self = this](auto c, auto) {
-        kkBegV(self, c);
-        return SkkOutput{};
-      } },
-    { 'B',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
-    { 'C',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
-    { 'D',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
-    { 'E',
-      [self = this](auto c, auto) {
-        kkBegV(self, c);
-        return SkkOutput{};
-      } },
-    { 'F',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
-    { 'G',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
-    { 'H',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
-    { 'I',
-      [self = this](auto c, auto) {
-        kkBegV(self, c);
-        return SkkOutput{};
-      } },
-    { 'J',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
-    { 'K',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
+    { 'A', kkBegV },
+    { 'B', kkBegC },
+    { 'C', kkBegC },
+    { 'D', kkBegC },
+    { 'E', kkBegV },
+    { 'F', kkBegC },
+    { 'G', kkBegC },
+    { 'H', kkBegC },
+    { 'I', kkBegV },
+    { 'J', kkBegC },
+    { 'K', kkBegC },
     { 'L',
       [](auto, auto) {
         return SkkOutput{
@@ -98,76 +50,28 @@ Skk::initialize()
           .NextKeymap = KeymapTypes::Zenkaku,
         };
       } },
-    { 'M',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
-    { 'N',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
-    { 'O',
-      [self = this](auto c, auto) {
-        kkBegV(self, c);
-        return SkkOutput{};
-      } },
-    { 'P',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
+    { 'M', kkBegC },
+    { 'N', kkBegC },
+    { 'O', kkBegV },
+    { 'P', kkBegC },
     { 'Q',
-      [self = this](auto, auto) {
-        self->kkBeg();
-        return SkkOutput{};
+      [](auto, auto) {
+        // self->kkBeg();
+        SkkOutput output;
+        output.NextMode = SkkModes::KINPUT_MODE;
+        // kanjiInputEffect(1);
+        kkClearBuf();
+        return output;
       } },
-    { 'R',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
-    { 'S',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
-    { 'T',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
-    { 'U',
-      [self = this](auto c, auto) {
-        kkBegV(self, c);
-        return SkkOutput{};
-      } },
-    { 'V',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
-    { 'W',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
-    { 'X',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
-    { 'Y',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
-    { 'Z',
-      [self = this](auto c, auto) {
-        kkBegC(self, c);
-        return SkkOutput{};
-      } },
+    { 'R', kkBegC },
+    { 'S', kkBegC },
+    { 'T', kkBegC },
+    { 'U', kkBegV },
+    { 'V', kkBegC },
+    { 'W', kkBegC },
+    { 'X', kkBegC },
+    { 'Y', kkBegC },
+    { 'Z', kkBegC },
     { '[', zenkakualpha::iZenEx },
     { '\\', [self = this](auto, auto) { return g_codeinput.inputCode(self); } },
     { ']', zenkakualpha::iZenEx },
@@ -272,13 +176,9 @@ Skk::initialize()
   KanjiInputKeymap.DefaultFunc = nulcmd;
   KanjiInputKeymap.Keymap = {
     { CTRL_G, kfCancel },
-    { CTRL_H,
-      [](auto c, auto) {
-        kfBS(c);
-        return SkkOutput{};
-      } },
+    { CTRL_H, kfBS },
     { CTRL_M, [self = this](auto c, auto) { return kfFixThru(self, c); } },
-    { ' ', [self = this](auto c, auto) { return kkconv(self, c); } },
+    { ' ', kkconv },
     { '!', kZenAl },
     { '"', kfthru },
     { '#', kfthru },
@@ -306,10 +206,10 @@ Skk::initialize()
     { '9', kfthru },
     { ':', kZenAl },
     { ';', kZenAl },
-    { '<', [self = this](auto c, auto) { return stPrefixCv(self, c); } },
+    { '<', stPrefixCv },
     { '=', kfthru },
-    { '>', [self = this](auto c, auto) { return stPrefixCv(self, c); } },
-    { '?', [self = this](auto c, auto) { return stPrefixCv(self, c); } },
+    { '>', stPrefixCv },
+    { '?', stPrefixCv },
     { '@', kfthru },
     { 'A', kOkuri },
     { 'B', kOkuri },
@@ -379,56 +279,56 @@ Skk::initialize()
   OkuriInputKeymap.DefaultFunc = nulcmd;
   OkuriInputKeymap.Keymap = {
     { CTRL_G, cancelOkuri },
-    { CTRL_H, [self = this](auto c, auto) { return okuriBS(self, c); } },
+    { CTRL_H, okuriBS },
     { CTRL_M, okfFixThru },
     { ' ', okfFix },
-    { 'A', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'A', okKanaV },
     { 'B', okKanaC },
     { 'C', okKanaC },
     { 'D', okKanaC },
-    { 'E', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'E', okKanaV },
     { 'F', okKanaC },
     { 'G', okKanaC },
     { 'H', okKanaC },
-    { 'I', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'I', okKanaV },
     { 'J', okKanaC },
     { 'K', okKanaC },
     { 'L', okfFixToZenA },
     { 'M', okKanaC },
     { 'N', okKanaC },
-    { 'O', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'O', okKanaV },
     { 'P', okKanaC },
     //
     { 'R', okKanaC },
     { 'S', okKanaC },
     { 'T', okKanaC },
-    { 'U', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'U', okKanaV },
     { 'V', okKanaC },
     { 'W', okKanaC },
     { 'X', okKanaC },
     { 'Y', okKanaC },
     { 'Z', okKanaC },
-    { 'a', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'a', okKanaV },
     { 'b', okKanaC },
     { 'c', okKanaC },
     { 'd', okKanaC },
-    { 'e', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'e', okKanaV },
     { 'f', okKanaC },
     { 'g', okKanaC },
     { 'h', okKanaC },
-    { 'i', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'i', okKanaV },
     { 'j', okKanaC },
     { 'k', okKanaC },
     { 'l', okfFixToAsc },
     { 'm', okKanaC },
     { 'n', okKanaC },
-    { 'o', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'o', okKanaV },
     { 'p', okKanaC },
     //
     { 'r', okKanaC },
     { 's', okKanaC },
     { 't', okKanaC },
-    { 'u', [self = this](auto c, auto o) { return okKanaV(self, c, o); } },
+    { 'u', okKanaV },
     { 'v', okKanaC },
     { 'w', okKanaC },
     { 'x', okKanaC },
@@ -439,106 +339,30 @@ Skk::initialize()
   auto& KAlphaInputKeymap = m_keymaps[KeymapTypes::KAlphaInput];
   KAlphaInputKeymap.DefaultFunc = nulcmd;
   KAlphaInputKeymap.Keymap = {
-    { CTRL_G, kfCancel },
-    { CTRL_H,
-      [](auto c, auto) {
-        kaBS(c);
-        return SkkOutput{};
-      } },
-    { ' ', [self = this](auto c, auto) { return kkconv(self, c); } },
-    { '!', kalpha },
-    { '"', kalpha },
-    { '#', kalpha },
-    { '$', kalpha },
-    { '%', kalpha },
-    { '^', kalpha },
-    { '\'', kalpha },
-    { '(', kalpha },
-    { ')', kalpha },
-    { '*', kalpha },
-    { '+', kalpha },
-    { '}', kalpha },
-    { '-', kalpha },
-    { '.', kalpha },
-    { '/', kalpha },
-    { '0', kalpha },
-    { '1', kalpha },
-    { '2', kalpha },
-    { '3', kalpha },
-    { '4', kalpha },
-    { '5', kalpha },
-    { '6', kalpha },
-    { '7', kalpha },
-    { '8', kalpha },
-    { '9', kalpha },
-    { ':', kalpha },
-    { ';', kalpha },
-    { '<', kalpha },
-    { '=', kalpha },
-    { '>', kalpha },
-    { '?', kalpha },
-    { '@', kalpha },
-    { 'A', kalpha },
-    { 'B', kalpha },
-    { 'C', kalpha },
-    { 'D', kalpha },
-    { 'E', kalpha },
-    { 'F', kalpha },
-    { 'G', kalpha },
-    { 'H', kalpha },
-    { 'I', kalpha },
-    { 'J', kalpha },
-    { 'K', kalpha },
-    { 'L', kalpha },
-    { 'M', kalpha },
-    { 'N', kalpha },
-    { 'O', kalpha },
-    { 'P', kalpha },
-    { 'Q', kalpha },
-    { 'R', kalpha },
-    { 'S', kalpha },
-    { 'T', kalpha },
-    { 'U', kalpha },
-    { 'V', kalpha },
-    { 'W', kalpha },
-    { 'X', kalpha },
-    { 'Y', kalpha },
-    { 'Z', kalpha },
-    { '[', kalpha },
-    { '\\', kalpha },
-    { ']', kalpha },
-    { '^', kalpha },
-    { '_', kalpha },
-    { '`', kalpha },
-    { 'a', kalpha },
-    { 'b', kalpha },
-    { 'c', kalpha },
-    { 'd', kalpha },
-    { 'e', kalpha },
-    { 'f', kalpha },
-    { 'g', kalpha },
-    { 'h', kalpha },
-    { 'i', kalpha },
-    { 'j', kalpha },
-    { 'k', kalpha },
-    { 'l', kalpha },
-    { 'm', kalpha },
-    { 'n', kalpha },
-    { 'o', kalpha },
-    { 'p', kalpha },
-    { 'q', kalpha },
-    { 'r', kalpha },
-    { 's', kalpha },
-    { 't', kalpha },
-    { 'u', kalpha },
-    { 'v', kalpha },
-    { 'w', kalpha },
-    { 'x', kalpha },
-    { 'y', kalpha },
-    { 'z', kalpha },
-    { '{', kalpha },
-    { '|', kalpha },
-    { '}', kalpha },
+    { CTRL_G, kfCancel }, { CTRL_H, kaBS }, { ' ', kkconv },  { '!', kalpha },
+    { '"', kalpha },      { '#', kalpha },  { '$', kalpha },  { '%', kalpha },
+    { '^', kalpha },      { '\'', kalpha }, { '(', kalpha },  { ')', kalpha },
+    { '*', kalpha },      { '+', kalpha },  { '}', kalpha },  { '-', kalpha },
+    { '.', kalpha },      { '/', kalpha },  { '0', kalpha },  { '1', kalpha },
+    { '2', kalpha },      { '3', kalpha },  { '4', kalpha },  { '5', kalpha },
+    { '6', kalpha },      { '7', kalpha },  { '8', kalpha },  { '9', kalpha },
+    { ':', kalpha },      { ';', kalpha },  { '<', kalpha },  { '=', kalpha },
+    { '>', kalpha },      { '?', kalpha },  { '@', kalpha },  { 'A', kalpha },
+    { 'B', kalpha },      { 'C', kalpha },  { 'D', kalpha },  { 'E', kalpha },
+    { 'F', kalpha },      { 'G', kalpha },  { 'H', kalpha },  { 'I', kalpha },
+    { 'J', kalpha },      { 'K', kalpha },  { 'L', kalpha },  { 'M', kalpha },
+    { 'N', kalpha },      { 'O', kalpha },  { 'P', kalpha },  { 'Q', kalpha },
+    { 'R', kalpha },      { 'S', kalpha },  { 'T', kalpha },  { 'U', kalpha },
+    { 'V', kalpha },      { 'W', kalpha },  { 'X', kalpha },  { 'Y', kalpha },
+    { 'Z', kalpha },      { '[', kalpha },  { '\\', kalpha }, { ']', kalpha },
+    { '^', kalpha },      { '_', kalpha },  { '`', kalpha },  { 'a', kalpha },
+    { 'b', kalpha },      { 'c', kalpha },  { 'd', kalpha },  { 'e', kalpha },
+    { 'f', kalpha },      { 'g', kalpha },  { 'h', kalpha },  { 'i', kalpha },
+    { 'j', kalpha },      { 'k', kalpha },  { 'l', kalpha },  { 'm', kalpha },
+    { 'n', kalpha },      { 'o', kalpha },  { 'p', kalpha },  { 'q', kalpha },
+    { 'r', kalpha },      { 's', kalpha },  { 't', kalpha },  { 'u', kalpha },
+    { 'v', kalpha },      { 'w', kalpha },  { 'x', kalpha },  { 'y', kalpha },
+    { 'z', kalpha },      { '{', kalpha },  { '|', kalpha },  { '}', kalpha },
     { DEL_CODE, kalpha },
   };
 
@@ -547,22 +371,10 @@ Skk::initialize()
     return fxthru(self, c);
   };
   SelectionKeymap.Keymap = {
-    { CTRL_G, [self = this](auto c, auto) { return cancelSel(self, c); } },
-    { CTRL_T, fixIt },
-    { ' ',
-      [](auto, auto) {
-        nxCand();
-        return SkkOutput{};
-      } },
-    { 'x',
-      [self = this](auto, auto) {
-        pvCand(self);
-        return SkkOutput{};
-      } },
-    { '>', [self = this](auto c, auto) { return stSuffix(self, c); } },
-    { '?', [self = this](auto c, auto) { return stSuffix(self, c); } },
-    { '<', [self = this](auto c, auto) { return stSuffix(self, c); } },
-    { EXTRA_CODE, thruFixItToAsc },
+    { CTRL_G, cancelSel }, { CTRL_T, fixIt },
+    { ' ', nxCand },       { 'x', pvCand },
+    { '>', stSuffix },     { '?', stSuffix },
+    { '<', stSuffix },     { EXTRA_CODE, thruFixItToAsc },
   };
 
   auto& CodeInputKeymap = m_keymaps[KeymapTypes::CodeInput];

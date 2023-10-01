@@ -81,6 +81,5 @@ public:
 
   bool is_okuri_input();
 
-  void kkBeg();
   SkkOutput input(uint8_t c, bool okuri = false);
 };

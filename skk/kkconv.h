@@ -12,25 +12,25 @@ void
 kkClearBuf();
 
 SkkOutput
-kkBegV(Skk* skk, char c);
+kkBegV(char c, bool o = {});
 
 SkkOutput
-kkBegC(Skk* skk, char c);
+kkBegC(char c, bool o = {});
 
-void
-kkBegA(Skk* skk, char c);
+SkkOutput
+kkBegA(char c, bool o = {});
 
 SkkOutput
 kalpha(char c, bool o = {});
 
-void
+SkkOutput
 kaBS(char c, bool o = {});
 
 SkkOutput
 kKanaV(char c, bool o = {});
 
 SkkOutput
-okKanaV(Skk* skk, char c, bool first);
+okKanaV(char c, bool first);
 
 SkkOutput
 kKanaC(char c, bool o = {});
@@ -83,33 +83,29 @@ okfFixThru(char c, bool o = {});
 SkkOutput
 thruOkfFixToAsc(char c, bool o = {});
 
-void
+SkkOutput
 kfBS(char c, bool o = {});
 
 SkkOutput
-okuriBS(Skk* skk, char c);
+okuriBS(char c, bool o = {});
 
 SkkOutput
-kkconv(Skk* skk, char c);
+kkconv(char c, bool o = {});
 
 SkkOutput
 kOkuri(char c, bool o = {});
 
 SkkOutput
-stSuffix(Skk* skk, char c);
+stSuffix(char c, bool o = {});
 
 SkkOutput
-stPrefixCv(Skk* skk, char c);
+stPrefixCv(char c, bool o = {});
 
-void
-nxCand();
-
-void
-pvCand(Skk* skk);
-
-/* back to kanji input mode */
 SkkOutput
-backToKanjiInput(Skk* skk);
+nxCand(char c = {}, bool o = {});
+
+SkkOutput
+pvCand(char c = {}, bool o = {});
 
 SkkOutput
 cancelOkuri(char c = {}, bool o = {});
@@ -121,7 +117,7 @@ SkkOutput
 thruFixItToAsc(char c, bool o = {});
 
 SkkOutput
-cancelSel(Skk* skk, char c);
+cancelSel(char c, bool o = {});
 
 SkkOutput
 h2kkana(char c, bool o = {});
