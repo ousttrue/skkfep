@@ -10,12 +10,6 @@
 
 #define USER_DIC_NAME ".skk/SKK-JISYO.L"
 
-SkkResult
-nulcmd(char, bool)
-{
-  return {};
-}
-
 #define DEFAULT_KANAKEY "^j"
 
 Skk::Skk()
@@ -91,7 +85,16 @@ Skk::restoreKeymap()
 SkkOutput
 Skk::input(uint8_t c, bool okuri)
 {
-  auto result = CurrentKeymap->input(c, okuri);
+  SkkResult result;
+  if (false) {
+
+    result = ConversinMode->input(c);
+
+  } else {
+    // 旧
+    result = CurrentKeymap->input(c, okuri);
+  }
+
   apply(result);
 
   // process result

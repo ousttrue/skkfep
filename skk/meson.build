@@ -10,6 +10,9 @@ skk_lib = static_library('skk', [
 
   'kkconv.cpp',
   'dictionary.cpp',
+
+  'conversionmode.cpp',
+  'inputmode.cpp',
   ],
   dependencies: [termpty_dep],
 )

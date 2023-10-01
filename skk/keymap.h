@@ -4,6 +4,35 @@
 #include <stdint.h>
 #include <string>
 
+// https://ddskk.readthedocs.io/ja/latest/05_basic.html#id12
+// https://github.com/uobikiemukot/yaskk
+// 変換モード
+enum class SkkConversionModes
+{
+  // 確定入力モード
+  Direct,
+  // 見出し語入力
+  Entry,
+  // 送り仮名確定待ち
+  Okuri,
+  // 候補選択
+  Selection,
+};
+
+// https://ddskk.readthedocs.io/ja/latest/05_basic.html#id8
+// https://fixedpoint.jp/2010/02/19/skk-graph.html
+// 入力モード
+enum class SkkInputModes
+{
+  Ascii,
+  // ひらがな
+  Hirakana,
+  // カタカナ
+  Katakana,
+  // 全角英語
+  Zenei,
+};
+
 enum SkkModes
 {
   // ascii
@@ -80,12 +109,11 @@ struct SkkOutput
   }
 };
 
-// 内部ステート(入力モード、変換モード、未確定文字列)の変更と
-// 3系統の出力 pty(確定文字列 child process), std out(未確定文字列 preedit),
-// statusline(モード表示など)
 struct SkkResult
 {
   SkkOutput Output;
+  SkkConversionModes ConversinMode;
+  SkkInputModes InputMode;
 
   std::optional<SkkModes> NextMode;
 
@@ -119,6 +147,11 @@ struct SkkResult
 };
 
 using KeyFunc = std::function<SkkResult(uint8_t, bool)>;
+inline SkkResult
+nulcmd(char, bool)
+{
+  return {};
+}
 
 // 変換モード(直入力、▽見出し入力, *送り入力、▼Select)
 // + 入力モード(ascii, ひら、カタ、全)

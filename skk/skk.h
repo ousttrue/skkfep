@@ -1,13 +1,14 @@
 #pragma once
 #include "keymap.h"
+#include "conversionmode.h"
 #include <assert.h>
+#include <memory>
 #include <unordered_map>
-
-SkkResult
-nulcmd(char, bool);
 
 class Skk
 {
+  std::shared_ptr<SkkConversionMode> ConversinMode = DirectMode::create();
+
   SkkModes lastmode = {};
   SkkModes curmode = {};
 
