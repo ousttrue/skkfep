@@ -18,9 +18,6 @@ short BlockTty;
 char OkuriFirst;
 struct Dictionary* UserDic = nullptr;
 
-#define VOWEL(c)                                                               \
-  ((c) == 'a' || (c) == 'i' || (c) == 'u' || (c) == 'e' || (c) == 'o')
-
 static char WordBuf[WORD_BUF_LEN];
 static int WordBufLen;
 
@@ -291,18 +288,19 @@ thruKfFixToAsc(char c, bool)
 }
 
 SkkOutput
-okfFix(Skk* skk, char c)
+okfFix(char c, bool)
 {
-  cancelOkuri(skk);
-  if (skk->is_okuri_input())
-    cancelOkuri(skk);
-  return kfFix(0);
+  auto output = cancelOkuri();
+  // if (skk->is_okuri_input())
+  //   output += cancelOkuri();
+  output += kfFix(0);
+  return output;
 }
 
 SkkOutput
-okfFixToAsc(Skk* skk, char c)
+okfFixToAsc(char c, bool)
 {
-  auto output = okfFix(skk, c);
+  auto output = okfFix(c);
   output.Through += romkan::flushKana();
   output.NextKeymap = KeymapTypes::Normal;
   output.NextMode = SkkModes::SKK_MODE;
@@ -310,9 +308,9 @@ okfFixToAsc(Skk* skk, char c)
 }
 
 SkkOutput
-okfFixToZenA(Skk* skk, char c)
+okfFixToZenA(char c, bool)
 {
-  auto output = okfFix(skk, c);
+  auto output = okfFix(c);
   output.Through += romkan::flushKana();
   output.NextKeymap = KeymapTypes::Zenkaku;
   output.NextMode = ZENEI_MODE;
@@ -320,17 +318,17 @@ okfFixToZenA(Skk* skk, char c)
 }
 
 SkkOutput
-okfFixThru(Skk* skk, char c)
+okfFixThru(char c, bool)
 {
-  auto output = okfFix(skk, c);
+  auto output = okfFix(c);
   output.Through += c;
   return output;
 }
 
 SkkOutput
-thruOkfFixToAsc(Skk* skk, char c)
+thruOkfFixToAsc(char c, bool)
 {
-  auto output = okfFix(skk, c);
+  auto output = okfFix(c);
   output.Through += romkan::flushKana();
   output.NextKeymap = KeymapTypes::Normal;
   output.NextMode = SkkModes::SKK_MODE;
@@ -376,7 +374,7 @@ okuriBS(Skk* skk, char c)
 
   SkkOutput output;
   if (n <= 1) {
-    cancelOkuri(skk);
+    output += cancelOkuri();
   } else {
     romkan::cancelConso();
     for (int i = 0; i < n; i++)
@@ -442,36 +440,37 @@ kkconv(Skk* skk, char c)
   }
 }
 
-void
-toOkuri(Skk* skk)
+static SkkOutput
+toOkuri()
 {
   OkuriInput = 1;
   *OkuriBuf = '\0';
   OkuriBufLen = 0;
-  skk->setKeymap(KeymapTypes::OkuriInput);
+  return {
+    .NextKeymap = KeymapTypes::OkuriInput,
+  };
 }
 
 SkkOutput
-kOkuri(Skk* skk, char c)
+kOkuri(char c, bool)
 {
   char okuri = tolower(c);
 
   if (WordBufLen == 0) {
-    /* Recover chattering effect */
-    if (VOWEL(okuri)) {
-      kKanaV(okuri);
-      return {};
+    // Recover chattering effect
+    if (vowel_from_char(okuri)) {
+      return kKanaV(okuri);
     }
     romkan::cancelConso();
     endKanjiInput();
     kanjiInputEffect(0);
     return { .NextKeymap = KeymapTypes::Kana };
   }
-  toOkuri(skk);
 
-  SkkOutput output;
+  auto output = toOkuri();
   output.Predit += '*';
-  output += skk->input(okuri, 1);
+  output.ReInput = okuri;
+  output.Okuri = true;
   return output;
 }
 
@@ -543,47 +542,49 @@ pvCand(Skk* skk)
   }
 }
 
+static SkkOutput
+clearOkuri()
+{
+  WordBufLen--;
+  WordBuf[WordBufLen] = '\0';
+  return toOkuri();
+}
+
 /* back to kanji input mode */
 SkkOutput
 backToKanjiInput(Skk* skk)
 {
-  skk->restoreKeymap();
-  skk->showmode(KINPUT_MODE);
+  SkkOutput output;
+  output.RestoreKeymap = true;
+  output.NextMode = KINPUT_MODE;
   kanjiInputEffect(1);
   if (OkuriInput) {
-    clearOkuri(skk);
+    output += clearOkuri();
     OkuriFirst = 1;
-    SkkOutput output;
     output.Predit += WordBuf;
     output.Predit += '*';
-    return output;
   } else {
-    return { .Predit = WordBuf };
+    output.Predit += WordBuf;
   }
+  return output;
 }
 
-void
-cancelOkuri(Skk* skk)
+SkkOutput
+cancelOkuri(char, bool)
 {
+  SkkOutput output;
   kanjiInputEffect(0);
   if (Nconso == 0) {
     rubout(1);
     OkuriInput = 0;
-    skk->setKeymap(KeymapTypes::KanjiInput);
+    output.NextKeymap = KeymapTypes::KanjiInput;
   } else {
     romkan::cancelConso();
-    clearOkuri(skk);
+    output += clearOkuri();
     OkuriFirst = 1;
   }
   kanjiInputEffect(1);
-}
-
-void
-clearOkuri(Skk* skk)
-{
-  WordBufLen--;
-  WordBuf[WordBufLen] = '\0';
-  toOkuri(skk);
+  return output;
 }
 
 SkkOutput

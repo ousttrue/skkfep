@@ -57,6 +57,7 @@ std::string
 inputKanaVowel(char c)
 {
   auto vowel = vowel_from_char(c);
+  assert(vowel);
   if (Kindex != CON::_0) { /* if preceding consonant exists */
     csrLeft(Nconso);
     erase(Nconso);
@@ -66,7 +67,7 @@ inputKanaVowel(char c)
   if (SmallTU && vowel == Vowel::U) {
     ss << CurrentTab KANA_XTU;
   } else {
-    ss << CurrentTab[(int)Kindex][(int)vowel];
+    ss << CurrentTab[(int)Kindex][(int)*vowel];
   }
   SmallTU = 0;
   Kindex = {};

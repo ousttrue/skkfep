@@ -69,19 +69,19 @@ SkkOutput
 thruKfFixToAsc(char c, bool o = {});
 
 SkkOutput
-okfFix(Skk* skk, char c);
+okfFix(char c, bool o = {});
 
 SkkOutput
-okfFixToAsc(Skk* skk, char c);
+okfFixToAsc(char c, bool o = {});
 
 SkkOutput
-okfFixToZenA(Skk* skk, char c);
+okfFixToZenA(char c, bool o = {});
 
 SkkOutput
-okfFixThru(Skk* skk, char c);
+okfFixThru(char c, bool o = {});
 
 SkkOutput
-thruOkfFixToAsc(Skk* skk, char c);
+thruOkfFixToAsc(char c, bool o = {});
 
 void
 kfBS(char c, bool o = {});
@@ -92,11 +92,8 @@ okuriBS(Skk* skk, char c);
 SkkOutput
 kkconv(Skk* skk, char c);
 
-void
-toOkuri(Skk* skk);
-
 SkkOutput
-kOkuri(Skk* skk, char c);
+kOkuri(char c, bool o = {});
 
 SkkOutput
 stSuffix(Skk* skk, char c);
@@ -114,11 +111,8 @@ pvCand(Skk* skk);
 SkkOutput
 backToKanjiInput(Skk* skk);
 
-void
-cancelOkuri(Skk* skk);
-
-void
-clearOkuri(Skk* skk);
+SkkOutput
+cancelOkuri(char c = {}, bool o = {});
 
 SkkOutput
 fixIt(char c = {}, bool o = {});

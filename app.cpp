@@ -171,16 +171,19 @@ App::Run()
             // key input may has side effect
             auto output = g_skk.input(c, okuri);
 
-            if (output.NextMode) {
+            if (output.ReInput) {
+              output = g_skk.input(output.ReInput, output.Okuri);
             }
 
-            if (output.NextKeymap) {
+            if (output.NextMode) {
+              g_skk.showmode(*output.NextMode);
+            }
+
+            if (output.RestoreKeymap) {
+              g_skk.restoreKeymap();
+            } else if (output.NextKeymap) {
               g_skk.setKeymap(*output.NextKeymap);
             }
-
-            // romkan::flushKana();
-            // setKeymap(KeymapTypes::Zenkaku);
-            // showmode(ZENEI_MODE);
 
             if (output.Predit.size()) {
               terminal::writes(output.Predit);

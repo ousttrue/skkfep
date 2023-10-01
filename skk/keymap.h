@@ -59,7 +59,8 @@ enum class KeymapTypes
 };
 
 // 内部ステート(入力モード、変換モード、未確定文字列)の変更と
-// 3系統の出力 pty(確定文字列 child process), std out(未確定文字列 preedit), statusline(モード表示など)
+// 3系統の出力 pty(確定文字列 child process), std out(未確定文字列 preedit),
+// statusline(モード表示など)
 struct SkkOutput
 {
   // 確定(to child process & 出力待ちflushout)
@@ -76,6 +77,13 @@ struct SkkOutput
   std::optional<SkkModes> NextMode;
 
   std::optional<KeymapTypes> NextKeymap;
+
+  bool RestoreKeymap = false;
+
+  // 再入力
+  // 小文字に変えて再入力
+  char ReInput = 0;
+  bool Okuri = false;
 
   SkkOutput& operator+=(const SkkOutput& rhs)
   {

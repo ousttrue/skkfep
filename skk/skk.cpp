@@ -143,9 +143,7 @@ Skk::setKanaKey()
     };
   };
   KanjiInputKeymap().Keymap[k] = kfFix;
-  OkuriInputKeymap().Keymap[k] = [self = this](auto c, auto) {
-    return okfFix(self, c);
-  };
+  OkuriInputKeymap().Keymap[k] = okfFix;
   KAlphaInputKeymap().Keymap[k] = kfFix;
 }
 
