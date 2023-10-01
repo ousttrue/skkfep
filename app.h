@@ -3,12 +3,9 @@
 #include <string>
 #include <string_view>
 
-extern Skk g_skk;
-
 class App
 {
-  std::string UserDicName;
-
+  Skk m_skk;
   App();
 
 public:
@@ -21,8 +18,8 @@ public:
     return s_instance;
   }
 
-  bool Initialize(std::string_view UserDicName,
-                  const char* cmd,
+  bool Initialize(const std::string& UserDicName,
+                  const std::string& cmd,
                   char** args,
                   const char* version);
   int Run();
@@ -33,6 +30,5 @@ public:
 
 private:
   void PtyFree();
-  void OpenDictionary(std::string_view path);
   void SaveJisyo();
 };

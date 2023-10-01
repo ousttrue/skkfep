@@ -29,7 +29,7 @@ char SlaveName[DEVICELEN];
 
 bool
 establishShell(const TermSize& size,
-               const char* ShellName,
+               const std::string& ShellName,
                char** ShellArg,
                void (*onSigChild)(int),
                const char* version)
@@ -117,18 +117,18 @@ establishShell(const TermSize& size,
 
     seteuid(getuid());
 
-    auto p = &ShellName[strlen(ShellName)];
+    auto p = &ShellName[ShellName.size()];
     while (ShellName <= p && *p != '/')
       p--;
     if (*p == '/')
       p++;
     strcpy(procName, p);
     if (ShellArg == NULL) {
-      execl(ShellName, procName, 0);
+      execl(ShellName.c_str(), procName, 0);
     } else {
-      execvp(ShellName, ShellArg);
+      execvp(ShellName.c_str(), ShellArg);
     }
-    perror(ShellName);
+    perror(ShellName.c_str());
     _exit(127);
   }
 

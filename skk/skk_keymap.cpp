@@ -48,6 +48,7 @@ code(const char* p)
     k ^= 0x40;
   return k;
 }
+
 void
 Skk::initialize()
 {

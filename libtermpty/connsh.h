@@ -13,7 +13,7 @@ extern FILE* Shellout;
 
 bool
 establishShell(const TermSize& size,
-               const char* ShellName,
+               const std::string& ShellName,
                char** ShellArg,
                void (*onSigChild)(int),
                const char* version);

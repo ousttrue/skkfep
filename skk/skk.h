@@ -34,6 +34,7 @@ class Skk
   KeymapPtr lastKeymap = nullptr;
 
 public:
+  std::string UserDicName;
   std::string KanaKey;
 
   Skk();
@@ -42,6 +43,7 @@ public:
   Skk& operator=(const Skk&) = delete;
 
   void initialize();
+  void open_dictionary(std::string_view path = {});
 
   Keymap& currentKeymap() { return *CurrentKeymap; }
 

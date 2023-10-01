@@ -1,10 +1,14 @@
 #include "skk.h"
 #include "ctrlcode.h"
+#include "dictinary.h"
 #include "kkconv.h"
 #include "romkan.h"
 #include "terms.h"
 #include <assert.h>
+#include <sstream>
 #include <stdio.h>
+
+#define USER_DIC_NAME ".skk/SKK-JISYO.L"
 
 SkkResult
 nulcmd(char, bool)
@@ -23,6 +27,20 @@ Skk::Skk()
 }
 
 Skk::~Skk() {}
+
+void
+Skk::open_dictionary(std::string_view path)
+{
+  if (path.empty()) {
+    std::stringstream ss;
+    ss << getenv("HOME") << "/" << USER_DIC_NAME;
+    UserDicName = ss.str();
+  }
+  auto d = new Dictionary;
+  if (d->load(UserDicName)) {
+    UserDic = d;
+  }
+}
 
 void
 Skk::showmode(SkkModes s)

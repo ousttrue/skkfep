@@ -11,36 +11,46 @@
 #include <unistd.h>
 #include <wait.h>
 
-std::string UserDicName;
-
-#define DEFAULT_SHELL "/bin/bash"
-char ShellName[64] = "";
-char** ShellArg = NULL;
-
-static void
-ParseArgs(int argc, char** argv)
+struct Args
 {
-  for (int i = 1; i < argc; i++) {
-    if (!strncmp(argv[i], "-k", 2))
-      g_skk.KanaKey = argv[i] + 2;
-    else if (!strcmp(argv[i], "-udic"))
-      UserDicName = argv[++i];
-    else if (!strcmp(argv[i], "-e")) {
-      strcpy(ShellName, argv[++i]);
-      ShellArg = argv + i;
-      break;
-    } else if (!strcmp(argv[i], "-P")) {
-      PreserveOnFailure ^= 1;
-    } else if (!strcmp(argv[i], "-rs")) {
-      ReverseStatus = 1;
+  std::string KanaKey;
+  std::string UserDicName;
+  std::string ShellName;
+  char** ShellArg = NULL;
+
+  bool Parse(int argc, char** argv)
+  {
+    if (auto p = getenv("SHELL")) {
+      ShellName = p;
+    } else {
+      auto pwent = getpwuid(getuid());
+      if (pwent && pwent->pw_shell)
+        ShellName = pwent->pw_shell;
+      if (ShellName.empty())
+        ShellName = "/bin/bash";
     }
+
+    for (int i = 1; i < argc; i++) {
+      if (!strncmp(argv[i], "-k", 2))
+        KanaKey = argv[i] + 2;
+      else if (!strcmp(argv[i], "-udic"))
+        UserDicName = argv[++i];
+      else if (!strcmp(argv[i], "-e")) {
+        ShellName = argv[++i];
+        ShellArg = argv + i;
+        break;
+      } else if (!strcmp(argv[i], "-P")) {
+        PreserveOnFailure ^= 1;
+      } else if (!strcmp(argv[i], "-rs")) {
+        ReverseStatus = 1;
+      }
 #ifdef DEBUG
-    else if (!strcmp(argv[i], "-deb"))
-      debfile = argv[++i];
+      else if (!strcmp(argv[i], "-deb"))
+        debfile = argv[++i];
 #endif
-    else {
-      fprintf(stderr, "skkfep: bad option %s\n", argv[i]);
-      fprintf(stderr, "\
+      else {
+        fprintf(stderr, "skkfep: bad option %s\n", argv[i]);
+        fprintf(stderr, "\
 usage: skkfep [options]\n\
 options:\n\
 	-o{euc|sj|jis{A@B}{HJB}}	DISPLAY KANJI CODE\n\
@@ -56,34 +66,30 @@ options:\n\
 	-emacsesc			ENABLE THROUGH ESCAPE and etc.\n\
 	-rs				REVERSE STATUS LINE\n\
 ");
-      exit(1);
+        return false;
+      }
     }
-  }
 
-  if (ShellName[0] == '\0') {
-    if (auto p = getenv("SHELL")) {
-      strcpy(ShellName, p);
-      ShellArg = NULL;
-    } else {
-      auto pwent = getpwuid(getuid());
-      if (pwent && pwent->pw_shell)
-        strcpy(ShellName, pwent->pw_shell);
-      if (ShellName[0] == '\0')
-        strcpy(ShellName, DEFAULT_SHELL);
-      ShellArg = NULL;
+    if (ShellName[0] == '\0') {
     }
+
+    return true;
   }
-}
+};
 
 int
 main(int argc, char* argv[], char* envp[])
 {
-  ParseArgs(argc, argv);
+  Args args;
+  if (!args.Parse(argc, argv)) {
+    return 1;
+  }
 
   printf("SKKFEP version %s\n", version);
 
-  if (!App::Instance().Initialize(UserDicName, ShellName, ShellArg, version)) {
-    return 1;
+  if (!App::Instance().Initialize(
+        args.UserDicName, args.ShellName, args.ShellArg, version)) {
+    return 2;
   }
 
   // mainloop

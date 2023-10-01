@@ -14,11 +14,7 @@
 #include <sys/select.h>
 #include <wait.h>
 
-#define USER_DIC_NAME ".skk/SKK-JISYO.L"
-
 #define IF_STOPPED(x) WIFSTOPPED(x)
-
-Skk g_skk;
 
 App::App() {}
 
@@ -57,20 +53,6 @@ App::PtyFree()
 }
 
 void
-App::OpenDictionary(std::string_view path)
-{
-  if (path.empty()) {
-    std::stringstream ss;
-    ss << getenv("HOME") << "/" << USER_DIC_NAME;
-    UserDicName = ss.str();
-  }
-  auto d = new Dictionary;
-  if (d->load(UserDicName)) {
-    UserDic = d;
-  }
-}
-
-void
 App::SaveJisyo()
 {
   if (UserDic) {
@@ -80,8 +62,8 @@ App::SaveJisyo()
 }
 
 bool
-App::Initialize(std::string_view UserDicName,
-                const char* cmd,
+App::Initialize(const std::string& UserDicName,
+                const std::string& cmd,
                 char** args,
                 const char* version)
 {
@@ -116,9 +98,9 @@ App::Initialize(std::string_view UserDicName,
     return false;
   }
 
-  OpenDictionary(UserDicName);
+  m_skk.open_dictionary(UserDicName);
+  m_skk.initialize();
   initFep();
-  g_skk.initialize();
 
   return true;
 }
@@ -169,7 +151,7 @@ App::Run()
           } else {
             // ascii
             // key input may has side effect
-            auto [confirmed, unconfirmed] = g_skk.input(c, okuri);
+            auto [confirmed, unconfirmed] = m_skk.input(c, okuri);
 
             if (unconfirmed.size()) {
               // TODO: decoration. ▽, ▼ standout, underline...etc

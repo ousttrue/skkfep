@@ -5,6 +5,7 @@
 TEST(SkkTest, zenkaku)
 {
   Skk skk;
+
   EXPECT_EQ(skk.currentKeymap().Type, KeymapTypes::Normal);
 
   {
@@ -41,6 +42,7 @@ TEST(SkkTest, romkan)
 TEST(SkkTest, henkan)
 {
   Skk skk;
+  skk.open_dictionary();
 
   {
     auto output = skk.input(CTRL_J);
