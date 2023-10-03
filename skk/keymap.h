@@ -4,14 +4,15 @@
 #include <stdint.h>
 #include <string>
 
+namespace skk {
 // https://ddskk.readthedocs.io/ja/latest/05_basic.html#id12
 // https://github.com/uobikiemukot/yaskk
 // 変換モード
-enum class SkkConversionModes
+enum class ConversionType
 {
   // 確定入力モード
   Direct,
-  // 見出し語入力
+  // 見出し語入力モード
   Entry,
   // 送り仮名確定待ち
   Okuri,
@@ -22,54 +23,19 @@ enum class SkkConversionModes
 // https://ddskk.readthedocs.io/ja/latest/05_basic.html#id8
 // https://fixedpoint.jp/2010/02/19/skk-graph.html
 // 入力モード
-enum class SkkInputModes
+enum class InputType
 {
   Ascii,
-  // ひらがな
-  Hirakana,
-  // カタカナ
-  Katakana,
-  // 全角英語
-  Zenei,
-};
-
-enum SkkModes
-{
-  // ascii
-  SKK_MODE,
-  // かな
-  KANA_MODE,
-  // 全角
-  ZENEI_MODE,
-  // カナ
-  KKANA_MODE,
-  // ▽
-  KINPUT_MODE,
-  // ▼
-  KSELECT_MODE,
-};
-
-enum class KeymapTypes
-{
-  // ascii
-  Normal,
-  // romkan
+  // 仮名(ひらがなデフォルトとカタカナのテーブル切り替えができる)
   Kana,
-  // 全角
+  // 全角英語
   Zenkaku,
-  // 入力▽+romkan
-  KanjiInput,
-  // 入力*
-  OkuriInput,
-  // 候補選択
-  Selection,
-  // 入力▽+ascii
-  KAlphaInput,
-
-  CodeInput,
+  // 漢字コード(skkfepの追加モード)
+  // TODO: unicode 入力にする
+  Code,
 };
 
-struct SkkOutput
+struct Output
 {
   // 確定(to child process & 出力待ちflushout)
   //   母音、子音+母音
@@ -83,7 +49,7 @@ struct SkkOutput
   //   送り未確定？
   std::string Unconfirmed;
 
-  SkkOutput& operator+=(const SkkOutput& rhs)
+  Output& operator+=(const Output& rhs)
   {
     Confirmed += rhs.Confirmed;
     Unconfirmed += rhs.Unconfirmed;
@@ -91,15 +57,11 @@ struct SkkOutput
   }
 };
 
-struct SkkResult
+struct Result
 {
-  SkkOutput Output;
-  SkkConversionModes ConversinMode;
-  SkkInputModes InputMode;
-
-  std::optional<SkkModes> NextMode;
-
-  std::optional<KeymapTypes> NextKeymap;
+  ::skk::Output Output;
+  std::optional<ConversionType> NextConversinMode;
+  std::optional<InputType> NextInputMode;
 
   bool RestoreKeymap = false;
 
@@ -108,14 +70,14 @@ struct SkkResult
   char ReInput = 0;
   bool Okuri = false;
 
-  SkkResult& operator+=(const SkkResult& rhs)
+  Result& operator+=(const Result& rhs)
   {
     Output += rhs.Output;
-    if (rhs.NextMode) {
-      NextMode = rhs.NextMode;
+    if (rhs.NextConversinMode) {
+      NextConversinMode = rhs.NextConversinMode;
     }
-    if (rhs.NextKeymap) {
-      NextKeymap = rhs.NextKeymap;
+    if (rhs.NextInputMode) {
+      NextInputMode = rhs.NextInputMode;
     }
     if (rhs.RestoreKeymap) {
       RestoreKeymap = rhs.RestoreKeymap;
@@ -128,8 +90,8 @@ struct SkkResult
   }
 };
 
-using KeyFunc = std::function<SkkResult(uint8_t, bool)>;
-inline SkkResult
+using KeyFunc = std::function<Result(uint8_t, bool)>;
+inline Result
 nulcmd(char, bool)
 {
   return {};
@@ -142,11 +104,11 @@ nulcmd(char, bool)
 // input => keymap => mode => app
 struct Keymap
 {
-  KeymapTypes Type;
+  InputType Type;
   KeyFunc DefaultFunc = {};
   std::unordered_map<uint8_t, KeyFunc> Keymap;
 
-  SkkResult input(uint8_t c, bool okuri)
+  Result input(uint8_t c, bool okuri)
   {
     auto found = Keymap.find(c);
     if (found == Keymap.end()) {
@@ -172,3 +134,5 @@ struct Keymap
   }
 };
 using KeymapPtr = Keymap*;
+
+} // namespace

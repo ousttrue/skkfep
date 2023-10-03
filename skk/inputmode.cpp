@@ -1,24 +1,23 @@
 #include "inputmode.h"
 
-SkkInputMode
-SkkInputMode::ascii()
+namespace skk {
+
+AsciiInput::AsciiInput()
 {
-  SkkInputMode inputMode;
-  inputMode.Default = [](char c, auto) {
+  Default = [](char c, auto) {
     char str[]{ c, 0 };
-    return SkkResult{
+    return Result{
       .Output{
         .Confirmed = str,
       },
     };
   };
-  return inputMode;
 }
 
-SkkInputMode
-SkkInputMode::hirakana()
-{
-  SkkInputMode inputMode;
+ZenkakuInput::ZenkakuInput() {}
 
-  return inputMode;
-}
+KanaInput::KanaInput() {}
+
+CodeInput::CodeInput() {}
+
+} // namespace

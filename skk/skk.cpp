@@ -6,30 +6,42 @@
 #include <assert.h>
 #include <sstream>
 
-#define USER_DIC_NAME ".skk/SKK-JISYO.L"
+namespace skk {
 
-#define DEFAULT_KANAKEY "^j"
-
-Skk::
-Skk()
+Skk::Skk(std::string_view kanaKey)
 {
-  KanaKey = DEFAULT_KANAKEY;
-  initialize();
-  setKeymap(KeymapTypes::Normal);
+  m_AsciiInput = std::make_shared<AsciiInput>();
+  m_ZenkakuInput = std::make_shared<ZenkakuInput>();
+  m_KanaInput = std::make_shared<KanaInput>();
+  m_CodeInput = std::make_shared<CodeInput>();
+
+  m_DirectMode = std::make_shared<DirectMode>();
+  m_EntryMode = std::make_shared<EntryMode>();
+  m_OkuriMode = std::make_shared<OkuriMode>();
+  m_SelectionMode = std::make_shared<SelectionMode>();
+
+  CurrentMode = m_DirectMode;
+  CurrentMode->InputMode = m_AsciiInput;
+
+  initialize(kanaKey);
 }
 
-Skk::~
-Skk()
-{
-}
+Skk::~Skk() {}
 
 void
 Skk::open_dictionary(std::string_view path)
 {
   if (path.empty()) {
-    std::stringstream ss;
-    ss << getenv("HOME") << "/" << USER_DIC_NAME;
-    UserDicName = ss.str();
+    return;
+  }
+  std::string UserDicName;
+  for (auto c : path) {
+    if (c == '~') {
+      // expand
+      UserDicName += getenv("HOME");
+    } else {
+      UserDicName += c;
+    }
   }
   auto d = new Dictionary;
   if (d->load(UserDicName)) {
@@ -37,24 +49,15 @@ Skk::open_dictionary(std::string_view path)
   }
 }
 
-SkkOutput
-Skk::input(uint8_t c, bool okuri)
+Output
+Skk::input(uint8_t c)
 {
-  SkkResult result;
-  if (false) {
-
-    result = ConversinMode->input(c);
-
-  } else {
-    // 旧
-    result = CurrentKeymap->input(c, okuri);
-  }
-
+  auto result = CurrentMode->input(c);
   apply(result);
 
   // process result
   if (result.ReInput) {
-    result = CurrentKeymap->input(result.ReInput, result.Okuri);
+    result = CurrentMode->input(result.ReInput);
     apply(result);
   }
 
@@ -63,44 +66,47 @@ Skk::input(uint8_t c, bool okuri)
 
 // update Keymap etc...
 void
-Skk::apply(const SkkResult& result)
+Skk::apply(const Result& result)
 {
-  if (result.NextMode) {
-    setKeymap((*result.NextMode));
+  if (result.NextConversinMode) {
+    switch (*result.NextConversinMode) {
+      case ConversionType::Direct:
+        CurrentMode = m_DirectMode;
+        break;
+
+      case ConversionType::Entry:
+        CurrentMode = m_EntryMode;
+        break;
+
+      case ConversionType::Okuri:
+        CurrentMode = m_OkuriMode;
+        break;
+
+      case ConversionType::Selection:
+        CurrentMode = m_SelectionMode;
+        break;
+    }
   }
 
-  if (result.RestoreKeymap) {
-    restoreKeymap();
-  } else if (result.NextKeymap) {
-    setKeymap(*result.NextKeymap);
+  if (result.NextInputMode) {
+    switch (*result.NextInputMode) {
+      case InputType::Ascii:
+        CurrentMode->InputMode = m_AsciiInput;
+        break;
+
+      case InputType::Kana:
+        CurrentMode->InputMode = m_KanaInput;
+        break;
+
+      case InputType::Zenkaku:
+        CurrentMode->InputMode = m_ZenkakuInput;
+        break;
+
+      case InputType::Code:
+        CurrentMode->InputMode = m_CodeInput;
+        break;
+    }
   }
 }
 
-std::string
-Skk::statusline() const
-{
-  switch (CurrentKeymap->Type) {
-    case KeymapTypes::Normal:
-      return "SKK";
-    case KeymapTypes::Kana:
-      if (romkan::isHiragana())
-        return "かな";
-      else
-        return "カナ";
-    case KeymapTypes::Zenkaku:
-      return "全英";
-    case KeymapTypes::KanjiInput:
-      return "単語入力";
-    case KeymapTypes::OkuriInput:
-      return "送り";
-    case KeymapTypes::Selection:
-      return "単語選択";
-    case KeymapTypes::KAlphaInput:
-      return "ascii";
-    case KeymapTypes::CodeInput:
-      return "code";
-  }
-
-  assert(false);
-  return "";
-}
+} // namespace

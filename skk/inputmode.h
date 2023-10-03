@@ -2,12 +2,23 @@
 #include "keymap.h"
 #include <unordered_map>
 
-struct SkkInputMode
+namespace skk {
+
+struct InputMode
 {
+  InputType Type;
+  std::string Statusline;
   KeyFunc Default = nulcmd;
   std::unordered_map<uint8_t, KeyFunc> KeyMap;
 
-  SkkResult input(uint8_t c)
+protected:
+  InputMode() {}
+
+public:
+  ~InputMode() {}
+  InputMode(const InputMode&) = delete;
+  InputMode& operator=(const InputMode&) = delete;
+  Result input(uint8_t c)
   {
     auto found = KeyMap.find(c);
     if (found == KeyMap.end()) {
@@ -16,9 +27,26 @@ struct SkkInputMode
       return found->second(c, false);
     }
   }
-
-  static SkkInputMode hirakana();
-  static SkkInputMode katakana();
-  static SkkInputMode zenei();
-  static SkkInputMode ascii();
 };
+
+struct AsciiInput : InputMode
+{
+  AsciiInput();
+};
+
+struct ZenkakuInput : InputMode
+{
+  ZenkakuInput();
+};
+
+struct KanaInput : InputMode
+{
+  KanaInput();
+};
+
+struct CodeInput : InputMode
+{
+  CodeInput();
+};
+
+} // namespace

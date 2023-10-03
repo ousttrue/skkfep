@@ -9,113 +9,113 @@ extern struct Dictionary* UserDic;
 void
 kkClearBuf();
 
-SkkResult
+skk::Result
 kkBegV(char c, bool o = {});
 
-SkkResult
+skk::Result
 kkBegC(char c, bool o = {});
 
-SkkResult
+skk::Result
 kkBegA(char c, bool o = {});
 
-SkkResult
+skk::Result
 kalpha(char c, bool o = {});
 
-SkkResult
+skk::Result
 kaBS(char c, bool o = {});
 
-SkkResult
+skk::Result
 kKanaV(char c, bool o = {});
 
-SkkResult
+skk::Result
 okKanaV(char c, bool first);
 
-SkkResult
+skk::Result
 kKanaC(char c, bool o = {});
 
-SkkResult
+skk::Result
 okKanaC(char c, bool first);
 
-SkkResult
+skk::Result
 kZenAl(char c, bool o = {});
 
-SkkResult
+skk::Result
 kZenEx(char c, bool o = {});
 
-SkkResult
+skk::Result
 kfthru(char c, bool o = {});
 
-SkkResult
+skk::Result
 fxthru(char c = {}, bool o = {});
 
-SkkResult
+skk::Result
 kfCancel(char c, bool o = {});
 
-SkkResult
+skk::Result
 kfFix(char c, bool o = {});
 
-SkkResult
+skk::Result
 kfFixToAsc(char c, bool o = {});
 
-SkkResult
+skk::Result
 kfFixToZenA(char c, bool o = {});
 
-SkkResult
+skk::Result
 kfFixThru(char c, bool o = {});
 
-SkkResult
+skk::Result
 thruKfFixToAsc(char c, bool o = {});
 
-SkkResult
+skk::Result
 okfFix(char c, bool o = {});
 
-SkkResult
+skk::Result
 okfFixToAsc(char c, bool o = {});
 
-SkkResult
+skk::Result
 okfFixToZenA(char c, bool o = {});
 
-SkkResult
+skk::Result
 okfFixThru(char c, bool o = {});
 
-SkkResult
+skk::Result
 thruOkfFixToAsc(char c, bool o = {});
 
-SkkResult
+skk::Result
 kfBS(char c, bool o = {});
 
-SkkResult
+skk::Result
 okuriBS(char c, bool o = {});
 
-SkkResult
+skk::Result
 kkconv(char c, bool o = {});
 
-SkkResult
+skk::Result
 kOkuri(char c, bool o = {});
 
-SkkResult
+skk::Result
 stSuffix(char c, bool o = {});
 
-SkkResult
+skk::Result
 stPrefixCv(char c, bool o = {});
 
-SkkResult
+skk::Result
 nxCand(char c = {}, bool o = {});
 
-SkkResult
+skk::Result
 pvCand(char c = {}, bool o = {});
 
-SkkResult
+skk::Result
 cancelOkuri(char c = {}, bool o = {});
 
-SkkResult
+skk::Result
 fixIt(char c = {}, bool o = {});
 
-SkkResult
+skk::Result
 thruFixItToAsc(char c, bool o = {});
 
-SkkResult
+skk::Result
 cancelSel(char c, bool o = {});
 
-SkkResult
+skk::Result
 h2kkana(char c, bool o = {});

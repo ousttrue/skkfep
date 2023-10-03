@@ -16,15 +16,9 @@
 
 #define IF_STOPPED(x) WIFSTOPPED(x)
 
-App::
-App()
-{
-}
+App::App() {}
 
-App::~
-App()
-{
-}
+App::~App() {}
 
 void
 App::Exit(int code)
@@ -105,7 +99,6 @@ App::Initialize(const std::string& UserDicName,
   }
 
   m_skk.open_dictionary(UserDicName);
-  m_skk.initialize();
   initFep();
 
   return true;
@@ -158,7 +151,7 @@ App::Run()
           } else {
             // ascii
             // key input may has side effect
-            auto [confirmed, unconfirmed] = m_skk.input(c, okuri);
+            auto [confirmed, unconfirmed] = m_skk.input(c);
 
             if (unconfirmed.size()) {
               // TODO: decoration. ▽, ▼ standout, underline...etc

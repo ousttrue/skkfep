@@ -5,7 +5,7 @@
 #include <optional>
 #include <string>
 
-class Skk;
+struct Skk;
 
 // 母音
 enum class Vowel
@@ -92,14 +92,14 @@ bool
 isHiragana();
 
 // 母音
-SkkResult
+skk::Result
 iKanaV(char c, bool o = {});
 
 // 子音
-SkkResult
+skk::Result
 iKanaC(char c, bool o = {});
 
-SkkResult
+skk::Result
 flthru(char c, bool);
 
 std::string
@@ -116,13 +116,13 @@ inputKanaConso(char c);
 std::string
 flushLastConso(char c);
 
-SkkResult
+skk::Result
 tglK(Skk* skk);
 
 void
 cancelConso();
 
-SkkResult
+skk::Result
 kanaBS(char c, bool o = {});
 
 void

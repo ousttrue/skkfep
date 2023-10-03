@@ -66,7 +66,7 @@ static short OkuriInput;
 static char OkuriBuf[OKURI_LEN];
 static int OkuriBufLen;
 
-static SkkResult
+static skk::Result
 bufferedInput(std::string_view s)
 {
   for (auto c : s) {
@@ -75,11 +75,11 @@ bufferedInput(std::string_view s)
   return { .Output = { .Unconfirmed = { s.begin(), s.end() } } };
 }
 
-static SkkResult
+static skk::Result
 showCand()
 {
   kanjiSelectionEffect(1);
-  SkkResult output;
+  skk::Result output;
   output.Output.Unconfirmed += *Current.Cand;
   if (OkuriInput) {
     output.Output.Unconfirmed += OkuriBuf;
@@ -87,18 +87,18 @@ showCand()
   return output;
 }
 
-static SkkResult
+static skk::Result
 toOkuri()
 {
   OkuriInput = 1;
   *OkuriBuf = '\0';
   OkuriBufLen = 0;
   return {
-    .NextKeymap = KeymapTypes::OkuriInput,
+    .NextConversinMode = skk::ConversionType::Okuri,
   };
 }
 
-static SkkResult
+static skk::Result
 clearOkuri()
 {
   WordBufLen--;
@@ -107,12 +107,12 @@ clearOkuri()
 }
 
 /* back to kanji input mode */
-static SkkResult
+static skk::Result
 backToKanjiInput()
 {
-  SkkResult output;
+  skk::Result output;
   output.RestoreKeymap = true;
-  output.NextMode = KINPUT_MODE;
+  output.NextConversinMode = skk::ConversionType::Entry;
   kanjiInputEffect(1);
   if (OkuriInput) {
     output += clearOkuri();
@@ -131,50 +131,50 @@ kkClearBuf()
   WordBufLen = 0;
 }
 
-SkkResult
+skk::Result
 kkBegV(char c, bool)
 {
-  SkkResult output;
-  output.NextMode = SkkModes::KINPUT_MODE;
+  skk::Result output;
+  output.NextConversinMode = skk::ConversionType::Entry;
   kanjiInputEffect(1);
   kkClearBuf();
   output += bufferedInput(romkan::inputKanaVowel(tolower(c)));
   return output;
 }
 
-SkkResult
+skk::Result
 kkBegC(char c, bool)
 {
-  SkkResult output;
-  output.NextMode = SkkModes::KINPUT_MODE;
+  skk::Result output;
+  output.NextConversinMode = skk::ConversionType::Entry;
   kanjiInputEffect(1);
   kkClearBuf();
   output += bufferedInput(romkan::inputKanaConso(tolower(c)));
   return output;
 }
 
-SkkResult
+skk::Result
 kkBegA(char c, bool)
 {
   romkan::flushKana();
-  SkkResult output;
-  output.NextKeymap = KeymapTypes::KAlphaInput;
-  output.NextMode = KINPUT_MODE;
+  skk::Result output;
+  output.NextConversinMode = skk::ConversionType::Entry;
+  output.NextInputMode = skk::InputType::Ascii;
   kanjiInputEffect(1);
   WordBufLen = 0;
   return output;
 }
 
-SkkResult
+skk::Result
 kalpha(char c, bool)
 {
-  SkkResult output;
+  skk::Result output;
   output.Output.Unconfirmed += c;
   WordBuf[WordBufLen++] = c;
   return output;
 }
 
-SkkResult
+skk::Result
 kaBS(char c, bool)
 {
   if (WordBufLen > 0) {
@@ -186,16 +186,16 @@ kaBS(char c, bool)
   return {};
 }
 
-SkkResult
+skk::Result
 kKanaV(char c, bool)
 {
   return bufferedInput(romkan::inputKanaVowel(c));
 }
 
-static SkkResult
+static skk::Result
 putOkuri(std::string_view s)
 {
-  SkkResult output;
+  skk::Result output;
   int l = OkuriBufLen;
   output.Output.Unconfirmed += s;
   for (auto c : s) {
@@ -212,7 +212,7 @@ putOkuri(std::string_view s)
   return output;
 }
 
-SkkResult
+skk::Result
 okKanaV(char c, bool first)
 {
   if (first) {
@@ -224,16 +224,16 @@ okKanaV(char c, bool first)
   return output;
 }
 
-SkkResult
+skk::Result
 kKanaC(char c, bool)
 {
   return bufferedInput(romkan::inputKanaConso(c));
 }
 
-SkkResult
+skk::Result
 okKanaC(char c, bool first)
 {
-  SkkResult output;
+  skk::Result output;
   if (Nconso == 0) {
     WordBuf[WordBufLen++] = c;
   } else if (first) {
@@ -244,19 +244,19 @@ okKanaC(char c, bool first)
   return output;
 }
 
-SkkResult
+skk::Result
 kZenAl(char c, bool)
 {
   return bufferedInput(zenkakualpha::inputZenkakuAlpha(c));
 }
 
-SkkResult
+skk::Result
 kZenEx(char c, bool)
 {
   return bufferedInput(zenkakualpha::inputZenkakuEx(c));
 }
 
-SkkResult
+skk::Result
 kfthru(char c, bool)
 {
   static char buf[2];
@@ -265,7 +265,7 @@ kfthru(char c, bool)
   return bufferedInput(buf);
 }
 
-SkkResult
+skk::Result
 fxthru(char, bool)
 {
   /* fix and through */
@@ -283,7 +283,8 @@ endKanjiInput()
   BlockTty = 0;
 }
 
-SkkResult
+// 漢字中止
+skk::Result
 kfCancel(char c, bool)
 {
   kanjiInputEffect(0);
@@ -291,43 +292,48 @@ kfCancel(char c, bool)
   rubout(WordBufLen);
   WordBuf[WordBufLen] = '\0';
   endKanjiInput();
-  return SkkResult{ .NextKeymap = KeymapTypes::Kana };
+  return skk::Result{ .NextConversinMode = skk::ConversionType::Direct };
 }
 
-SkkResult
+// 確定
+skk::Result
 kfFix(char c, bool)
 {
-  SkkResult output;
+  skk::Result output;
   csrLeft(WordBufLen);
   WordBuf[WordBufLen] = '\0';
   kanjiInputEffect(0);
   output.Output.Confirmed += WordBuf;
   endKanjiInput();
-  output.NextKeymap = KeymapTypes::Kana;
+  output.NextConversinMode = skk::ConversionType::Direct;
+  output.NextInputMode = skk::InputType::Kana;
   return output;
 }
 
-SkkResult
+// 確定してAscii
+skk::Result
 kfFixToAsc(char c, bool)
 {
   auto output = kfFix(c);
   output.Output.Confirmed += romkan::flushKana();
-  output.NextKeymap = KeymapTypes::Normal;
-  output.NextMode = SkkModes::SKK_MODE;
+  output.NextConversinMode = skk::ConversionType::Direct;
+  output.NextInputMode = skk::InputType::Ascii;
   return output;
 }
 
-SkkResult
+// 確定して全角
+skk::Result
 kfFixToZenA(char c, bool)
 {
   auto output = kfFix(c);
   output.Output.Confirmed += romkan::flushKana();
-  output.NextKeymap = KeymapTypes::Zenkaku;
-  output.NextMode = ZENEI_MODE;
+  output.NextConversinMode = skk::ConversionType::Direct;
+  output.NextInputMode = skk::InputType::Zenkaku;
   return output;
 }
 
-SkkResult
+// 確定して透過
+skk::Result
 kfFixThru(char c, bool)
 {
   auto output = kfFix(c);
@@ -335,48 +341,51 @@ kfFixThru(char c, bool)
   return output;
 }
 
-SkkResult
+// 確定してAsciiモード
+skk::Result
 thruKfFixToAsc(char c, bool)
 {
   auto output = kfFix(c);
   output.Output.Confirmed += romkan::flushKana();
-  output.NextKeymap = KeymapTypes::Normal;
-  output.NextMode = SkkModes::SKK_MODE;
+  output.NextConversinMode = skk::ConversionType::Direct;
+  output.NextInputMode = skk::InputType::Ascii;
   output.Output.Confirmed += c;
   return output;
 }
 
-SkkResult
+// 送り確定
+skk::Result
 okfFix(char c, bool)
 {
   auto output = cancelOkuri();
-  // if (skk->is_okuri_input())
-  //   output += cancelOkuri();
   output += kfFix(0);
   return output;
 }
 
-SkkResult
+// 送り確定 Ascii モード
+skk::Result
 okfFixToAsc(char c, bool)
 {
   auto output = okfFix(c);
   output.Output.Confirmed += romkan::flushKana();
-  output.NextKeymap = KeymapTypes::Normal;
-  output.NextMode = SkkModes::SKK_MODE;
+  output.NextConversinMode = skk::ConversionType::Direct;
+  output.NextInputMode = skk::InputType::Ascii;
   return output;
 }
 
-SkkResult
+// 送り確定 全角 モード
+skk::Result
 okfFixToZenA(char c, bool)
 {
   auto output = okfFix(c);
   output.Output.Confirmed += romkan::flushKana();
-  output.NextKeymap = KeymapTypes::Zenkaku;
-  output.NextMode = ZENEI_MODE;
+  output.NextConversinMode = skk::ConversionType::Direct;
+  output.NextInputMode = skk::InputType::Zenkaku;
   return output;
 }
 
-SkkResult
+// 送り確定 透過
+skk::Result
 okfFixThru(char c, bool)
 {
   auto output = okfFix(c);
@@ -384,18 +393,18 @@ okfFixThru(char c, bool)
   return output;
 }
 
-SkkResult
+skk::Result
 thruOkfFixToAsc(char c, bool)
 {
   auto output = okfFix(c);
   output.Output.Confirmed += romkan::flushKana();
-  output.NextKeymap = KeymapTypes::Normal;
-  output.NextMode = SkkModes::SKK_MODE;
+  output.NextConversinMode = skk::ConversionType::Direct;
+  output.NextInputMode = skk::InputType::Ascii;
   output.Output.Confirmed += c;
   return output;
 }
 
-SkkResult
+skk::Result
 kfBS(char c, bool)
 {
   kanjiInputEffect(0);
@@ -423,7 +432,7 @@ kfBS(char c, bool)
   return {};
 }
 
-SkkResult
+skk::Result
 okuriBS(char c, bool)
 {
   kanjiInputEffect(0);
@@ -432,7 +441,7 @@ okuriBS(char c, bool)
   for (int i = 0; i < n; i++)
     con[i] = LastConso[i];
 
-  SkkResult output;
+  skk::Result output;
   if (n <= 1) {
     output += cancelOkuri();
   } else {
@@ -444,7 +453,8 @@ okuriBS(char c, bool)
   return output;
 }
 
-SkkResult
+// 検索して変換候補をを表示する
+skk::Result
 kkconv(char c, bool)
 {
   kanjiInputEffect(0);
@@ -452,9 +462,9 @@ kkconv(char c, bool)
   romkan::cancelConso();
   if (WordBufLen == 0 || (OkuriInput && WordBufLen == 1)) {
     endKanjiInput();
-    output.NextKeymap = KeymapTypes::Kana;
+    // output.NextInputMode = KeymapTypes::Selection;
   }
-  output.NextMode = KSELECT_MODE;
+  // output.NextConversinMode = skk::ConversionType::Selection;
 
   WordBuf[WordBufLen] = '\0';
   Current.List = UserDic->getCand(WordBuf);
@@ -468,27 +478,28 @@ kkconv(char c, bool)
   if (OkuriInput)
     l += strlen(OkuriBuf) - 1;
   rubout(l);
-  output.NextKeymap = KeymapTypes::Selection;
+  output.NextConversinMode = skk::ConversionType::Selection;
 
   if (Current.IsEnabled()) {
     BlockTty = 1;
     output += showCand();
     return output;
   } else {
-    /* Really, enter register mode */
+    // 候補無かった
     if (PreserveOnFailure) {
+      // Really, enter register mode
       bell();
       output += backToKanjiInput();
       return output;
     } else {
       endKanjiInput();
-      output.NextKeymap = KeymapTypes::Kana;
+      output.NextConversinMode = skk::ConversionType::Direct;
       return output;
     }
   }
 }
 
-SkkResult
+skk::Result
 kOkuri(char c, bool)
 {
   char okuri = tolower(c);
@@ -501,7 +512,7 @@ kOkuri(char c, bool)
     romkan::cancelConso();
     endKanjiInput();
     kanjiInputEffect(0);
-    return { .NextKeymap = KeymapTypes::Kana };
+    return { .NextConversinMode = skk::ConversionType::Direct };
   }
 
   auto output = toOkuri();
@@ -511,18 +522,18 @@ kOkuri(char c, bool)
   return output;
 }
 
-SkkResult
+skk::Result
 stSuffix(char c, bool)
 {
   auto output = fixIt();
-  output.NextMode = SkkModes::KINPUT_MODE;
+  output.NextConversinMode = skk::ConversionType::Entry;
   kanjiInputEffect(1);
   kkClearBuf();
   output += kfthru(c);
   return output;
 }
 
-SkkResult
+skk::Result
 stPrefixCv(char c, bool)
 {
   if (WordBufLen == 0) {
@@ -547,7 +558,7 @@ clearCurrent()
   return l;
 }
 
-SkkResult
+skk::Result
 nxCand(char, bool)
 {
   auto l = clearCurrent();
@@ -555,7 +566,7 @@ nxCand(char, bool)
   Current.Increment();
 
   // draw
-  SkkResult output;
+  skk::Result output;
   csrLeft(l);
   kanjiSelectionEffect(1);
   output.Output.Unconfirmed += *Current.Cand;
@@ -565,12 +576,12 @@ nxCand(char, bool)
   return output;
 }
 
-SkkResult
+skk::Result
 pvCand(char, bool)
 {
   auto l = clearCurrent();
 
-  SkkResult output;
+  skk::Result output;
   if (Current.Decrement()) {
     csrLeft(l);
     kanjiSelectionEffect(1);
@@ -584,15 +595,15 @@ pvCand(char, bool)
   return output;
 }
 
-SkkResult
+skk::Result
 cancelOkuri(char, bool)
 {
-  SkkResult output;
+  skk::Result output;
   kanjiInputEffect(0);
   if (Nconso == 0) {
     rubout(1);
     OkuriInput = 0;
-    output.NextKeymap = KeymapTypes::KanjiInput;
+    output.NextConversinMode = skk::ConversionType::Entry;
   } else {
     romkan::cancelConso();
     output += clearOkuri();
@@ -602,11 +613,11 @@ cancelOkuri(char, bool)
   return output;
 }
 
-SkkResult
+skk::Result
 fixIt(char, bool)
 {
   kanjiSelectionEffect(0);
-  SkkResult output;
+  skk::Result output;
   if (Current.IsEnabled()) {
     auto l = Current.Cand->size();
     if (OkuriInput)
@@ -618,22 +629,22 @@ fixIt(char, bool)
     }
   }
   endKanjiInput();
-  output.NextKeymap = KeymapTypes::Kana;
+  output.NextConversinMode = skk::ConversionType::Direct;
   return output;
 }
 
-SkkResult
+skk::Result
 thruFixItToAsc(char c, bool o)
 {
   auto output = fixIt();
   output.Output.Confirmed += romkan::flushKana();
-  output.NextKeymap = KeymapTypes::Normal;
-  output.NextMode = SkkModes::SKK_MODE;
+  output.NextConversinMode = skk::ConversionType::Direct;
+  output.NextInputMode = skk::InputType::Ascii;
   output.Output.Confirmed += c;
   return output;
 }
 
-SkkResult
+skk::Result
 cancelSel(char c, bool)
 {
   kanjiSelectionEffect(0);
@@ -646,7 +657,7 @@ cancelSel(char c, bool)
   return backToKanjiInput();
 }
 
-SkkResult
+skk::Result
 h2kkana(char c, bool)
 {
   kanjiInputEffect(0);
@@ -654,7 +665,7 @@ h2kkana(char c, bool)
   romkan::cancelConso();
   if (WordBufLen == 0 || (OkuriInput && WordBufLen == 1)) {
     endKanjiInput();
-    output.NextKeymap = KeymapTypes::Kana;
+    output.NextConversinMode = skk::ConversionType::Direct;
   }
   WordBuf[WordBufLen] = '\0';
 
@@ -665,6 +676,6 @@ h2kkana(char c, bool)
   romkan::hira2kata(WordBuf);
   output.Output.Confirmed += WordBuf;
   endKanjiInput();
-  output.NextKeymap = KeymapTypes::Kana;
+  output.NextInputMode = skk::InputType::Kana;
   return output;
 }

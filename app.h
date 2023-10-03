@@ -5,7 +5,7 @@
 
 class App
 {
-  Skk m_skk;
+  skk::Skk m_skk;
   App();
 
 public:

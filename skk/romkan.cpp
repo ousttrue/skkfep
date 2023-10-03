@@ -29,19 +29,19 @@ isHiragana()
   return CurrentTab == HiraTab;
 }
 
-SkkResult
+skk::Result
 iKanaV(char c, bool)
 {
   return { .Output = { .Confirmed = inputKanaVowel(c) } };
 }
 
-SkkResult
+skk::Result
 iKanaC(char c, bool)
 {
   return { .Output = { .Confirmed = inputKanaConso(c) } };
 }
 
-SkkResult
+skk::Result
 flthru(char c, bool)
 {
   return { .Output = { .Confirmed = flushKana() } };
@@ -219,7 +219,7 @@ flushLastConso(char c)
   return out;
 }
 
-SkkResult
+skk::Result
 tglK(Skk* skk)
 {
   auto out = flushKana();
@@ -240,10 +240,10 @@ cancelConso()
   SmallTU = 0;
 }
 
-SkkResult
+skk::Result
 kanaBS(char c, bool)
 {
-  SkkResult output;
+  skk::Result output;
   if (Nconso) {
     int n = Nconso;
     char con[MAX_CONSO];
