@@ -225,10 +225,8 @@ tglK(Skk* skk)
   auto out = flushKana();
   if (CurrentTab == HiraTab) {
     CurrentTab = KataTab;
-    skk->showmode(KKANA_MODE);
   } else {
     CurrentTab = HiraTab;
-    skk->showmode(KANA_MODE);
   }
   return { .Output = { .Confirmed = out } };
 }

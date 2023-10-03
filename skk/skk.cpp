@@ -1,26 +1,27 @@
 #include "skk.h"
-#include "ctrlcode.h"
 #include "dictinary.h"
 #include "kkconv.h"
 #include "romkan.h"
-#include "terms.h"
+// #include "terms.h"
 #include <assert.h>
 #include <sstream>
-#include <stdio.h>
 
 #define USER_DIC_NAME ".skk/SKK-JISYO.L"
 
 #define DEFAULT_KANAKEY "^j"
 
-Skk::Skk()
+Skk::
+Skk()
 {
   KanaKey = DEFAULT_KANAKEY;
   initialize();
   setKeymap(KeymapTypes::Normal);
-  showmode(SKK_MODE);
 }
 
-Skk::~Skk() {}
+Skk::~
+Skk()
+{
+}
 
 void
 Skk::open_dictionary(std::string_view path)
@@ -34,52 +35,6 @@ Skk::open_dictionary(std::string_view path)
   if (d->load(UserDicName)) {
     UserDic = d;
   }
-}
-
-void
-Skk::showmode(SkkModes s)
-{
-  lastmode = curmode;
-  showmessage(mode_string(s));
-  curmode = s;
-}
-
-void
-Skk::showcurmode()
-{
-  showmessage(mode_string(curmode));
-}
-
-void
-Skk::showlastmode()
-{
-  showmessage(mode_string(lastmode));
-  curmode = lastmode;
-}
-
-void
-Skk::setKeymap(KeymapPtr _new)
-{
-  lastKeymap = CurrentKeymap;
-  CurrentKeymap = _new;
-}
-
-void
-Skk::setKeymap(KeymapTypes t)
-{
-  setKeymap(&m_keymaps[t]);
-  if (t == KeymapTypes::Kana) {
-    if (romkan::isHiragana())
-      showmode(KANA_MODE);
-    else
-      showmode(KKANA_MODE);
-  }
-}
-
-void
-Skk::restoreKeymap()
-{
-  CurrentKeymap = lastKeymap;
 }
 
 SkkOutput
@@ -111,7 +66,6 @@ void
 Skk::apply(const SkkResult& result)
 {
   if (result.NextMode) {
-    showmode(*result.NextMode);
     setKeymap((*result.NextMode));
   }
 
@@ -120,4 +74,33 @@ Skk::apply(const SkkResult& result)
   } else if (result.NextKeymap) {
     setKeymap(*result.NextKeymap);
   }
+}
+
+std::string
+Skk::statusline() const
+{
+  switch (CurrentKeymap->Type) {
+    case KeymapTypes::Normal:
+      return "SKK";
+    case KeymapTypes::Kana:
+      if (romkan::isHiragana())
+        return "かな";
+      else
+        return "カナ";
+    case KeymapTypes::Zenkaku:
+      return "全英";
+    case KeymapTypes::KanjiInput:
+      return "単語入力";
+    case KeymapTypes::OkuriInput:
+      return "送り";
+    case KeymapTypes::Selection:
+      return "単語選択";
+    case KeymapTypes::KAlphaInput:
+      return "ascii";
+    case KeymapTypes::CodeInput:
+      return "code";
+  }
+
+  assert(false);
+  return "";
 }

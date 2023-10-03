@@ -16,9 +16,15 @@
 
 #define IF_STOPPED(x) WIFSTOPPED(x)
 
-App::App() {}
+App::
+App()
+{
+}
 
-App::~App() {}
+App::~
+App()
+{
+}
 
 void
 App::Exit(int code)
@@ -114,6 +120,7 @@ App::Run()
   FD_ZERO(&selfds);
   int fdnum = child::Shellfd + 1;
 
+  std::string last_statusline;
   char okuri = 0;
   for (;;) {
     FD_SET(0, &selfds);
@@ -162,7 +169,11 @@ App::Run()
               child::writeShells(confirmed);
             }
 
-            // TODO: status line update
+            auto statusline = m_skk.statusline();
+            if (statusline != last_statusline) {
+              showmessage(statusline);
+              last_statusline = statusline;
+            }
 
             okuri = OkuriFirst;
           }

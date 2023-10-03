@@ -1,4 +1,5 @@
 #pragma once
+#include <string_view>
 
 bool
 getTCstr();
@@ -52,7 +53,7 @@ void
 bell();
 
 void
-showmessage(const char* s);
+showmessage(std::string_view s);
 
 void
 kanjiInputEffect(int on);

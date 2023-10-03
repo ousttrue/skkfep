@@ -153,7 +153,7 @@ bell()
 }
 
 void
-showmessage(const char* s)
+showmessage(std::string_view s)
 {
   if (status::type() != StatusType::NoStatusLine) {
     toMsg();

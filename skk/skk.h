@@ -1,6 +1,6 @@
 #pragma once
-#include "keymap.h"
 #include "conversionmode.h"
+#include "keymap.h"
 #include <assert.h>
 #include <memory>
 #include <unordered_map>
@@ -8,9 +8,6 @@
 class Skk
 {
   std::shared_ptr<SkkConversionMode> ConversinMode = DirectMode::create();
-
-  SkkModes lastmode = {};
-  SkkModes curmode = {};
 
   std::unordered_map<KeymapTypes, Keymap> m_keymaps{
     { KeymapTypes::Normal, Keymap{ KeymapTypes::Normal } },
@@ -48,12 +45,12 @@ public:
 
   Keymap& currentKeymap() { return *CurrentKeymap; }
 
-  void showmode(SkkModes s);
-  void showcurmode();
-  void showlastmode();
-
-  void setKeymap(KeymapPtr _new);
-  void setKeymap(KeymapTypes t);
+  void setKeymap(KeymapPtr _new)
+  {
+    lastKeymap = CurrentKeymap;
+    CurrentKeymap = _new;
+  }
+  void setKeymap(KeymapTypes t) { setKeymap(&m_keymaps[t]); }
   void setKeymap(SkkModes m)
   {
     switch (m) {
@@ -79,8 +76,11 @@ public:
         break;
     }
   }
-  void restoreKeymap();
+  void restoreKeymap() { CurrentKeymap = lastKeymap; }
+
   SkkOutput input(uint8_t c, bool okuri = false);
+
+  std::string statusline() const;
 
 private:
   void apply(const SkkResult& result);

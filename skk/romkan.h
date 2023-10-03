@@ -34,8 +34,6 @@ vowel_from_char(char c)
 
   return {};
 }
-// #define VOWEL(c)                                                               \
-//   ((c) == 'a' || (c) == 'i' || (c) == 'u' || (c) == 'e' || (c) == 'o')
 
 // 子音(Consonant)
 enum class CON
