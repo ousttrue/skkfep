@@ -6,7 +6,7 @@ skk_lib = static_library('skk', [
   'input/romkan_hira.cpp',
   'input/romkan_kata.cpp',
   'input/codeinput.cpp',
-  'input/zenkakualpha.cpp',
+  'input/zenkaku.cpp',
 
   'conversion/conversionmode.cpp',
   'conversion/kkconv.cpp',

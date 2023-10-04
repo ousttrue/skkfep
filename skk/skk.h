@@ -1,7 +1,7 @@
 #pragma once
 #include "conversion/conversionmode.h"
 #include "input/romkan.h"
-#include "input/zenkakualpha.h"
+#include "input/zenkaku.h"
 #include "keymap.h"
 #include <assert.h>
 

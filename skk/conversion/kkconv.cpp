@@ -1,7 +1,6 @@
 #include "kkconv.h"
 #include "dictionary.h"
 #include "input/romkan.h"
-#include "input/zenkakualpha.h"
 #include "terms.h"
 #include <ctype.h>
 #include <optional>
@@ -248,18 +247,6 @@ okKanaC(char c, bool first)
   }
   output += putOkuri(romkan::inputKanaConso(tolower(c)));
   return output;
-}
-
-skk::Result
-kZenAl(char c, bool)
-{
-  return bufferedInput(zenkakualpha::inputZenkakuAlpha(c));
-}
-
-skk::Result
-kZenEx(char c, bool)
-{
-  return bufferedInput(zenkakualpha::inputZenkakuEx(c));
 }
 
 skk::Result

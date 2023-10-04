@@ -6,8 +6,6 @@
 #include <optional>
 #include <string>
 
-struct Skk;
-
 // 母音
 enum class Vowel
 {

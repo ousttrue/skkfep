@@ -37,12 +37,6 @@ skk::Result
 okKanaC(char c, bool first);
 
 skk::Result
-kZenAl(char c, bool o = {});
-
-skk::Result
-kZenEx(char c, bool o = {});
-
-skk::Result
 kfthru(char c, bool o = {});
 
 skk::Result
