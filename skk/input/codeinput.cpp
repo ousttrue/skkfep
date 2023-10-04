@@ -17,7 +17,7 @@ skk::Result
 KanjiCodeInput::inputCode(Skk* skk)
 {
   skk::Result result;
-  result.Output.Confirmed = romkan::flushKana();
+  // result.Output.Confirmed = romkan::flushKana();
   if (status::type() != StatusType::NoStatusLine) {
     codeinMsg();
     result.NextInputMode = skk::InputType::Code;

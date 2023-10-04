@@ -8,74 +8,114 @@
 #define KANA_NN [(int)CON::NN][0]
 #define KANA_XTU [(int)CON::NN][1]
 
-extern const char* HiraTab[][5];
-extern const char* KataTab[][5];
+extern skk::KanaTable HiraTab;
+extern skk::KanaTable KataTab;
 
-// LastConso[0] is always '\0'
-char LastConso[MAX_CONSO];
-short Nconso = 0;
+namespace skk {
 
-bool SmallTU = false;
+// void
+// cancelConso()
+// {
+//   rubout(Nconso);
+//   Nconso = 0;
+//   Kindex = {};
+//   SmallTU = 0;
+// }
+//
+// skk::Result
+// kanaBS(char c, bool)
+// {
+//   skk::Result output;
+//   if (Nconso) {
+//     int n = Nconso;
+//     char con[MAX_CONSO];
+//     for (int i = 1; i < Nconso; i++)
+//       con[i] = LastConso[i];
+//     cancelConso();
+//     for (int i = 1; i < n; i++)
+//       output += iKanaC(con[i]);
+//   } else {
+//     output.Output.Confirmed += c;
+//   }
+//   return output;
+// }
+//
+// void
+// hira2kata(char* buf)
+// {
+//   int i = 0;
+//   while (buf[i]) {
+//     if (buf[0] & 0x80) {
+//       for (int j = 0; j <= (int)CON::NN; j++) {
+//         for (int k = 0; k < 5; k++) {
+//           if (!strncmp(&buf[i], HiraTab[j][k], 2)) {
+//             strncpy(&buf[i], KataTab[j][k], 2);
+//             goto brk1;
+//           }
+//         }
+//       }
+//     brk1:
+//       i += 2;
+//     } else
+//       i++;
+//   }
+// }
 
-CON Kindex = {};
-static const char* (*CurrentTab)[5] = HiraTab;
-
-namespace romkan {
-
-bool
-isHiragana()
+KanaInput::KanaInput()
+  : InputMode(InputType::Kana)
 {
-  return CurrentTab == HiraTab;
 }
 
-skk::Result
-iKanaV(char c, bool)
+const KanaTable&
+KanaInput::currentTab() const
 {
-  return { .Output = { .Confirmed = inputKanaVowel(c) } };
+  if (IsHiragana) {
+    return HiraTab;
+  } else {
+    return KataTab;
+  }
 }
 
-skk::Result
-iKanaC(char c, bool)
+Result
+KanaInput::putc(char8_t c)
 {
-  return { .Output = { .Confirmed = inputKanaConso(c) } };
-}
-
-skk::Result
-flthru(char c, bool)
-{
-  return { .Output = { .Confirmed = flushKana() } };
-}
-
-std::string
-flushKana()
-{
-  return flushLastConso('\0');
+  if (c == 'l') {
+    return {
+      .Output = { .Confirmed = flushKana() },
+      .NextInputMode = InputType::Ascii,
+    };
+  } else if (c == 'q') {
+    IsHiragana = !IsHiragana;
+    return { .Output = { .Confirmed = flushKana() } };
+  }
+  if (vowel_from_char(c)) {
+    return { .Output = inputKanaVowel(c) };
+  } else {
+    return {
+      .Output = inputKanaConso(c),
+    };
+  }
 }
 
 skk::Output
-inputKanaVowel(char c)
+KanaInput::inputKanaVowel(char c)
 {
   auto vowel = vowel_from_char(c);
   assert(vowel);
-  if (Kindex != CON::_0) { /* if preceding consonant exists */
-    csrLeft(Nconso);
-    erase(Nconso);
-    csrLeft(Nconso);
-  }
   std::stringstream ss;
   if (SmallTU && vowel == Vowel::U) {
-    ss << CurrentTab KANA_XTU;
+    ss << currentTab().m_table KANA_XTU;
   } else {
-    ss << CurrentTab[(int)Kindex][(int)*vowel];
+    ss << currentTab().m_table[(int)Kindex][(int)*vowel];
   }
-  SmallTU = 0;
+  SmallTU = false;
   Kindex = {};
-  Nconso = 0;
+  Consonant.clear();
   return { .Confirmed = ss.str() };
 }
 
 skk::Output
-inputKanaConso(char c)
+KanaInput::inputKanaConso(char c)
 {
   char notOverwrite = 0;
   switch (c) {
@@ -84,7 +124,7 @@ inputKanaConso(char c)
       break;
 
     case 's':
-      if (LastConso[Nconso] == 't') {
+      if (Consonant.back() == 't') {
         Kindex = CON::TS;
         notOverwrite = 1;
       } else {
@@ -93,7 +133,7 @@ inputKanaConso(char c)
       break;
 
     case 't':
-      if (LastConso[Nconso] == 'x') {
+      if (Consonant.back() == 'x') {
         SmallTU = 1;
         notOverwrite = 1;
       }
@@ -101,17 +141,16 @@ inputKanaConso(char c)
       break;
 
     case 'n':
-      if (LastConso[Nconso] == 'n') {
-        csrLeft(Nconso);
-        Nconso = 0;
+      if (Consonant.back() == 'n') {
+        Consonant.clear();
         Kindex = {};
-        return { .Confirmed = CurrentTab KANA_NN };
+        return { .Confirmed = currentTab().m_table KANA_NN };
       }
       Kindex = CON::N;
       break;
 
     case 'h':
-      switch (LastConso[Nconso]) {
+      switch (Consonant.back()) {
         case 'c':
           notOverwrite = 1;
           Kindex = CON::CH;
@@ -157,17 +196,17 @@ inputKanaConso(char c)
       Kindex = CON::X;
       break;
     case 'y':
-      if (LastConso[Nconso] && Kindex < CON::Y) {
+      if (Consonant.back() && Kindex < CON::Y) {
         notOverwrite = 1;
         Kindex = (CON)((int)Kindex + (int)CON::Y + 1);
-      } else if (LastConso[Nconso] == 'j') {
+      } else if (Consonant.back() == 'j') {
         notOverwrite = 1;
         Kindex = CON::JY;
       } else
         Kindex = CON::Y;
       break;
     case 'w':
-      if (LastConso[Nconso] == 'x') {
+      if (Consonant.back() == 'x') {
         notOverwrite = 1;
         Kindex = CON::XW;
       } else
@@ -188,8 +227,7 @@ inputKanaConso(char c)
   if (!notOverwrite) {
     ss << flushLastConso(c);
   }
-  Nconso++;
-  LastConso[Nconso] = c;
+  Consonant.push_back(c);
 
   char str[] = { c, 0 };
   return {
@@ -199,144 +237,21 @@ inputKanaConso(char c)
 }
 
 std::string
-flushLastConso(char c)
+KanaInput::flushLastConso(char c)
 {
-  if (Nconso == 0) {
+  if (Consonant.empty()) {
     return "";
   }
 
-  if (Nconso <= 2) {
-    csrLeft(Nconso);
-  } else {
-    csrLeft(Nconso);
-    erase(Nconso);
-    csrLeft(Nconso);
-  }
-
   std::string out;
-  if (LastConso[Nconso] == 'n') {
-    out += CurrentTab KANA_NN;
-  } else if (LastConso[Nconso] == c) {
-    out += CurrentTab KANA_XTU;
+  if (Consonant.back() == 'n') {
+    out += currentTab().m_table KANA_NN;
+  } else if (Consonant.back() == c) {
+    out += currentTab().m_table KANA_XTU;
   }
-  Nconso = 0;
+  Consonant.clear();
+
   return out;
-}
-
-skk::Result
-tglK()
-{
-  auto out = flushKana();
-  if (CurrentTab == HiraTab) {
-    CurrentTab = KataTab;
-  } else {
-    CurrentTab = HiraTab;
-  }
-  return { .Output = { .Confirmed = out } };
-}
-
-void
-cancelConso()
-{
-  rubout(Nconso);
-  Nconso = 0;
-  Kindex = {};
-  SmallTU = 0;
-}
-
-skk::Result
-kanaBS(char c, bool)
-{
-  skk::Result output;
-  if (Nconso) {
-    int n = Nconso;
-    char con[MAX_CONSO];
-    for (int i = 1; i < Nconso; i++)
-      con[i] = LastConso[i];
-    cancelConso();
-    for (int i = 1; i < n; i++)
-      output += iKanaC(con[i]);
-  } else {
-    output.Output.Confirmed += c;
-  }
-  return output;
-}
-
-void
-hira2kata(char* buf)
-{
-  int i = 0;
-  while (buf[i]) {
-    if (buf[0] & 0x80) {
-      for (int j = 0; j <= (int)CON::NN; j++) {
-        for (int k = 0; k < 5; k++) {
-          if (!strncmp(&buf[i], HiraTab[j][k], 2)) {
-            strncpy(&buf[i], KataTab[j][k], 2);
-            goto brk1;
-          }
-        }
-      }
-    brk1:
-      i += 2;
-    } else
-      i++;
-  }
-}
-
-} // namespace
-
-namespace skk {
-
-KanaInput::KanaInput()
-  : InputMode(InputType::Kana)
-{
-}
-
-Result
-KanaInput::putc(char8_t c)
-{
-  if (c == 'l') {
-    return {
-      .Output = { .Confirmed = romkan::flushKana() },
-      .NextInputMode = InputType::Ascii,
-    };
-  } else if (c == 'q') {
-    romkan::tglK();
-    return {};
-  }
-  if (vowel_from_char(c)) {
-    // { 'a', romkan::iKanaV },
-    // { 'i', romkan::iKanaV },
-    // { 'u', romkan::iKanaV },
-    // { 'e', romkan::iKanaV },
-    // { 'o', romkan::iKanaV },
-    return { .Output{
-      .Confirmed = romkan::iKanaV(c).Output.Confirmed,
-    } };
-  } else {
-    // { 'b', romkan::iKanaC },
-    // { 'c', romkan::iKanaC },
-    // { 'd', romkan::iKanaC },
-    // { 'f', romkan::iKanaC },
-    // { 'g', romkan::iKanaC },
-    // { 'h', romkan::iKanaC },
-    // { 'j', romkan::iKanaC },
-    // { 'k', romkan::iKanaC },
-    // { 'm', romkan::iKanaC },
-    // { 'n', romkan::iKanaC },
-    // { 'p', romkan::iKanaC },
-    // { 'r', romkan::iKanaC },
-    // { 's', romkan::iKanaC },
-    // { 't', romkan::iKanaC },
-    // { 'v', romkan::iKanaC },
-    // { 'w', romkan::iKanaC },
-    // { 'x', romkan::iKanaC },
-    // { 'y', romkan::iKanaC },
-    // { 'z', romkan::iKanaC },
-    return { .Output{
-      .Unconfirmed = romkan::iKanaC(c).Output.Unconfirmed,
-    } };
-  }
 }
 
 } // namespace

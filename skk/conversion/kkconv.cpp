@@ -142,7 +142,7 @@ kkBegV(char c, bool)
   output.NextConversinMode = skk::ConversionType::Entry;
   kanjiInputEffect(1);
   kkClearBuf();
-  output += bufferedInput(romkan::inputKanaVowel(tolower(c)));
+  // output += bufferedInput(romkan::inputKanaVowel(tolower(c)));
   return output;
 }
 
@@ -153,14 +153,14 @@ kkBegC(char c, bool)
   output.NextConversinMode = skk::ConversionType::Entry;
   kanjiInputEffect(1);
   kkClearBuf();
-  output += bufferedInput(romkan::inputKanaConso(tolower(c)));
+  // output += bufferedInput(romkan::inputKanaConso(tolower(c)));
   return output;
 }
 
 skk::Result
 kkBegA(char c, bool)
 {
-  romkan::flushKana();
+  // romkan::flushKana();
   skk::Result output;
   output.NextConversinMode = skk::ConversionType::Entry;
   output.NextInputMode = skk::InputType::Ascii;
@@ -193,13 +193,14 @@ kaBS(char c, bool)
 skk::Result
 kKanaV(char c, bool)
 {
-  return bufferedInput(romkan::inputKanaVowel(c));
+  // return bufferedInput(romkan::inputKanaVowel(c));
+  return {};
 }
 
 static skk::Result
-putOkuri(const skk::Output &o)
+putOkuri(const skk::Output& o)
 {
-  auto s=o.Confirmed + o.Unconfirmed;
+  auto s = o.Confirmed + o.Unconfirmed;
   skk::Result output;
   int l = OkuriBufLen;
   output.Output.Unconfirmed += s;
@@ -220,33 +221,36 @@ putOkuri(const skk::Output &o)
 skk::Result
 okKanaV(char c, bool first)
 {
-  if (first) {
-    WordBuf[WordBufLen++] = c;
-  }
-  rubout(1);
-  auto output = putOkuri(romkan::inputKanaVowel(tolower(c)));
-  output += kkconv(c);
-  return output;
+  // if (first) {
+  //   WordBuf[WordBufLen++] = c;
+  // }
+  // rubout(1);
+  // auto output = putOkuri(romkan::inputKanaVowel(tolower(c)));
+  // output += kkconv(c);
+  // return output;
+  return {};
 }
 
 skk::Result
 kKanaC(char c, bool)
 {
-  return bufferedInput(romkan::inputKanaConso(c));
+  // return bufferedInput(romkan::inputKanaConso(c));
+  return {};
 }
 
 skk::Result
 okKanaC(char c, bool first)
 {
-  skk::Result output;
-  if (Nconso == 0) {
-    WordBuf[WordBufLen++] = c;
-  } else if (first) {
-    output += bufferedInput(romkan::flushLastConso('\0'));
-    WordBuf[WordBufLen++] = c;
-  }
-  output += putOkuri(romkan::inputKanaConso(tolower(c)));
-  return output;
+  // skk::Result output;
+  // if (Nconso == 0) {
+  //   WordBuf[WordBufLen++] = c;
+  // } else if (first) {
+  //   output += bufferedInput(romkan::flushLastConso('\0'));
+  //   WordBuf[WordBufLen++] = c;
+  // }
+  // output += putOkuri(romkan::inputKanaConso(tolower(c)));
+  // return output;
+  return {};
 }
 
 skk::Result
@@ -281,7 +285,7 @@ skk::Result
 kfCancel(char c, bool)
 {
   kanjiInputEffect(0);
-  romkan::cancelConso();
+  // romkan::cancelConso();
   rubout(WordBufLen);
   WordBuf[WordBufLen] = '\0';
   endKanjiInput();
@@ -308,7 +312,7 @@ skk::Result
 kfFixToAsc(char c, bool)
 {
   auto output = kfFix(c);
-  output.Output.Confirmed += romkan::flushKana();
+  // output.Output.Confirmed += romkan::flushKana();
   output.NextConversinMode = skk::ConversionType::Direct;
   output.NextInputMode = skk::InputType::Ascii;
   return output;
@@ -319,7 +323,7 @@ skk::Result
 kfFixToZenA(char c, bool)
 {
   auto output = kfFix(c);
-  output.Output.Confirmed += romkan::flushKana();
+  // output.Output.Confirmed += romkan::flushKana();
   output.NextConversinMode = skk::ConversionType::Direct;
   output.NextInputMode = skk::InputType::Zenkaku;
   return output;
@@ -339,7 +343,7 @@ skk::Result
 thruKfFixToAsc(char c, bool)
 {
   auto output = kfFix(c);
-  output.Output.Confirmed += romkan::flushKana();
+  // output.Output.Confirmed += romkan::flushKana();
   output.NextConversinMode = skk::ConversionType::Direct;
   output.NextInputMode = skk::InputType::Ascii;
   output.Output.Confirmed += c;
@@ -360,7 +364,7 @@ skk::Result
 okfFixToAsc(char c, bool)
 {
   auto output = okfFix(c);
-  output.Output.Confirmed += romkan::flushKana();
+  // output.Output.Confirmed += romkan::flushKana();
   output.NextConversinMode = skk::ConversionType::Direct;
   output.NextInputMode = skk::InputType::Ascii;
   return output;
@@ -371,7 +375,7 @@ skk::Result
 okfFixToZenA(char c, bool)
 {
   auto output = okfFix(c);
-  output.Output.Confirmed += romkan::flushKana();
+  // output.Output.Confirmed += romkan::flushKana();
   output.NextConversinMode = skk::ConversionType::Direct;
   output.NextInputMode = skk::InputType::Zenkaku;
   return output;
@@ -390,7 +394,7 @@ skk::Result
 thruOkfFixToAsc(char c, bool)
 {
   auto output = okfFix(c);
-  output.Output.Confirmed += romkan::flushKana();
+  // output.Output.Confirmed += romkan::flushKana();
   output.NextConversinMode = skk::ConversionType::Direct;
   output.NextInputMode = skk::InputType::Ascii;
   output.Output.Confirmed += c;
@@ -401,18 +405,19 @@ skk::Result
 kfBS(char c, bool)
 {
   kanjiInputEffect(0);
-  if (Nconso) {
-    rubout(Nconso);
-    char con[MAX_CONSO];
-    for (int i = 1; i < Nconso; i++)
-      con[i] = LastConso[i];
-    int n = Nconso;
-    Nconso = 0;
-    Kindex = {};
-    SmallTU = 0;
-    for (int i = 1; i < n; i++)
-      kKanaC(con[i]);
-  } else if (WordBufLen > 0) {
+  // if (Nconso) {
+  //   rubout(Nconso);
+  //   char con[MAX_CONSO];
+  //   for (int i = 1; i < Nconso; i++)
+  //     con[i] = LastConso[i];
+  //   int n = Nconso;
+  //   Nconso = 0;
+  //   Kindex = {};
+  //   SmallTU = 0;
+  //   for (int i = 1; i < n; i++)
+  //     kKanaC(con[i]);
+  // } else 
+    if (WordBufLen > 0) {
     if (WordBuf[WordBufLen - 1] & 0x80) { /* is KANJI */
       rubout(2);
       WordBufLen -= 2;
@@ -428,91 +433,94 @@ kfBS(char c, bool)
 skk::Result
 okuriBS(char c, bool)
 {
-  kanjiInputEffect(0);
-  int n = Nconso;
-  char con[MAX_CONSO];
-  for (int i = 0; i < n; i++)
-    con[i] = LastConso[i];
-
-  skk::Result output;
-  if (n <= 1) {
-    output += cancelOkuri();
-  } else {
-    romkan::cancelConso();
-    for (int i = 0; i < n; i++)
-      output += okKanaC(con[i], 0);
-  }
-  kanjiInputEffect(1);
-  return output;
+  // kanjiInputEffect(0);
+  // int n = Nconso;
+  // char con[MAX_CONSO];
+  // for (int i = 0; i < n; i++)
+  //   con[i] = LastConso[i];
+  //
+  // skk::Result output;
+  // if (n <= 1) {
+  //   output += cancelOkuri();
+  // } else {
+  //   romkan::cancelConso();
+  //   for (int i = 0; i < n; i++)
+  //     output += okKanaC(con[i], 0);
+  // }
+  // kanjiInputEffect(1);
+  // return output;
+  return {};
 }
 
 // 検索して変換候補をを表示する
 skk::Result
 kkconv(char c, bool)
 {
-  kanjiInputEffect(0);
-  auto output = bufferedInput(romkan::flushLastConso('\0'));
-  romkan::cancelConso();
-  if (WordBufLen == 0 || (OkuriInput && WordBufLen == 1)) {
-    endKanjiInput();
-    // output.NextInputMode = KeymapTypes::Selection;
-  }
+  // kanjiInputEffect(0);
+  // auto output = bufferedInput(romkan::flushLastConso('\0'));
+  // romkan::cancelConso();
+  // if (WordBufLen == 0 || (OkuriInput && WordBufLen == 1)) {
+  //   endKanjiInput();
+  //   // output.NextInputMode = KeymapTypes::Selection;
+  // }
+  // // output.NextConversinMode = skk::ConversionType::Selection;
+  //
+  // WordBuf[WordBufLen] = '\0';
+  // Current.List = UserDic->getCand(WordBuf);
+  // if (Current.List) {
+  //   Current.Cand = Current.List->begin();
+  // } else {
+  //   Current.Cand = {};
+  // }
+  //
+  // int l = WordBufLen;
+  // if (OkuriInput)
+  //   l += strlen(OkuriBuf) - 1;
+  // rubout(l);
   // output.NextConversinMode = skk::ConversionType::Selection;
-
-  WordBuf[WordBufLen] = '\0';
-  Current.List = UserDic->getCand(WordBuf);
-  if (Current.List) {
-    Current.Cand = Current.List->begin();
-  } else {
-    Current.Cand = {};
-  }
-
-  int l = WordBufLen;
-  if (OkuriInput)
-    l += strlen(OkuriBuf) - 1;
-  rubout(l);
-  output.NextConversinMode = skk::ConversionType::Selection;
-
-  if (Current.IsEnabled()) {
-    BlockTty = 1;
-    output += showCand();
-    return output;
-  } else {
-    // 候補無かった
-    if (PreserveOnFailure) {
-      // Really, enter register mode
-      bell();
-      output += backToKanjiInput();
-      return output;
-    } else {
-      endKanjiInput();
-      output.NextConversinMode = skk::ConversionType::Direct;
-      return output;
-    }
-  }
+  //
+  // if (Current.IsEnabled()) {
+  //   BlockTty = 1;
+  //   output += showCand();
+  //   return output;
+  // } else {
+  //   // 候補無かった
+  //   if (PreserveOnFailure) {
+  //     // Really, enter register mode
+  //     bell();
+  //     output += backToKanjiInput();
+  //     return output;
+  //   } else {
+  //     endKanjiInput();
+  //     output.NextConversinMode = skk::ConversionType::Direct;
+  //     return output;
+  //   }
+  // }
+  return {};
 }
 
 skk::Result
 kOkuri(char c, bool)
 {
-  char okuri = tolower(c);
-
-  if (WordBufLen == 0) {
-    // Recover chattering effect
-    if (vowel_from_char(okuri)) {
-      return kKanaV(okuri);
-    }
-    romkan::cancelConso();
-    endKanjiInput();
-    kanjiInputEffect(0);
-    return { .NextConversinMode = skk::ConversionType::Direct };
-  }
-
-  auto output = toOkuri();
-  output.Output.Unconfirmed += '*';
-  output.ReInput = okuri;
-  output.Okuri = true;
-  return output;
+  // char okuri = tolower(c);
+  //
+  // if (WordBufLen == 0) {
+  //   // Recover chattering effect
+  //   if (vowel_from_char(okuri)) {
+  //     return kKanaV(okuri);
+  //   }
+  //   romkan::cancelConso();
+  //   endKanjiInput();
+  //   kanjiInputEffect(0);
+  //   return { .NextConversinMode = skk::ConversionType::Direct };
+  // }
+  //
+  // auto output = toOkuri();
+  // output.Output.Unconfirmed += '*';
+  // output.ReInput = okuri;
+  // output.Okuri = true;
+  // return output;
+  return {};
 }
 
 skk::Result
@@ -593,15 +601,15 @@ cancelOkuri(char, bool)
 {
   skk::Result output;
   kanjiInputEffect(0);
-  if (Nconso == 0) {
-    rubout(1);
-    OkuriInput = 0;
-    output.NextConversinMode = skk::ConversionType::Entry;
-  } else {
-    romkan::cancelConso();
-    output += clearOkuri();
-    OkuriFirst = 1;
-  }
+  // if (Nconso == 0) {
+  //   rubout(1);
+  //   OkuriInput = 0;
+  //   output.NextConversinMode = skk::ConversionType::Entry;
+  // } else {
+  //   romkan::cancelConso();
+  //   output += clearOkuri();
+  //   OkuriFirst = 1;
+  // }
   kanjiInputEffect(1);
   return output;
 }
@@ -630,7 +638,7 @@ skk::Result
 thruFixItToAsc(char c, bool o)
 {
   auto output = fixIt();
-  output.Output.Confirmed += romkan::flushKana();
+  // output.Output.Confirmed += romkan::flushKana();
   output.NextConversinMode = skk::ConversionType::Direct;
   output.NextInputMode = skk::InputType::Ascii;
   output.Output.Confirmed += c;
@@ -653,22 +661,23 @@ cancelSel(char c, bool)
 skk::Result
 h2kkana(char c, bool)
 {
-  kanjiInputEffect(0);
-  auto output = bufferedInput(romkan::flushLastConso('\0'));
-  romkan::cancelConso();
-  if (WordBufLen == 0 || (OkuriInput && WordBufLen == 1)) {
-    endKanjiInput();
-    output.NextConversinMode = skk::ConversionType::Direct;
-  }
-  WordBuf[WordBufLen] = '\0';
-
-  auto l = WordBufLen;
-  if (OkuriInput)
-    l += strlen(OkuriBuf) - 1;
-  rubout(l);
-  romkan::hira2kata(WordBuf);
-  output.Output.Confirmed += WordBuf;
-  endKanjiInput();
-  output.NextInputMode = skk::InputType::Kana;
-  return output;
+  // kanjiInputEffect(0);
+  // // auto output = bufferedInput(romkan::flushLastConso('\0'));
+  // romkan::cancelConso();
+  // if (WordBufLen == 0 || (OkuriInput && WordBufLen == 1)) {
+  //   endKanjiInput();
+  //   output.NextConversinMode = skk::ConversionType::Direct;
+  // }
+  // WordBuf[WordBufLen] = '\0';
+  //
+  // auto l = WordBufLen;
+  // if (OkuriInput)
+  //   l += strlen(OkuriBuf) - 1;
+  // rubout(l);
+  // romkan::hira2kata(WordBuf);
+  // output.Output.Confirmed += WordBuf;
+  // endKanjiInput();
+  // output.NextInputMode = skk::InputType::Kana;
+  // return output;
+  return {};
 }

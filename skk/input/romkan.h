@@ -6,7 +6,8 @@
 #include <optional>
 #include <string>
 
-// 母音
+namespace skk {
+
 enum class Vowel
 {
   A,
@@ -77,64 +78,30 @@ enum class CON
   JY,
   TH,
   NN,
+  COUNT,
 };
-
-#define MAX_CONSO 5
-extern char LastConso[MAX_CONSO]; /* LastConso[0] is always '\0' */
-extern short Nconso;
-extern bool SmallTU;
-extern CON Kindex;
-
-namespace romkan {
-
-bool
-isHiragana();
-
-// 母音
-skk::Result
-iKanaV(char c, bool o = {});
-
-// 子音
-skk::Result
-iKanaC(char c, bool o = {});
-
-skk::Result
-flthru(char c, bool);
-
-std::string
-flushKana();
-
-// 母音
-skk::Output
-inputKanaVowel(char c);
-
-// 子音
-skk::Output
-inputKanaConso(char c);
-
-std::string
-flushLastConso(char c);
-
-skk::Result
-tglK();
-
-void
-cancelConso();
-
-skk::Result
-kanaBS(char c, bool o = {});
-
-void
-hira2kata(char* buf);
-
-} // namespace
-
-namespace skk {
+struct KanaTable
+{
+  const char* m_table[(int)CON::COUNT][5];
+};
 
 struct KanaInput : InputMode
 {
+  // Hiragana or Katakana
+  bool IsHiragana = true;
+  std::string Consonant;
+  bool SmallTU = false;
+  CON Kindex = {};
+
   KanaInput();
   Result putc(char8_t c) override;
+
+private:
+  Output inputKanaVowel(char c);
+  Output inputKanaConso(char c);
+  std::string flushLastConso(char c);
+  std::string flushKana() { return flushLastConso('\0'); }
+  const KanaTable& currentTab() const;
 };
 
 } // namespace
