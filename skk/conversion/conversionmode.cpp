@@ -14,7 +14,7 @@ DirectMode::input(uint8_t c)
   }
 
   return {
-    .Output = InputMode->input(c),
+    .Output = InputMode->putc(c),
   };
 }
 
@@ -22,7 +22,7 @@ Result
 EntryMode::input(uint8_t c)
 {
   return {
-    .Output = InputMode->input(c),
+    .Output = InputMode->putc(c),
   };
 }
 
@@ -30,7 +30,7 @@ Result
 OkuriMode::input(uint8_t c)
 {
   return {
-    .Output = InputMode->input(c),
+    .Output = InputMode->putc(c),
   };
 }
 
@@ -38,7 +38,7 @@ Result
 SelectionMode::input(uint8_t c)
 {
   return {
-    .Output = InputMode->input(c),
+    .Output = InputMode->putc(c),
   };
 }
 

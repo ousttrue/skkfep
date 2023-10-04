@@ -136,7 +136,7 @@ namespace skk {
 struct KanaInput : InputMode
 {
   KanaInput();
-  Output input(uint8_t c) override;
+  Output putc(char8_t c) override;
 };
 
 } // namespace

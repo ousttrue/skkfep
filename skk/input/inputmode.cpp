@@ -2,14 +2,13 @@
 
 namespace skk {
 
-AsciiInput::
-AsciiInput()
+AsciiInput::AsciiInput()
   : InputMode(InputType::Ascii)
 {
 }
 
 Output
-AsciiInput::input(uint8_t c)
+AsciiInput::putc(char8_t c)
 {
   char str[]{ (char)c, 0 };
   return Output{
@@ -19,14 +18,13 @@ AsciiInput::input(uint8_t c)
 
 //
 //
-CodeInput::
-CodeInput()
+CodeInput::CodeInput()
   : InputMode(InputType::Code)
 {
 }
 
 Output
-CodeInput::input(uint8_t c)
+CodeInput::putc(char8_t c)
 {
   return Output{};
 }

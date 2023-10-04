@@ -3,8 +3,6 @@
 
 namespace skk {
 
-using InputFunc = std::function<Output(uint8_t)>;
-
 struct InputMode
 {
   InputType Type;
@@ -17,19 +15,32 @@ public:
   virtual ~InputMode() {}
   InputMode(const InputMode&) = delete;
   InputMode& operator=(const InputMode&) = delete;
-  virtual Output input(uint8_t c) = 0;
+  virtual Output putc(char8_t c) = 0;
+
+  // for test
+  Output puts(std::u8string_view s)
+  {
+    std::string confirmed;
+    Output o;
+    for (auto c : s) {
+      o = putc(c);
+      confirmed += o.Confirmed;
+    }
+    o.Confirmed = confirmed;
+    return o;
+  }
 };
 
 struct AsciiInput : InputMode
 {
   AsciiInput();
-  Output input(uint8_t c) override;
+  Output putc(char8_t c) override;
 };
 
 struct CodeInput : InputMode
 {
   CodeInput();
-  Output input(uint8_t c) override;
+  Output putc(char8_t c) override;
 };
 
 } // namespace

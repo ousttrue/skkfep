@@ -293,7 +293,7 @@ KanaInput::KanaInput()
 }
 
 Output
-KanaInput::input(uint8_t c)
+KanaInput::putc(char8_t c)
 {
   if (vowel_from_char(c)) {
     return Output{

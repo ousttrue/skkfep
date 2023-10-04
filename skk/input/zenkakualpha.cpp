@@ -160,14 +160,13 @@ inputZenkakuEx(char c)
 
 namespace skk {
 
-ZenkakuInput::
-ZenkakuInput()
+ZenkakuInput::ZenkakuInput()
   : InputMode(InputType::Zenkaku)
 {
 }
 
 Output
-ZenkakuInput::input(uint8_t c)
+ZenkakuInput::putc(char8_t c)
 {
   return Output{
     .Confirmed = zenkakualpha::inputZenkakuAlpha(c),

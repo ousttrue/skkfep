@@ -5,26 +5,26 @@
 TEST(SkkTest, zenkaku)
 {
   skk::Skk skk;
-  EXPECT_EQ(skk.conversionmode(), skk::ConversionType::Direct);
-  EXPECT_EQ(skk.inputmode(), skk::InputType::Ascii);
+  EXPECT_EQ(skk::ConversionType::Direct, skk.conversionmode());
+  EXPECT_EQ(skk::InputType::Ascii, skk.inputmode());
 
   {
     auto output = skk.input(CTRL_J);
-    EXPECT_EQ(skk.conversionmode(), skk::ConversionType::Direct);
-    EXPECT_EQ(skk.inputmode(), skk::InputType::Kana);
+    EXPECT_EQ(skk::ConversionType::Direct, skk.conversionmode());
+    EXPECT_EQ(skk::InputType::Kana, skk.inputmode());
   }
 
   {
     auto output = skk.input('L');
-    EXPECT_EQ(skk.conversionmode(), skk::ConversionType::Direct);
-    EXPECT_EQ(skk.inputmode(), skk::InputType::Zenkaku);
+    EXPECT_EQ(skk::ConversionType::Direct, skk.conversionmode());
+    EXPECT_EQ(skk::InputType::Zenkaku, skk.inputmode());
   }
 
   {
     auto output = skk.input('a');
-    EXPECT_EQ(skk.conversionmode(), skk::ConversionType::Direct);
-    EXPECT_EQ(skk.inputmode(), skk::InputType::Zenkaku);
-    EXPECT_EQ(output.Confirmed, "ａ");
+    EXPECT_EQ(skk::ConversionType::Direct, skk.conversionmode());
+    EXPECT_EQ(skk::InputType::Zenkaku, skk.inputmode());
+    EXPECT_EQ("ａ", output.Confirmed);
   }
 }
 
@@ -34,15 +34,15 @@ TEST(SkkTest, romkan)
 
   {
     auto output = skk.input(CTRL_J);
-    EXPECT_EQ(skk.conversionmode(), skk::ConversionType::Direct);
-    EXPECT_EQ(skk.inputmode(), skk::InputType::Kana);
+    EXPECT_EQ(skk::ConversionType::Direct, skk.conversionmode());
+    EXPECT_EQ(skk::InputType::Kana, skk.inputmode());
   }
 
   {
     auto output = skk.input('a');
-    EXPECT_EQ(skk.conversionmode(), skk::ConversionType::Direct);
-    EXPECT_EQ(skk.inputmode(), skk::InputType::Kana);
-    EXPECT_EQ(output.Confirmed, "あ");
+    EXPECT_EQ(skk::ConversionType::Direct, skk.conversionmode());
+    EXPECT_EQ(skk::InputType::Kana, skk.inputmode());
+    EXPECT_EQ("あ", output.Confirmed);
   }
 }
 
@@ -53,28 +53,28 @@ TEST(SkkTest, henkan)
 
   {
     auto output = skk.input(CTRL_J);
-    EXPECT_EQ(skk.conversionmode(), skk::ConversionType::Direct);
-    EXPECT_EQ(skk.inputmode(), skk::InputType::Kana);
+    EXPECT_EQ(skk::ConversionType::Direct, skk.conversionmode());
+    EXPECT_EQ(skk::InputType::Kana, skk.inputmode());
   }
 
   {
     auto output = skk.input('A');
-    EXPECT_EQ(skk.conversionmode(), skk::ConversionType::Entry);
-    EXPECT_EQ(skk.inputmode(), skk::InputType::Kana);
-    EXPECT_EQ(output.Unconfirmed, "あ");
+    EXPECT_EQ(skk::ConversionType::Entry, skk.conversionmode());
+    EXPECT_EQ(skk::InputType::Kana, skk.inputmode());
+    EXPECT_EQ("あ", output.Unconfirmed);
   }
 
   {
     auto output = skk.input(' ');
-    EXPECT_EQ(skk.conversionmode(), skk::ConversionType::Selection);
-    EXPECT_EQ(skk.inputmode(), skk::InputType::Kana);
-    EXPECT_EQ(output.Unconfirmed, "亜");
+    EXPECT_EQ(skk::ConversionType::Selection, skk.conversionmode());
+    EXPECT_EQ(skk::InputType::Kana, skk.inputmode());
+    EXPECT_EQ("亜", output.Unconfirmed);
   }
 
   {
     auto output = skk.input(CTRL_J);
-    EXPECT_EQ(skk.conversionmode(), skk::ConversionType::Direct);
-    EXPECT_EQ(skk.inputmode(), skk::InputType::Kana);
-    EXPECT_EQ(output.Confirmed, "亜");
+    EXPECT_EQ(skk::ConversionType::Direct, skk.conversionmode());
+    EXPECT_EQ(skk::InputType::Kana, skk.inputmode());
+    EXPECT_EQ("亜", output.Confirmed);
   }
 }
