@@ -1,8 +1,8 @@
 #pragma once
 #include "conversion/conversionmode.h"
+#include "input/zenkakualpha.h"
 #include "keymap.h"
 #include <assert.h>
-#include <unordered_map>
 
 namespace skk {
 

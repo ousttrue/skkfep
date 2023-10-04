@@ -1,4 +1,5 @@
 #pragma once
+#include "inputmode.h"
 #include "keymap.h"
 #include <string>
 
@@ -15,5 +16,15 @@ iZenEx(char c, bool o = {});
 
 std::string
 inputZenkakuEx(char c);
+
+} // namespace
+
+namespace skk {
+
+struct ZenkakuInput : InputMode
+{
+  ZenkakuInput();
+  Output input(uint8_t c) override;
+};
 
 } // namespace

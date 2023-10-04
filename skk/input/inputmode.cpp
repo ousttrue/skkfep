@@ -2,22 +2,45 @@
 
 namespace skk {
 
-AsciiInput::AsciiInput()
+AsciiInput::
+AsciiInput()
+  : InputMode(InputType::Ascii)
 {
-  Default = [](char c, auto) {
-    char str[]{ c, 0 };
-    return Result{
-      .Output{
-        .Confirmed = str,
-      },
-    };
+}
+
+Output
+AsciiInput::input(uint8_t c)
+{
+  char str[]{ (char)c, 0 };
+  return Output{
+    .Confirmed = str,
   };
 }
 
-ZenkakuInput::ZenkakuInput() {}
+//
+KanaInput::
+KanaInput()
+  : InputMode(InputType::Kana)
+{
+}
 
-KanaInput::KanaInput() {}
+Output
+KanaInput::input(uint8_t c)
+{
+  return Output{};
+}
 
-CodeInput::CodeInput() {}
+//
+CodeInput::
+CodeInput()
+  : InputMode(InputType::Code)
+{
+}
+
+Output
+CodeInput::input(uint8_t c)
+{
+  return Output{};
+}
 
 } // namespace

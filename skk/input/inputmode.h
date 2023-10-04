@@ -1,52 +1,41 @@
 #pragma once
 #include "keymap.h"
-#include <unordered_map>
 
 namespace skk {
+
+using InputFunc = std::function<Output(uint8_t)>;
 
 struct InputMode
 {
   InputType Type;
   std::string Statusline;
-  KeyFunc Default = nulcmd;
-  std::unordered_map<uint8_t, KeyFunc> KeyMap;
 
 protected:
-  InputMode() {}
+  InputMode(InputType type) {}
 
 public:
-  ~InputMode() {}
+  virtual ~InputMode() {}
   InputMode(const InputMode&) = delete;
   InputMode& operator=(const InputMode&) = delete;
-  Result input(uint8_t c)
-  {
-    auto found = KeyMap.find(c);
-    if (found == KeyMap.end()) {
-      return Default(c, false);
-    } else {
-      return found->second(c, false);
-    }
-  }
+  virtual Output input(uint8_t c) = 0;
 };
 
 struct AsciiInput : InputMode
 {
   AsciiInput();
-};
-
-struct ZenkakuInput : InputMode
-{
-  ZenkakuInput();
+  Output input(uint8_t c) override;
 };
 
 struct KanaInput : InputMode
 {
   KanaInput();
+  Output input(uint8_t c) override;
 };
 
 struct CodeInput : InputMode
 {
   CodeInput();
+  Output input(uint8_t c) override;
 };
 
 } // namespace

@@ -13,25 +13,33 @@ DirectMode::input(uint8_t c)
     };
   }
 
-  return InputMode->input(c);
+  return {
+    .Output = InputMode->input(c),
+  };
 }
 
 Result
 EntryMode::input(uint8_t c)
 {
-  return InputMode->input(c);
+  return {
+    .Output = InputMode->input(c),
+  };
 }
 
 Result
 OkuriMode::input(uint8_t c)
 {
-  return InputMode->input(c);
+  return {
+    .Output = InputMode->input(c),
+  };
 }
 
 Result
 SelectionMode::input(uint8_t c)
 {
-  return InputMode->input(c);
+  return {
+    .Output = InputMode->input(c),
+  };
 }
 
 } // namespace
