@@ -1,5 +1,5 @@
 #pragma once
-#include "conversionmode.h"
+#include "conversion/conversionmode.h"
 #include "keymap.h"
 #include <assert.h>
 #include <unordered_map>

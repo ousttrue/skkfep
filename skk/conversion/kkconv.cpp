@@ -1,8 +1,8 @@
 #include "kkconv.h"
-#include "dictinary.h"
-#include "romkan.h"
+#include "dictionary.h"
+#include "input/romkan.h"
+#include "input/zenkakualpha.h"
 #include "terms.h"
-#include "zenkakualpha.h"
 #include <ctype.h>
 #include <optional>
 #include <string.h>

@@ -1,7 +1,5 @@
-#include "dictinary.h"
+#include "dictionary.h"
 #include <assert.h>
-#include <fstream>
-#include <string.h>
 #include <sys/stat.h>
 
 // Check if word is an OKURI-ARI entry or not

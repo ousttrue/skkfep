@@ -1,8 +1,6 @@
 #include "app.h"
-#include "kkconv.h"
-#include "skk.h"
+#include "conversion/kkconv.h"
 #include "statusline.h"
-#include "terms.h"
 #include "version.h"
 #include <pwd.h>
 #include <stdio.h>

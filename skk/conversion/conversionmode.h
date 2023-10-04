@@ -1,5 +1,5 @@
 #pragma once
-#include "inputmode.h"
+#include "input/inputmode.h"
 #include "keymap.h"
 #include <memory>
 

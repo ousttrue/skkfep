@@ -2,17 +2,16 @@ skk_lib = static_library('skk', [
   'skk.cpp',
   'skk_keymap.cpp',
 
-  'romkan.cpp',
-  'romkan_hira.cpp',
-  'romkan_kata.cpp',
-  'codeinput.cpp',
-  'zenkakualpha.cpp',
+  'input/inputmode.cpp',
+  'input/romkan.cpp',
+  'input/romkan_hira.cpp',
+  'input/romkan_kata.cpp',
+  'input/codeinput.cpp',
+  'input/zenkakualpha.cpp',
 
-  'kkconv.cpp',
-  'dictionary.cpp',
-
-  'conversionmode.cpp',
-  'inputmode.cpp',
+  'conversion/conversionmode.cpp',
+  'conversion/kkconv.cpp',
+  'conversion/dictionary.cpp',
   ],
   dependencies: [termpty_dep],
 )

@@ -1,14 +1,12 @@
 #include "skk.h"
-#include "dictinary.h"
-#include "kkconv.h"
-#include "romkan.h"
-// #include "terms.h"
+#include "conversion/dictionary.h"
+#include "conversion/kkconv.h"
 #include <assert.h>
-#include <sstream>
 
 namespace skk {
 
-Skk::Skk(std::string_view kanaKey)
+Skk::
+Skk(std::string_view kanaKey)
 {
   m_AsciiInput = std::make_shared<AsciiInput>();
   m_ZenkakuInput = std::make_shared<ZenkakuInput>();
@@ -26,7 +24,10 @@ Skk::Skk(std::string_view kanaKey)
   initialize(kanaKey);
 }
 
-Skk::~Skk() {}
+Skk::~
+Skk()
+{
+}
 
 void
 Skk::open_dictionary(std::string_view path)

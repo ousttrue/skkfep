@@ -1,7 +1,6 @@
 #include "app.h"
 #include "connsh.h"
-#include "dictinary.h"
-#include "kkconv.h"
+#include "conversion/kkconv.h"
 #include "signal_setup.h"
 #include "skk.h"
 #include "statusline.h"
@@ -9,16 +8,21 @@
 #include "terms.h"
 #include "termsize.h"
 #include <signal.h>
-#include <sstream>
 #include <sys/ioctl.h>
 #include <sys/select.h>
 #include <wait.h>
 
 #define IF_STOPPED(x) WIFSTOPPED(x)
 
-App::App() {}
+App::
+App()
+{
+}
 
-App::~App() {}
+App::~
+App()
+{
+}
 
 void
 App::Exit(int code)
