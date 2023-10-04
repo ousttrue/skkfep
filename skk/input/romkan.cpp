@@ -224,7 +224,7 @@ flushLastConso(char c)
 }
 
 skk::Result
-tglK(Skk* skk)
+tglK()
 {
   auto out = flushKana();
   if (CurrentTab == HiraTab) {
@@ -292,17 +292,50 @@ KanaInput::KanaInput()
 {
 }
 
-Output
+Result
 KanaInput::putc(char8_t c)
 {
+  if (c == 'l') {
+    return {
+      .Output = { .Confirmed = romkan::flushKana() },
+      .NextInputMode = InputType::Ascii,
+    };
+  } else if (c == 'q') {
+    romkan::tglK();
+    return {};
+  }
   if (vowel_from_char(c)) {
-    return Output{
+    // { 'a', romkan::iKanaV },
+    // { 'i', romkan::iKanaV },
+    // { 'u', romkan::iKanaV },
+    // { 'e', romkan::iKanaV },
+    // { 'o', romkan::iKanaV },
+    return { .Output{
       .Confirmed = romkan::iKanaV(c).Output.Confirmed,
-    };
+    } };
   } else {
-    return Output{
+    // { 'b', romkan::iKanaC },
+    // { 'c', romkan::iKanaC },
+    // { 'd', romkan::iKanaC },
+    // { 'f', romkan::iKanaC },
+    // { 'g', romkan::iKanaC },
+    // { 'h', romkan::iKanaC },
+    // { 'j', romkan::iKanaC },
+    // { 'k', romkan::iKanaC },
+    // { 'm', romkan::iKanaC },
+    // { 'n', romkan::iKanaC },
+    // { 'p', romkan::iKanaC },
+    // { 'r', romkan::iKanaC },
+    // { 's', romkan::iKanaC },
+    // { 't', romkan::iKanaC },
+    // { 'v', romkan::iKanaC },
+    // { 'w', romkan::iKanaC },
+    // { 'x', romkan::iKanaC },
+    // { 'y', romkan::iKanaC },
+    // { 'z', romkan::iKanaC },
+    return { .Output{
       .Unconfirmed = romkan::iKanaC(c).Output.Unconfirmed,
-    };
+    } };
   }
 }
 

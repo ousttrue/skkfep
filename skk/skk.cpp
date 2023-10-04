@@ -3,11 +3,76 @@
 #include "conversion/kkconv.h"
 #include <assert.h>
 
+static int
+code(const char* p)
+{
+  int k;
+  if (p[0] == '\\') {
+    switch (p[1]) {
+      case 'a':
+        return '\007';
+      case 'b':
+        return '\b';
+      case 'f':
+        return '\f';
+      case 'n':
+        return '\n';
+      case 'r':
+        return '\r';
+      case 't':
+        return '\t';
+      case 'v':
+        return '\v';
+      case 'x':
+        sscanf(p + 2, "%x", &k);
+        return k;
+      default:
+        if (('0' <= p[1]) && (p[1] <= '9')) {
+          sscanf(p + 1, "%o", &k);
+          return k;
+        } else {
+          p++;
+        }
+        break;
+    }
+  } else if (p[0] == '^') {
+    p++;
+  }
+  k = p[0];
+  if (k >= '`')
+    k -= ('a' - 'A');
+  if (k >= ' ')
+    k ^= 0x40;
+  return k;
+}
 namespace skk {
 
-Skk::
-Skk(std::string_view kanaKey)
+Skk::Skk(std::string_view _kanaKey)
 {
+  std::string kanaKey{ _kanaKey.begin(), _kanaKey.end() };
+  auto k = code(kanaKey.c_str());
+  // printf("KanaKey=^%c\n", k ^ 0x40);
+  // NormalKeymap.Keymap[k] = [](auto, auto) {
+  //   return SkkResult{
+  //     .NextKeymap = KeymapTypes::Kana,
+  //   };
+  // };
+  // SelectionKeymap.Keymap[k] = fixIt;
+  // CodeInputKeymap.Keymap[k] = [](auto, auto) {
+  //   return SkkResult{
+  //     .NextKeymap = KeymapTypes::Kana,
+  //   };
+  // };
+  // KanaKeymap.Keymap[k] = nulcmd;
+  // ZenkakuKeymap.Keymap[k] = [](auto, auto) {
+  //   return SkkResult{
+  //     .NextKeymap = KeymapTypes::Kana,
+  //   };
+  // };
+  // KanjiInputKeymap.Keymap[k] = kfFix;
+  // OkuriInputKeymap.Keymap[k] = okfFix;
+  // KAlphaInputKeymap.Keymap[k] = kfFix;
+
   m_AsciiInput = std::make_shared<AsciiInput>();
   m_ZenkakuInput = std::make_shared<ZenkakuInput>();
   m_KanaInput = std::make_shared<KanaInput>();
@@ -20,14 +85,9 @@ Skk(std::string_view kanaKey)
 
   CurrentMode = m_DirectMode;
   CurrentMode->InputMode = m_AsciiInput;
-
-  initialize(kanaKey);
 }
 
-Skk::~
-Skk()
-{
-}
+Skk::~Skk() {}
 
 void
 Skk::open_dictionary(std::string_view path)

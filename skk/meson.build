@@ -1,6 +1,5 @@
 skk_lib = static_library('skk', [
   'skk.cpp',
-  'skk_keymap.cpp',
 
   'input/inputmode.cpp',
   'input/romkan.cpp',

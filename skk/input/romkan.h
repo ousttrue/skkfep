@@ -118,7 +118,7 @@ std::string
 flushLastConso(char c);
 
 skk::Result
-tglK(Skk* skk);
+tglK();
 
 void
 cancelConso();
@@ -136,7 +136,7 @@ namespace skk {
 struct KanaInput : InputMode
 {
   KanaInput();
-  Output putc(char8_t c) override;
+  Result putc(char8_t c) override;
 };
 
 } // namespace

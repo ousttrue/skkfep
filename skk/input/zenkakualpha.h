@@ -24,7 +24,7 @@ namespace skk {
 struct ZenkakuInput : InputMode
 {
   ZenkakuInput();
-  Output putc(char8_t c) override;
+  Result putc(char8_t c) override;
 };
 
 } // namespace

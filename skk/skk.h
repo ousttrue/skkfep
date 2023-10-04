@@ -36,7 +36,6 @@ struct Skk
   Output input(uint8_t c);
 
 private:
-  void initialize(std::string_view kanaKey);
   void apply(const Result& result);
 };
 

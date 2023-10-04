@@ -15,32 +15,32 @@ public:
   virtual ~InputMode() {}
   InputMode(const InputMode&) = delete;
   InputMode& operator=(const InputMode&) = delete;
-  virtual Output putc(char8_t c) = 0;
+  virtual Result putc(char8_t c) = 0;
 
   // for test
-  Output puts(std::u8string_view s)
+  Result puts(std::u8string_view s)
   {
     std::string confirmed;
-    Output o;
+    Result res;
     for (auto c : s) {
-      o = putc(c);
-      confirmed += o.Confirmed;
+      res = putc(c);
+      confirmed += res.Output.Confirmed;
     }
-    o.Confirmed = confirmed;
-    return o;
+    res.Output.Confirmed = confirmed;
+    return res;
   }
 };
 
 struct AsciiInput : InputMode
 {
   AsciiInput();
-  Output putc(char8_t c) override;
+  Result putc(char8_t c) override;
 };
 
 struct CodeInput : InputMode
 {
   CodeInput();
-  Output putc(char8_t c) override;
+  Result putc(char8_t c) override;
 };
 
 } // namespace
