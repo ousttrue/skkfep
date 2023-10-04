@@ -1,6 +1,5 @@
 #include "romkan.h"
 #include "skk.h"
-#include "stty.h"
 #include "terms.h"
 #include <ctype.h>
 #include <sstream>
@@ -53,7 +52,7 @@ flushKana()
   return flushLastConso('\0');
 }
 
-std::string
+skk::Output
 inputKanaVowel(char c)
 {
   auto vowel = vowel_from_char(c);
@@ -72,10 +71,10 @@ inputKanaVowel(char c)
   SmallTU = 0;
   Kindex = {};
   Nconso = 0;
-  return ss.str();
+  return { .Confirmed = ss.str() };
 }
 
-std::string
+skk::Output
 inputKanaConso(char c)
 {
   char notOverwrite = 0;
@@ -106,7 +105,7 @@ inputKanaConso(char c)
         csrLeft(Nconso);
         Nconso = 0;
         Kindex = {};
-        return CurrentTab KANA_NN;
+        return { .Confirmed = CurrentTab KANA_NN };
       }
       Kindex = CON::N;
       break;
@@ -184,14 +183,19 @@ inputKanaConso(char c)
       Kindex = CON::V;
       break;
   }
+
   std::stringstream ss;
   if (!notOverwrite) {
     ss << flushLastConso(c);
   }
   Nconso++;
   LastConso[Nconso] = c;
-  terminal::write1(c);
-  return ss.str();
+
+  char str[] = { c, 0 };
+  return {
+    .Confirmed = ss.str(),
+    .Unconfirmed = str,
+  };
 }
 
 std::string
@@ -276,6 +280,29 @@ hira2kata(char* buf)
       i += 2;
     } else
       i++;
+  }
+}
+
+} // namespace
+
+namespace skk {
+
+KanaInput::KanaInput()
+  : InputMode(InputType::Kana)
+{
+}
+
+Output
+KanaInput::input(uint8_t c)
+{
+  if (vowel_from_char(c)) {
+    return Output{
+      .Confirmed = romkan::iKanaV(c).Output.Confirmed,
+    };
+  } else {
+    return Output{
+      .Unconfirmed = romkan::iKanaC(c).Output.Unconfirmed,
+    };
   }
 }
 

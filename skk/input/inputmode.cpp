@@ -18,18 +18,6 @@ AsciiInput::input(uint8_t c)
 }
 
 //
-KanaInput::
-KanaInput()
-  : InputMode(InputType::Kana)
-{
-}
-
-Output
-KanaInput::input(uint8_t c)
-{
-  return Output{};
-}
-
 //
 CodeInput::
 CodeInput()

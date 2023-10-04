@@ -18,12 +18,28 @@ TEST(InputTest, zenkaku)
   EXPECT_EQ(output.Confirmed, "ａ");
 }
 
-TEST(InputTest, kana)
+TEST(InputTest, kanaVowel)
 {
   skk::KanaInput input;
 
   auto output = input.input('a');
   EXPECT_EQ(output.Confirmed, "あ");
+}
+
+TEST(InputTest, kanaConsonant)
+{
+  skk::KanaInput input;
+
+  {
+    auto output = input.input('k');
+    skk::Output expected{ "", "k" };
+    EXPECT_EQ(output, expected);
+  }
+  {
+    auto output = input.input('a');
+    skk::Output expected{ "か", "" };
+    EXPECT_EQ(output, expected);
+  }
 }
 
 // TEST(InputTest, code)

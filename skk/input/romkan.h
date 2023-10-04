@@ -1,4 +1,5 @@
 #pragma once
+#include "inputmode.h"
 #include "keymap.h"
 #include <assert.h>
 #include <functional>
@@ -106,11 +107,11 @@ std::string
 flushKana();
 
 // 母音
-std::string
+skk::Output
 inputKanaVowel(char c);
 
 // 子音
-std::string
+skk::Output
 inputKanaConso(char c);
 
 std::string
@@ -127,5 +128,15 @@ kanaBS(char c, bool o = {});
 
 void
 hira2kata(char* buf);
+
+} // namespace
+
+namespace skk {
+
+struct KanaInput : InputMode
+{
+  KanaInput();
+  Output input(uint8_t c) override;
+};
 
 } // namespace

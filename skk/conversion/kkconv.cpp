@@ -74,6 +74,11 @@ bufferedInput(std::string_view s)
   }
   return { .Output = { .Unconfirmed = { s.begin(), s.end() } } };
 }
+static skk::Result
+bufferedInput(const skk::Output& output)
+{
+  return bufferedInput(output.Confirmed + output.Unconfirmed);
+}
 
 static skk::Result
 showCand()
@@ -193,8 +198,9 @@ kKanaV(char c, bool)
 }
 
 static skk::Result
-putOkuri(std::string_view s)
+putOkuri(const skk::Output &o)
 {
+  auto s=o.Confirmed + o.Unconfirmed;
   skk::Result output;
   int l = OkuriBufLen;
   output.Output.Unconfirmed += s;

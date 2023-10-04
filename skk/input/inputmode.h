@@ -26,12 +26,6 @@ struct AsciiInput : InputMode
   Output input(uint8_t c) override;
 };
 
-struct KanaInput : InputMode
-{
-  KanaInput();
-  Output input(uint8_t c) override;
-};
-
 struct CodeInput : InputMode
 {
   CodeInput();

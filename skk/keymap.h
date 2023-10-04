@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include <optional>
+#include <ostream>
 #include <stdint.h>
 #include <string>
 
@@ -49,6 +50,11 @@ struct Output
   //   送り未確定？
   std::string Unconfirmed;
 
+  bool operator==(const Output& rhs) const
+  {
+    return Confirmed == rhs.Confirmed && Unconfirmed == rhs.Unconfirmed;
+  }
+
   Output& operator+=(const Output& rhs)
   {
     Confirmed += rhs.Confirmed;
@@ -56,6 +62,13 @@ struct Output
     return *this;
   }
 };
+
+inline std::ostream&
+operator<<(std::ostream& os, const Output& rhs)
+{
+  os << "{" << rhs.Confirmed << ", " << rhs.Unconfirmed << "}";
+  return os;
+}
 
 struct Result
 {
