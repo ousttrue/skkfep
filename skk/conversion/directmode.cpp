@@ -6,7 +6,6 @@ namespace skk {
 Result
 DirectMode::input(uint8_t c)
 {
-  // auto& KanaKeymap = m_keymaps[KeymapTypes::Kana];
   // KanaKeymap.DefaultFunc = romkan::flthru;
   // KanaKeymap.Keymap = {
   //   { '!', zenkakualpha::iZenAl },
@@ -17,17 +16,25 @@ DirectMode::input(uint8_t c)
   //   { ':', zenkakualpha::iZenAl },
   //   { ';', zenkakualpha::iZenAl },
   //   { '?', zenkakualpha::iZenAl },
-  //   { 'A', kkBegV },
-  //   { 'B', kkBegC },
-  //   { 'C', kkBegC },
-  //   { 'D', kkBegC },
-  //   { 'E', kkBegV },
-  //   { 'F', kkBegC },
-  //   { 'G', kkBegC },
-  //   { 'H', kkBegC },
-  //   { 'I', kkBegV },
-  //   { 'J', kkBegC },
-  //   { 'K', kkBegC },
+
+  switch (c) {
+    case 'A':
+    case 'I':
+    case 'U':
+    case 'E':
+    case 'O':
+      return beginEntryModeVowel(c);
+  }
+
+  // case 'B', kkBegC },
+  // case 'C', kkBegC },
+  // case 'D', kkBegC },
+  // case 'F', kkBegC },
+  // case 'G', kkBegC },
+  // case 'H', kkBegC },
+  // case 'J', kkBegC },
+  // case 'K', kkBegC },
+
   //   { 'L',
   //     [](auto, auto) {
   //       return SkkResult{
@@ -38,7 +45,6 @@ DirectMode::input(uint8_t c)
   //     } },
   //   { 'M', kkBegC },
   //   { 'N', kkBegC },
-  //   { 'O', kkBegV },
   //   { 'P', kkBegC },
   //   { 'Q',
   //     [](auto, auto) {
@@ -52,7 +58,6 @@ DirectMode::input(uint8_t c)
   //   { 'R', kkBegC },
   //   { 'S', kkBegC },
   //   { 'T', kkBegC },
-  //   { 'U', kkBegV },
   //   { 'V', kkBegC },
   //   { 'W', kkBegC },
   //   { 'X', kkBegC },
@@ -62,9 +67,18 @@ DirectMode::input(uint8_t c)
   //   { '\\', [self = this](auto, auto) { return g_codeinput.inputCode(self); }
   //   }, { ']', zenkakualpha::iZenEx },
 
-  return {
-    .Output = InputMode->putc(c),
-  };
+  return InputMode->putc(c);
+}
+
+skk::Result
+DirectMode::beginEntryModeVowel(char c)
+{
+  auto res = InputMode->putc(tolower(c));
+  res.NextConversinMode = skk::ConversionType::Entry;
+  res.NextInputMode = skk::InputType::Kana;
+  res.Output.Unconfirmed += res.Output.Confirmed;
+  res.Output.Confirmed.clear();
+  return res;
 }
 
 } // namespace

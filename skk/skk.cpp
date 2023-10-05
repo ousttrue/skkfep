@@ -56,7 +56,6 @@ Skk::Skk(std::string_view _kanaKey)
   //     .NextKeymap = KeymapTypes::Kana,
   //   };
   // };
-  // SelectionKeymap.Keymap[k] = fixIt;
   // CodeInputKeymap.Keymap[k] = [](auto, auto) {
   //   return SkkResult{
   //     .NextKeymap = KeymapTypes::Kana,
@@ -88,7 +87,7 @@ Skk::Skk(std::string_view _kanaKey)
 
 Skk::~Skk()
 {
-  m_SelectionMode->save_dictionary();
+  m_EntryMode->save_dictionary();
 }
 
 void
@@ -106,7 +105,7 @@ Skk::open_dictionary(std::string_view path)
       UserDicName += c;
     }
   }
-  m_SelectionMode->open_dictionary(UserDicName);
+  m_EntryMode->open_dictionary(UserDicName);
 }
 
 Output
@@ -114,13 +113,6 @@ Skk::input(uint8_t c)
 {
   auto result = CurrentMode->input(c);
   apply(result);
-
-  // process result
-  if (result.ReInput) {
-    result = CurrentMode->input(result.ReInput);
-    apply(result);
-  }
-
   return result.Output;
 }
 
@@ -128,21 +120,28 @@ Skk::input(uint8_t c)
 void
 Skk::apply(const Result& result)
 {
+  std::shared_ptr<InputMode> lastInput;
   if (result.NextConversinMode) {
     switch (*result.NextConversinMode) {
       case ConversionType::Direct:
+        lastInput = CurrentMode->InputMode;
         CurrentMode = m_DirectMode;
         break;
 
       case ConversionType::Entry:
+        m_EntryMode->begin(result.Output.Unconfirmed);
+        lastInput = CurrentMode->InputMode;
         CurrentMode = m_EntryMode;
         break;
 
       case ConversionType::Okuri:
+        lastInput = CurrentMode->InputMode;
         CurrentMode = m_OkuriMode;
         break;
 
       case ConversionType::Selection:
+        m_SelectionMode->begin(result.Context);
+        lastInput = CurrentMode->InputMode;
         CurrentMode = m_SelectionMode;
         break;
     }
@@ -166,6 +165,8 @@ Skk::apply(const Result& result)
         CurrentMode->InputMode = m_CodeInput;
         break;
     }
+  } else if (lastInput) {
+    CurrentMode->InputMode = lastInput;
   }
 }
 

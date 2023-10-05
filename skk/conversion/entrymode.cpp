@@ -1,4 +1,5 @@
 #include "entrymode.h"
+#include "dictionary.h"
 
 namespace skk {
 
@@ -27,13 +28,17 @@ namespace skk {
 Result
 EntryMode::input(uint8_t c)
 {
+  switch (c) {
+    case ' ':
+      return kkconv();
+  }
+
   // auto& KanjiInputKeymap = m_keymaps[KeymapTypes::KanjiInput];
   // KanjiInputKeymap.DefaultFunc = nulcmd;
   // KanjiInputKeymap.Keymap = {
   //   { CTRL_G, kfCancel },
   //   { CTRL_H, kfBS },
   //   { CTRL_M, kfFixThru },
-  //   { ' ', kkconv },
   //   { '!', kZenAl },
   //   { '"', kfthru },
   //   { '#', kfthru },
@@ -129,9 +134,83 @@ EntryMode::input(uint8_t c)
   //   { '}', kfthru },
   //   { '~', kfthru },
   // };
-  return {
-    .Output = InputMode->putc(c),
-  };
+  return InputMode->putc(c);
+}
+
+// 検索して変換候補をを表示する
+Result
+EntryMode::kkconv()
+{
+  // kanjiInputEffect(0);
+  // auto output = bufferedInput(romkan::flushLastConso('\0'));
+  // romkan::cancelConso();
+
+  // if (WordBufLen == 0 || (OkuriInput && WordBufLen == 1)) {
+  //   endKanjiInput();
+  //   // output.NextInputMode = KeymapTypes::Selection;
+  // }
+
+  Result res;
+  res.NextConversinMode = ConversionType::Selection;
+
+  res.Context = CandidateSelector(UserDic->getCand(WordBuf));
+  if (res.Context.List) {
+    res.Context.Cand = res.Context.List->begin();
+  } else {
+    res.Context.Cand = {};
+  }
+
+  auto l = WordBuf.size();
+  if (OkuriBuf.size()) {
+    l += OkuriBuf.size();
+  }
+
+  // rubout(l);
+  // static skk::Result
+  // showCand()
+  // {
+  //   kanjiSelectionEffect(1);
+  //   skk::Result output;
+  //   return output;
+  // }
+
+  if (res.Context.IsEnabled()) {
+    // BlockTty = 1;
+    // output += showCand();
+    res.Output.Unconfirmed += *res.Context.Cand;
+    if (OkuriBuf.size()) {
+      res.Output.Unconfirmed += OkuriBuf;
+    }
+    return res;
+  }
+
+  // 候補無かった
+  res.NextConversinMode = skk::ConversionType::Direct;
+  return res;
+}
+
+void
+EntryMode::open_dictionary(std::string_view UserDicName)
+{
+  auto d = new Dictionary;
+  if (d->load(UserDicName)) {
+    UserDic = d;
+  }
+}
+
+void
+EntryMode::save_dictionary()
+{
+  if (UserDic) {
+    printf("Saving JISYO...\n");
+    delete UserDic;
+  }
+}
+
+void
+EntryMode::begin(std::string_view unconfirmed)
+{
+  WordBuf = unconfirmed;
 }
 
 } // namespace

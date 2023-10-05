@@ -10,6 +10,9 @@ struct DirectMode : ConversionMode
   {
   }
   Result input(uint8_t c) override;
+
+private:
+  skk::Result beginEntryModeVowel(char c);
 };
 
 }

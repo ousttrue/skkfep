@@ -1,4 +1,5 @@
 #pragma once
+#include "conversion/dictionary.h"
 #include <functional>
 #include <optional>
 #include <ostream>
@@ -75,13 +76,7 @@ struct Result
   ::skk::Output Output;
   std::optional<ConversionType> NextConversinMode;
   std::optional<InputType> NextInputMode;
-
-  bool RestoreKeymap = false;
-
-  // 再入力
-  // 小文字に変えて再入力
-  char ReInput = 0;
-  bool Okuri = false;
+  CandidateSelector Context;
 
   Result& operator+=(const Result& rhs)
   {
@@ -91,13 +86,6 @@ struct Result
     }
     if (rhs.NextInputMode) {
       NextInputMode = rhs.NextInputMode;
-    }
-    if (rhs.RestoreKeymap) {
-      RestoreKeymap = rhs.RestoreKeymap;
-    }
-    if (rhs.ReInput) {
-      ReInput = rhs.ReInput;
-      Okuri = rhs.Okuri;
     }
     return *this;
   }

@@ -1,4 +1,5 @@
 #include "selectionmode.h"
+#include "ctrlcode.h"
 #include "dictionary.h"
 #include "input/romkan.h"
 #include "terms.h"
@@ -11,56 +12,8 @@
 //
 // short BlockTty;
 // char OkuriFirst;
+
 //
-// static char WordBuf[WORD_BUF_LEN];
-// static int WordBufLen;
-//
-// struct Context
-// {
-//   const CandList* List = nullptr;
-//   std::list<std::string>::const_iterator Cand;
-//
-//   Context() {}
-//
-//   Context(const CandList* list)
-//     : List(list)
-//   {
-//     if (List) {
-//       Cand = List->begin();
-//     }
-//   }
-//
-//   bool IsEnabled()
-//   {
-//     if (List && Cand != List->end()) {
-//       return true;
-//     }
-//     return false;
-//   }
-//
-//   bool Increment()
-//   {
-//     if (IsEnabled()) {
-//       ++Cand;
-//       return true;
-//     }
-//     return false;
-//   }
-//
-//   bool Decrement()
-//   {
-//     if (IsEnabled() && Cand != List->begin()) {
-//       --Cand;
-//       return true;
-//     }
-//     return false;
-//   }
-// };
-//
-// static Context Current;
-// static short OkuriInput;
-// static char OkuriBuf[OKURI_LEN];
-// static int OkuriBufLen;
 //
 // static skk::Result
 // bufferedInput(std::string_view s)
@@ -76,17 +29,6 @@
 //   return bufferedInput(output.Confirmed + output.Unconfirmed);
 // }
 //
-// static skk::Result
-// showCand()
-// {
-//   kanjiSelectionEffect(1);
-//   skk::Result output;
-//   output.Output.Unconfirmed += *Current.Cand;
-//   if (OkuriInput) {
-//     output.Output.Unconfirmed += OkuriBuf;
-//   }
-//   return output;
-// }
 //
 // static skk::Result
 // toOkuri()
@@ -132,16 +74,6 @@
 //   WordBufLen = 0;
 // }
 //
-// skk::Result
-// kkBegV(char c, bool)
-// {
-//   skk::Result output;
-//   output.NextConversinMode = skk::ConversionType::Entry;
-//   kanjiInputEffect(1);
-//   kkClearBuf();
-//   // output += bufferedInput(romkan::inputKanaVowel(tolower(c)));
-//   return output;
-// }
 //
 // skk::Result
 // kkBegC(char c, bool)
@@ -448,53 +380,7 @@
 //   // return output;
 //   return {};
 // }
-//
-// // 検索して変換候補をを表示する
-// skk::Result
-// kkconv(char c, bool)
-// {
-//   // kanjiInputEffect(0);
-//   // auto output = bufferedInput(romkan::flushLastConso('\0'));
-//   // romkan::cancelConso();
-//   // if (WordBufLen == 0 || (OkuriInput && WordBufLen == 1)) {
-//   //   endKanjiInput();
-//   //   // output.NextInputMode = KeymapTypes::Selection;
-//   // }
-//   // // output.NextConversinMode = skk::ConversionType::Selection;
-//   //
-//   // WordBuf[WordBufLen] = '\0';
-//   // Current.List = UserDic->getCand(WordBuf);
-//   // if (Current.List) {
-//   //   Current.Cand = Current.List->begin();
-//   // } else {
-//   //   Current.Cand = {};
-//   // }
-//   //
-//   // int l = WordBufLen;
-//   // if (OkuriInput)
-//   //   l += strlen(OkuriBuf) - 1;
-//   // rubout(l);
-//   // output.NextConversinMode = skk::ConversionType::Selection;
-//   //
-//   // if (Current.IsEnabled()) {
-//   //   BlockTty = 1;
-//   //   output += showCand();
-//   //   return output;
-//   // } else {
-//   //   // 候補無かった
-//   //   if (PreserveOnFailure) {
-//   //     // Really, enter register mode
-//   //     bell();
-//   //     output += backToKanjiInput();
-//   //     return output;
-//   //   } else {
-//   //     endKanjiInput();
-//   //     output.NextConversinMode = skk::ConversionType::Direct;
-//   //     return output;
-//   //   }
-//   // }
-//   return {};
-// }
+
 //
 // skk::Result
 // kOkuri(char c, bool)
@@ -611,25 +497,7 @@
 //   return output;
 // }
 //
-// skk::Result
-// fixIt(char, bool)
-// {
-//   kanjiSelectionEffect(0);
-//   skk::Result output;
-//   if (Current.IsEnabled()) {
-//     auto l = Current.Cand->size();
-//     if (OkuriInput)
-//       l += strlen(OkuriBuf);
-//     csrLeft(l);
-//     output.Output.Confirmed += *Current.Cand;
-//     if (OkuriInput) {
-//       output.Output.Confirmed += OkuriBuf;
-//     }
-//   }
-//   endKanjiInput();
-//   output.NextConversinMode = skk::ConversionType::Direct;
-//   return output;
-// }
+
 //
 // skk::Result
 // thruFixItToAsc(char c, bool o)
@@ -684,6 +552,13 @@ namespace skk {
 Result
 SelectionMode::input(uint8_t c)
 {
+  switch (c) {
+    case CTRL_J:
+      return fixIt();
+  }
+
+  // SelectionKeymap.Keymap[k] = fixIt;
+
   // auto& SelectionKeymap = m_keymaps[KeymapTypes::Selection];
   // SelectionKeymap.DefaultFunc = fxthru;
   // SelectionKeymap.Keymap = {
@@ -692,27 +567,27 @@ SelectionMode::input(uint8_t c)
   //   { '>', stSuffix },     { '?', stSuffix },
   //   { '<', stSuffix },     { EXTRA_CODE, thruFixItToAsc },
   // };
-  return {
-    .Output = InputMode->putc(c),
-  };
+  return InputMode->putc(c);
 }
 
-void
-SelectionMode::open_dictionary(std::string_view UserDicName)
+skk::Result
+SelectionMode::fixIt()
 {
-  auto d = new Dictionary;
-  if (d->load(UserDicName)) {
-    UserDic = d;
+  // kanjiSelectionEffect(0);
+  skk::Result res;
+  if (Candiates.IsEnabled()) {
+    auto l = Candiates.Cand->size();
+    // if (OkuriInput)
+    //   l += strlen(OkuriBuf);
+    csrLeft(l);
+    res.Output.Confirmed += *Candiates.Cand;
+    // if (OkuriInput) {
+    //   res.Output.Confirmed += OkuriBuf;
+    // }
   }
-}
-
-void
-SelectionMode::save_dictionary()
-{
-  if (UserDic) {
-    printf("Saving JISYO...\n");
-    delete UserDic;
-  }
+  // endKanjiInput();
+  res.NextConversinMode = skk::ConversionType::Direct;
+  return res;
 }
 
 } // namespace skk

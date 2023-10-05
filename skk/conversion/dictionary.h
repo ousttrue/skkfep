@@ -31,4 +31,46 @@ private:
   void mergeDictionary(const std::string& dicname);
 };
 
+struct CandidateSelector
+{
+  const CandList* List = nullptr;
+  std::list<std::string>::const_iterator Cand;
+
+  CandidateSelector() {}
+
+  CandidateSelector(const CandList* list)
+    : List(list)
+  {
+    if (List) {
+      Cand = List->begin();
+    }
+  }
+
+  bool IsEnabled()
+  {
+    if (List && Cand != List->end()) {
+      return true;
+    }
+    return false;
+  }
+
+  bool Increment()
+  {
+    if (IsEnabled()) {
+      ++Cand;
+      return true;
+    }
+    return false;
+  }
+
+  bool Decrement()
+  {
+    if (IsEnabled() && Cand != List->begin()) {
+      --Cand;
+      return true;
+    }
+    return false;
+  }
+};
+
 } // namespace
