@@ -9,7 +9,9 @@ skk_lib = static_library('skk', [
   'input/zenkaku.cpp',
 
   'conversion/conversionmode.cpp',
-  'conversion/kkconv.cpp',
+  'conversion/entrymode.cpp',
+  'conversion/okurimode.cpp',
+  'conversion/selectionmode.cpp',
   'conversion/dictionary.cpp',
   ],
   dependencies: [termpty_dep],

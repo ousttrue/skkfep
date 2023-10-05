@@ -62,7 +62,7 @@ namespace skk {
 // }
 
 KanaInput::KanaInput()
-  : InputMode(InputType::Kana)
+  : InputMode(InputType::Kana, "かな")
 {
 }
 

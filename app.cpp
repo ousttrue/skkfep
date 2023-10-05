@@ -1,6 +1,5 @@
 #include "app.h"
 #include "connsh.h"
-#include "conversion/kkconv.h"
 #include "signal_setup.h"
 #include "skk.h"
 #include "statusline.h"
@@ -14,21 +13,14 @@
 
 #define IF_STOPPED(x) WIFSTOPPED(x)
 
-App::
-App()
-{
-}
+App::App() {}
 
-App::~
-App()
-{
-}
+App::~App() {}
 
 void
 App::Exit(int code)
 {
   PtyFree();
-  SaveJisyo();
   exit(code);
 }
 
@@ -36,7 +28,6 @@ void
 App::Abort()
 {
   PtyFree();
-  SaveJisyo();
   signal(SIGQUIT, SIG_DFL);
   signal(SIGIOT, SIG_DFL);
   abort();
@@ -54,15 +45,6 @@ void
 App::PtyFree()
 {
   child::freeDevice();
-}
-
-void
-App::SaveJisyo()
-{
-  if (UserDic) {
-    printf("Saving JISYO...\n");
-    delete UserDic;
-  }
 }
 
 bool
@@ -129,7 +111,8 @@ App::Run()
 
     // read pty out
     if (FD_ISSET(child::Shellfd, &selfds)) {
-      if (!BlockTty) {
+      // if (!BlockTty)
+      {
         char shellBuf[SH_BUF_SIZ];
         auto i = read(child::Shellfd, shellBuf, SH_BUF_SIZ);
         if (i > 0) {
@@ -144,7 +127,7 @@ App::Run()
       int i;
       if (ioctl(0, FIONREAD, &i) == 0) {
         for (; i; --i) {
-          OkuriFirst = 0;
+          // OkuriFirst = 0;
 
           int c = getchar();
 
@@ -172,7 +155,7 @@ App::Run()
               last_statusline = statusline;
             }
 
-            okuri = OkuriFirst;
+            // okuri = OkuriFirst;
           }
         }
       }

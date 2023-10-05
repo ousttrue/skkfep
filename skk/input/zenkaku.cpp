@@ -130,7 +130,7 @@ zen(char8_t c)
 namespace skk {
 
 ZenkakuInput::ZenkakuInput()
-  : InputMode(InputType::Zenkaku)
+  : InputMode(InputType::Zenkaku, "全角")
 {
 }
 

@@ -1,6 +1,5 @@
 #include "skk.h"
 #include "conversion/dictionary.h"
-#include "conversion/kkconv.h"
 #include <assert.h>
 
 static int
@@ -87,7 +86,10 @@ Skk::Skk(std::string_view _kanaKey)
   CurrentMode->InputMode = m_AsciiInput;
 }
 
-Skk::~Skk() {}
+Skk::~Skk()
+{
+  m_SelectionMode->save_dictionary();
+}
 
 void
 Skk::open_dictionary(std::string_view path)
@@ -104,10 +106,7 @@ Skk::open_dictionary(std::string_view path)
       UserDicName += c;
     }
   }
-  auto d = new Dictionary;
-  if (d->load(UserDicName)) {
-    UserDic = d;
-  }
+  m_SelectionMode->open_dictionary(UserDicName);
 }
 
 Output

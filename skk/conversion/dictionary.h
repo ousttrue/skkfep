@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <vector>
 
+namespace skk {
+
 using CandList = std::list<std::string>;
 
 struct Dictionary
@@ -17,8 +19,8 @@ private:
   time_t mtime;
 
 public:
-  Dictionary(){}
-  ~Dictionary(){}
+  Dictionary() {}
+  ~Dictionary() {}
   Dictionary(const Dictionary&) = delete;
   Dictionary& operator=(const Dictionary&) = delete;
 
@@ -28,3 +30,5 @@ public:
 private:
   void mergeDictionary(const std::string& dicname);
 };
+
+} // namespace

@@ -2,6 +2,8 @@
 #include <assert.h>
 #include <sys/stat.h>
 
+namespace skk {
+
 // Check if word is an OKURI-ARI entry or not
 static bool
 isConjugate(std::string_view word)
@@ -254,3 +256,5 @@ Dictionary::mergeDictionary(const std::string& dicname)
     fclose(f);
   }
 }
+
+} // namespace

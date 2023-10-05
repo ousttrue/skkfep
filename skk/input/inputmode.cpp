@@ -4,7 +4,7 @@
 namespace skk {
 
 AsciiInput::AsciiInput()
-  : InputMode(InputType::Ascii)
+  : InputMode(InputType::Ascii, "ASCII")
 {
 }
 
@@ -55,7 +55,7 @@ AsciiInput::putc(char8_t c)
 //
 //
 CodeInput::CodeInput()
-  : InputMode(InputType::Code)
+  : InputMode(InputType::Code, "文字コード")
 {
 }
 

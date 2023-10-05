@@ -9,7 +9,11 @@ struct InputMode
   std::string Statusline;
 
 protected:
-  InputMode(InputType type) {}
+  InputMode(InputType type, std::string_view statusline)
+    : Type(type)
+    , Statusline(statusline)
+  {
+  }
 
 public:
   virtual ~InputMode() {}

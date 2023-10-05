@@ -1,8 +1,9 @@
 #pragma once
-#include "conversion/conversionmode.h"
+#include "conversion/entrymode.h"
+#include "conversion/okurimode.h"
+#include "conversion/selectionmode.h"
 #include "input/romkan.h"
 #include "input/zenkaku.h"
-#include "keymap.h"
 #include <assert.h>
 
 namespace skk {

@@ -1,5 +1,5 @@
 #include "app.h"
-#include "conversion/kkconv.h"
+#include "skk.h"
 #include "statusline.h"
 #include "version.h"
 #include <pwd.h>
@@ -9,12 +9,15 @@
 #include <unistd.h>
 #include <wait.h>
 
+#define PRESERVE_ON_FAILURE 1 /* preserve candidate on conversion failure */
+
 struct Args
 {
   std::string KanaKey;
   std::string UserDicName;
   std::string ShellName;
   char** ShellArg = NULL;
+  bool PreserveOnFailure = PRESERVE_ON_FAILURE;
 
   bool Parse(int argc, char** argv)
   {

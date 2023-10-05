@@ -30,5 +30,4 @@ public:
 
 private:
   void PtyFree();
-  void SaveJisyo();
 };

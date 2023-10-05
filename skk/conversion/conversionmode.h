@@ -32,31 +32,4 @@ struct DirectMode : ConversionMode
   Result input(uint8_t c) override;
 };
 
-struct EntryMode : ConversionMode
-{
-  EntryMode()
-    : ConversionMode(ConversionType::Entry, "漢字")
-  {
-  }
-  Result input(uint8_t c) override;
-};
-
-struct OkuriMode : ConversionMode
-{
-  OkuriMode()
-    : ConversionMode(ConversionType::Okuri, "送り")
-  {
-  }
-  Result input(uint8_t c) override;
-};
-
-struct SelectionMode : ConversionMode
-{
-  SelectionMode()
-    : ConversionMode(ConversionType::Selection, "選択")
-  {
-  }
-  Result input(uint8_t c) override;
-};
-
 } // namespace
