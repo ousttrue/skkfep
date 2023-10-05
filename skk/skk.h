@@ -1,4 +1,5 @@
 #pragma once
+#include "conversion/directmode.h"
 #include "conversion/entrymode.h"
 #include "conversion/okurimode.h"
 #include "conversion/selectionmode.h"

@@ -1,4 +1,4 @@
-#include "conversionmode.h"
+#include "directmode.h"
 #include "ctrlcode.h"
 
 namespace skk {
@@ -9,7 +9,6 @@ DirectMode::input(uint8_t c)
   // auto& KanaKeymap = m_keymaps[KeymapTypes::Kana];
   // KanaKeymap.DefaultFunc = romkan::flthru;
   // KanaKeymap.Keymap = {
-  //   { CTRL_H, romkan::kanaBS },
   //   { '!', zenkakualpha::iZenAl },
   //   { ',', zenkakualpha::iZenAl },
   //   { '-', zenkakualpha::iZenEx },

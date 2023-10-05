@@ -99,6 +99,8 @@ struct KanaInput : InputMode
 private:
   Output inputKanaVowel(char c);
   Output inputKanaConso(char c);
+  Output backSpace();
+  void clear();
   std::string flushLastConso(char c);
   std::string flushKana() { return flushLastConso('\0'); }
   const KanaTable& currentTab() const;

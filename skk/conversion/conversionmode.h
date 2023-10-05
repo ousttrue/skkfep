@@ -23,13 +23,4 @@ public:
   virtual Result input(uint8_t c) = 0;
 };
 
-struct DirectMode : ConversionMode
-{
-  DirectMode()
-    : ConversionMode(ConversionType::Direct, "直接")
-  {
-  }
-  Result input(uint8_t c) override;
-};
-
 } // namespace

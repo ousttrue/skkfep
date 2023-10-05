@@ -1,4 +1,5 @@
 #include "romkan.h"
+#include "ctrlcode.h"
 #include "skk.h"
 #include "terms.h"
 #include <ctype.h>
@@ -12,54 +13,6 @@ extern skk::KanaTable HiraTab;
 extern skk::KanaTable KataTab;
 
 namespace skk {
-
-// void
-// cancelConso()
-// {
-//   rubout(Nconso);
-//   Nconso = 0;
-//   Kindex = {};
-//   SmallTU = 0;
-// }
-//
-// skk::Result
-// kanaBS(char c, bool)
-// {
-//   skk::Result output;
-//   if (Nconso) {
-//     int n = Nconso;
-//     char con[MAX_CONSO];
-//     for (int i = 1; i < Nconso; i++)
-//       con[i] = LastConso[i];
-//     cancelConso();
-//     for (int i = 1; i < n; i++)
-//       output += iKanaC(con[i]);
-//   } else {
-//     output.Output.Confirmed += c;
-//   }
-//   return output;
-// }
-//
-// void
-// hira2kata(char* buf)
-// {
-//   int i = 0;
-//   while (buf[i]) {
-//     if (buf[0] & 0x80) {
-//       for (int j = 0; j <= (int)CON::NN; j++) {
-//         for (int k = 0; k < 5; k++) {
-//           if (!strncmp(&buf[i], HiraTab[j][k], 2)) {
-//             strncpy(&buf[i], KataTab[j][k], 2);
-//             goto brk1;
-//           }
-//         }
-//       }
-//     brk1:
-//       i += 2;
-//     } else
-//       i++;
-//   }
-// }
 
 KanaInput::KanaInput()
   : InputMode(InputType::Kana, "かな")
@@ -79,24 +32,42 @@ KanaInput::currentTab() const
 Result
 KanaInput::putc(char8_t c)
 {
-  if (c == 'l') {
-    return {
-      .Output = { .Confirmed = flushKana() },
-      .NextInputMode = InputType::Ascii,
-    };
-  } else if (c == 'q') {
-    IsHiragana = !IsHiragana;
-    return { .Output = { .Confirmed = flushKana() } };
+  switch (c) {
+    case CTRL_H:
+      return { .Output = backSpace() };
+
+    case 'l':
+      // ascii mode
+      return {
+        .Output = { .Confirmed = flushKana() },
+        .NextInputMode = InputType::Ascii,
+      };
+
+    case 'L':
+      // 全角mode
+      return {
+        .Output = { .Confirmed = flushKana() },
+        .NextInputMode = InputType::Zenkaku,
+      };
+
+    case 'q':
+      // toggle: ひらがな<>カタカナ
+      IsHiragana = !IsHiragana;
+      return { .Output = { .Confirmed = flushKana() } };
   }
+
+  // 母音
   if (vowel_from_char(c)) {
     return { .Output = inputKanaVowel(c) };
-  } else {
-    return {
-      .Output = inputKanaConso(c),
-    };
   }
+
+  // 子音
+  return {
+    .Output = inputKanaConso(c),
+  };
 }
 
+// 母音
 skk::Output
 KanaInput::inputKanaVowel(char c)
 {
@@ -108,12 +79,11 @@ KanaInput::inputKanaVowel(char c)
   } else {
     ss << currentTab().m_table[(int)Kindex][(int)*vowel];
   }
-  SmallTU = false;
-  Kindex = {};
-  Consonant.clear();
+  clear();
   return { .Confirmed = ss.str() };
 }
 
+// 子音
 skk::Output
 KanaInput::inputKanaConso(char c)
 {
@@ -234,6 +204,30 @@ KanaInput::inputKanaConso(char c)
     .Confirmed = ss.str(),
     .Unconfirmed = str,
   };
+}
+
+skk::Output
+KanaInput::backSpace()
+{
+  skk::Output output;
+  if (Consonant.size()) {
+    auto con = Consonant;
+    clear();
+    for (auto c : con) {
+      output += inputKanaConso(c);
+    }
+  } else {
+    output.Confirmed.push_back(CTRL_H);
+  }
+  return output;
+}
+
+void
+KanaInput::clear()
+{
+  Consonant.clear();
+  Kindex = {};
+  SmallTU = 0;
 }
 
 std::string

@@ -8,7 +8,7 @@ skk_lib = static_library('skk', [
   'input/codeinput.cpp',
   'input/zenkaku.cpp',
 
-  'conversion/conversionmode.cpp',
+  'conversion/directmode.cpp',
   'conversion/entrymode.cpp',
   'conversion/okurimode.cpp',
   'conversion/selectionmode.cpp',

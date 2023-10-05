@@ -2,6 +2,28 @@
 
 namespace skk {
 
+//
+// void
+// hira2kata(char* buf)
+// {
+//   int i = 0;
+//   while (buf[i]) {
+//     if (buf[0] & 0x80) {
+//       for (int j = 0; j <= (int)CON::NN; j++) {
+//         for (int k = 0; k < 5; k++) {
+//           if (!strncmp(&buf[i], HiraTab[j][k], 2)) {
+//             strncpy(&buf[i], KataTab[j][k], 2);
+//             goto brk1;
+//           }
+//         }
+//       }
+//     brk1:
+//       i += 2;
+//     } else
+//       i++;
+//   }
+// }
+
 Result
 EntryMode::input(uint8_t c)
 {
